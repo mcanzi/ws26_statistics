@@ -15,8 +15,8 @@ output:
     reveal_options:
       width: 1050
       height: 700
-      slideNumber: true
-      showSlideNumber: print
+      slideNumber: "c/t"
+      showSlideNumber: all
       controls: true
       touch: true
       transitionSpeed: fast
