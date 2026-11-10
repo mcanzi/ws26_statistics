@@ -3,7 +3,7 @@
    beige and paper white, sumi-ink text, indian reds for headings and accents,
    a muted teal for links, and cherry blossoms over the background.
    One of three themes for Statistics for Linguists, made to match
-   mcanzi.github.io: theme-dark.css, theme-light.css, theme-doglord.css.
+   mcanzi.github.io: theme-dark.css, theme-light.css, theme-purple.css.
    All three share the same rules; only the palette and the background
    differ. */
 
@@ -81,7 +81,7 @@
 }
 
 /* ---- canvas: the website's background drawings, faint, in tiles -------
-   The tile is img/motifs/rafflesia.svg, sakura.svg or doglord-flames.svg
+   The tile is img/motifs/rafflesia.svg, sakura.svg or flames.svg
    from mcanzi.github.io, with its opacity built in. */
 
 .reveal-viewport,

@@ -1,9 +1,9 @@
-/* theme-doglord.css
-   The Doglord theme of mcanzi.github.io for {revealjs}: black and violet,
+/* theme-purple.css
+   The purple theme of mcanzi.github.io for {revealjs}: black and violet,
    candle gold for accents, a faint film grain, a dark vignette and orange
    flames over the background, after early-seventies heavy metal sleeves.
    One of three themes for Statistics for Linguists, made to match
-   mcanzi.github.io: theme-dark.css, theme-light.css, theme-doglord.css.
+   mcanzi.github.io: theme-dark.css, theme-light.css, theme-purple.css.
    All three share the same rules; only the palette and the background
    differ. */
 
@@ -81,7 +81,7 @@
 }
 
 /* ---- canvas: the website's background drawings, faint, in tiles -------
-   The tile is img/motifs/rafflesia.svg, sakura.svg or doglord-flames.svg
+   The tile is img/motifs/rafflesia.svg, sakura.svg or flames.svg
    from mcanzi.github.io, with its opacity built in. */
 
 .reveal-viewport,
@@ -618,7 +618,7 @@ body {
   margin-bottom: 1.1em;
 }
 
-/* ---- Doglord only: headings glow faintly, as on the website ---------- */
+/* ---- purple theme only: headings glow faintly, as on the website ----- */
 
 .reveal h1,
 .reveal h2 { text-shadow: 0 0 22px rgba(157, 107, 240, 0.35); }

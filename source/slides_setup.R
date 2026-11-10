@@ -9,7 +9,7 @@ slide_palettes <- list(
     mist = "#2b2723", moss = "#8a8c74", muted = "#6e675e", floor_col = "#f3eee5",
     vine = "#e0d8cb", dim_col = "#ebe4d8", qr_dark = "#2b2723", qr_light = "#fbf9f5"
   ),
-  doglord = list(
+  purple = list(
     pandan = "#9d6bf0", hornbill = "#c9a23f", kingfisher = "#e2772f", orchid = "#d16fb8",
     mist = "#e7e0f2", moss = "#8a7aa6", muted = "#9b8fb0", floor_col = "#0c0911",
     vine = "#2f2541", dim_col = "#1c1527", qr_dark = "#0c0911", qr_light = "#e7e0f2"
