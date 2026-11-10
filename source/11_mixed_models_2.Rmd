@@ -1,0 +1,543 @@
+---
+title: "Mixed models 2"
+subtitle: "Fitting, testing and troubleshooting"
+author: "Dr Massimiliano Canzi"
+knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirname(input), "..", "docs")))
+output:
+  revealjs::revealjs_presentation:
+    theme: black
+    css: theme-doglord.css
+    highlight: zenburn
+    mathjax: null
+    incremental: true
+    transition: fade
+    background_transition: fade
+    self_contained: true
+    reveal_options:
+      width: 1050
+      height: 700
+      slideNumber: true
+      showSlideNumber: print
+      controls: true
+      touch: true
+      transitionSpeed: fast
+      navigationMode: linear
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      comment = "",
+                      fig.width = 10, fig.height = 4.4, out.width = "100%")
+
+library(tidyverse)
+library(lme4)
+
+source("slides_setup.R", local = knitr::knit_global())
+
+options(width = 72, pillar.print_min = 4, pillar.print_max = 4)
+```
+
+# Mixed models in practice
+
+<style>
+  :root {
+    --footer-text:  "Mixed models 2";
+    --qr:           `r qr_css`;
+    --lecture:      `r lecture_label`;
+  }
+</style>
+
+::: {.fact}
+`Did you know:` [octopus]{.hl} has three English plurals: _octopuses_, _octopi_ (the oldest, from the idea that a Latin-looking word needs a Latin ending) and the rare _octopodes_ (from the idea that it is Greek).
+
+_Source: Merriam-Webster_
+:::
+
+## Today
+
+- Simulating a data set where we [know]{.hl} the truth
+- Fitting and [reading]{.hl} an `lmer()` model
+- [Extracting]{.hl} estimates, random effects, confidence intervals and predictions
+- [Significance testing]{.hl}: likelihood ratio tests
+- [Common mistakes]{.hl}, made on purpose
+- `R²`, convergence problems and singular fits
+
+## Last week
+
+- Repeated measures are [not independent]{.hl}: data from the same speaker or word are alike
+- Mixed models add [varying intercepts]{.hl} and [varying slopes]{.hl} for each grouping factor
+- `(1 + x | speaker)` for predictors that vary within speakers; `(1 | word)` when x does not vary within words
+- Without varying slopes, standard errors are [too small]{.hl}
+
+. . .
+
+Today: doing it properly, from simulation to write-up.
+
+# Simulating vowel durations
+
+## Why simulate?
+
+With real data, we never know the [true]{.hl} effects. With simulated data, we do, so we can check whether the model [recovers]{.hl} them.
+
+. . .
+
+Like Winter (2019, section 15.2), we simulate vowel durations. Our design:
+
+- [16]{.hl} speakers each read the same [24]{.hl} words
+- Half the words end in a [voiced]{.hl} consonant, half in a [voiceless]{.hl} one
+- True voicing effect: vowels [20 ms]{.hl} longer before voiced consonants
+
+## The simulation {.smaller}
+
+```{r}
+set.seed(1)
+n_speakers <- 16
+n_words    <- 24
+
+speakers <- tibble(speaker = sprintf("S%02d", 1:n_speakers),
+                   s0 = rnorm(n_speakers, 0, 25),     # speaker's own speed
+                   s1 = rnorm(n_speakers, 0, 12))     # speaker's own voicing effect
+words <- tibble(word    = sprintf("w%02d", 1:n_words),
+                voicing = rep(c("voiceless", "voiced"), each = n_words / 2),
+                w0      = rnorm(n_words, 0, 15))     # word's own duration
+
+vowels <- crossing(speakers, words) |>
+  mutate(duration = round(150 + s0 + w0 +
+                          (20 + s1) * (voicing == "voiced") +
+                          rnorm(n(), 0, 20)),
+         voicing = factor(voicing, levels = c("voiceless", "voiced"))) |>
+  select(speaker, word, voicing, duration)
+```
+
+. . .
+
+`(voicing == "voiced")` is `TRUE` or `FALSE`, which R treats as [1]{.hl} or [0]{.hl}: a dummy variable, as in lecture 7.
+
+## The data
+
+```{r, echo = FALSE, fig.height = 4.4}
+vowels |>
+  summarise(duration = mean(duration), .by = c(speaker, voicing)) |>
+  ggplot(aes(x = voicing, y = duration, group = speaker)) +
+  geom_line(colour = kingfisher, alpha = 0.6, linewidth = 0.8) +
+  geom_point(colour = kingfisher, size = 2) +
+  stat_summary(aes(group = 1), fun = mean, geom = "line", colour = hornbill, linewidth = 2) +
+  labs(x = "Following consonant", y = "Mean vowel duration (ms)")
+```
+
+One line per speaker (blue), and the overall means (orange). Speakers differ in [speed]{.hl} and in the [size]{.hl} of their voicing effect.
+
+# Fitting the model
+
+::: {.fact}
+`Did you know:` octopuses have [three hearts]{.hl} and blue blood: their blood carries oxygen with copper-based hemocyanin, not iron-based haemoglobin.
+
+_Source: Smithsonian Magazine_
+:::
+
+## Which random effects?
+
+- `speaker`: every speaker produces voiced [and]{.hl} voiceless words, so voicing varies [within]{.hl} speakers: `(1 + voicing | speaker)`
+- `word`: each word is either voiced or voiceless, so voicing does [not]{.hl} vary within words: `(1 | word)`
+
+. . .
+
+```{r}
+m <- lmer(duration ~ voicing + (1 + voicing | speaker) + (1 | word),
+          data = vowels)
+```
+
+. . .
+
+The maximal random effects structure [justified by the design]{.hl} (Barr et al., 2013, lecture 10).
+
+## `summary()` {.smaller}
+
+```{r}
+summary(m)
+```
+
+## Reading the output
+
+- __REML criterion__: the fit statistic for REML estimation (more on REML below)
+- __Random effects__: the [variances]{.hl} and [SDs]{.hl} of the varying effects, and their correlation
+- __Fixed effects__: estimates, SEs and t values, read exactly as in `lm()`
+- __Correlation of fixed effects__: how the estimates of the fixed effects covary. Rarely of interest
+
+. . .
+
+The voicing effect is estimated at `r round(fixef(m)["voicingvoiced"], 1)` ms (truth: 20). The intercept, `r round(fixef(m)[1], 1)` ms, is the mean duration before voiceless consonants (truth: 150).
+
+## Where are the p-values?
+
+`lme4` deliberately does not print p-values for the fixed effects.
+
+. . .
+
+For a t-test, we need the [degrees of freedom]{.hl}. In a mixed model, it is not clear what they are: 384 observations? 16 speakers? 24 words? Something in between?
+
+. . .
+
+Several solutions exist. We will look at two: [likelihood ratio tests]{.hl}, and approximate degrees of freedom with `{lmerTest}`.
+
+# Extracting information
+
+::: {.fact}
+`Did you know:` about [two-thirds]{.hl} of an octopus's neurons are in its arms, not its head, so each arm can act semi-independently.
+
+_Source: Smithsonian Magazine_
+:::
+
+## Fixed effects and their SEs
+
+```{r}
+fixef(m)
+coef(summary(m))
+```
+
+## Random effects
+
+```{r}
+VarCorr(m)
+sigma(m)              # the residual SD
+```
+
+. . .
+
+`VarCorr()` gives the SDs of the random effects. Speakers' voicing effects vary with an SD of about `r round(attr(VarCorr(m)$speaker, "stddev")[2], 1)` ms around the average of `r round(fixef(m)[2], 1)` ms.
+
+## Each speaker's estimates {.smaller}
+
+`ranef()`: each speaker's [adjustment]{.hl} to the fixed effects. `coef()`: fixed effects [plus]{.hl} adjustments, that is each speaker's own estimates.
+
+```{r}
+head(ranef(m)$speaker, 3)
+head(coef(m)$speaker, 3)
+```
+
+. . .
+
+Speaker S01's voicing effect: `r round(fixef(m)[2], 2)` + `r round(ranef(m)$speaker[1, 2], 2)` = `r round(coef(m)$speaker[1, 2], 2)` ms.
+
+## Confidence intervals
+
+```{r}
+confint(m, parm = "beta_", method = "profile")
+```
+
+. . .
+
+`parm = "beta_"` asks for the fixed effects only. Profile intervals can be slow for large models; `method = "Wald"` is a quick approximation:
+
+```{r}
+confint(m, parm = "beta_", method = "Wald")
+```
+
+## Predictions {.smaller}
+
+`re.form = NA`: the [population-level]{.hl} prediction, for an average speaker and an average word:
+
+```{r}
+new <- tibble(voicing = factor(c("voiceless", "voiced"), levels = levels(vowels$voicing)))
+predict(m, newdata = new, re.form = NA)
+```
+
+. . .
+
+Without `re.form = NA`, the prediction includes the random effects: here, speaker S01 reading word w01:
+
+```{r}
+predict(m, newdata = tibble(speaker = "S01", word = "w01", voicing = new$voicing[1]))
+```
+
+For a [new]{.hl} speaker, not in the data, only the population-level prediction makes sense.
+
+# Significance testing
+
+::: {.fact}
+`Did you know:` octopus ink does more than hide: it contains [tyrosinase]{.hl}, which irritates a predator's eyes and garbles its senses of smell and taste.
+
+_Source: Smithsonian Magazine_
+:::
+
+## Likelihood ratio tests
+
+Compare two [nested]{.hl} models: one with the predictor, one without it, and the [same]{.hl} random effects.
+
+```{r}
+m_null <- lmer(duration ~ 1 + (1 + voicing | speaker) + (1 | word),
+               data = vowels, REML = FALSE)
+m_full <- lmer(duration ~ voicing + (1 + voicing | speaker) + (1 | word),
+               data = vowels, REML = FALSE)
+```
+
+. . .
+
+Does adding `voicing` improve the fit by more than we would expect by chance?
+
+## `anova()`
+
+```{r}
+anova(m_null, m_full)
+```
+
+. . .
+
+The full model fits much better: χ²(`r anova(m_null, m_full)$Df[2]`) = `r round(anova(m_null, m_full)$Chisq[2], 2)`, p = `r signif(anova(m_null, m_full)$"Pr(>Chisq)"[2], 2)`.
+
+## What the test does
+
+- Each model has a __log-likelihood__: how probable the data are under the model's estimates
+- The more complex model always fits at least as well
+- Twice the difference in log-likelihood is compared with a [χ² distribution]{.hl}, with df = the difference in the number of parameters
+
+. . .
+
+Here the models differ by [one]{.hl} parameter, the voicing effect, so the test has [1]{.hl} df.
+
+## REML or ML?
+
+- `lmer()` uses __REML__ (restricted maximum likelihood) by default: better estimates of the [variances]{.hl}
+- To compare models that differ in their [fixed effects]{.hl}, the likelihoods must come from __ML__: `REML = FALSE`
+
+. . .
+
+If you forget, `anova()` refits the models with ML for you, and says so:
+
+```{r, message = TRUE}
+m_reml <- lmer(duration ~ voicing + (1 + voicing | speaker) + (1 | word), data = vowels)
+m_reml_null <- update(m_reml, . ~ . - voicing)
+anova(m_reml_null, m_reml)$"Pr(>Chisq)"
+```
+
+## p-values with `{lmerTest}`
+
+`{lmerTest}` (Kuznetsova, Brockhoff & Christensen, 2017) adds approximate degrees of freedom and p-values to `summary()`:
+
+```{r}
+library(lmerTest)
+m_lt <- lmer(duration ~ voicing + (1 + voicing | speaker) + (1 | word), data = vowels)
+coef(summary(m_lt))
+```
+
+```{r, include = FALSE}
+detach("package:lmerTest", unload = TRUE)
+```
+
+. . .
+
+The df are estimated with the [Satterthwaite]{.hl} method: here about `r round(coef(summary(m_lt))[2, "df"])`, much closer to the number of speakers and words than to 384 observations.
+
+## Reporting
+
+```{r, echo = FALSE}
+ci <- confint(m, parm = "beta_", method = "profile")
+lrt <- anova(m_null, m_full)
+```
+
+> Vowels were `r round(fixef(m)[2], 1)` ms longer before voiced than before voiceless consonants (95% CI [`r round(ci[2, 1], 1)`, `r round(ci[2, 2], 1)`]). A likelihood ratio test against a model without voicing showed that this effect was reliable, χ²(1) = `r round(lrt$Chisq[2], 2)`, p = `r signif(lrt$"Pr(>Chisq)"[2], 2)`.
+
+. . .
+
+Also report the [random effects structure]{.hl}: "The model included by-speaker random intercepts and random slopes for voicing, and by-word random intercepts."
+
+# Common mistakes
+
+## A slope that cannot exist
+
+What if we add a random slope for voicing [by word]{.hl}?
+
+```{r, warning = TRUE, message = TRUE}
+m_bad <- lmer(duration ~ voicing + (1 + voicing | speaker) + (1 + voicing | word),
+              data = vowels)
+```
+
+. . .
+
+Each word is [either]{.hl} voiced or voiceless, so a by-word voicing slope is impossible to estimate. The model cannot converge to a sensible answer: always check [which]{.hl} slopes your design supports.
+
+## Forgetting the random slopes
+
+```{r}
+m_int_only <- lmer(duration ~ voicing + (1 | speaker) + (1 | word), data = vowels)
+
+c(with_slopes    = coef(summary(m))["voicingvoiced", "Std. Error"],
+  without_slopes = coef(summary(m_int_only))["voicingvoiced", "Std. Error"])
+```
+
+. . .
+
+Here the difference is [small]{.hl}: speakers' voicing effects vary little (SD ≈ `r round(attr(VarCorr(m)$speaker, "stddev")[2], 1)` ms). The more slopes vary across speakers, the bigger the gap: in lecture 10, the SE went from 1.5 to 4.2 ms.
+
+# Remaining issues
+
+::: {.fact}
+`Did you know:` in 2016, Inky, a common octopus at the National Aquarium of New Zealand in Napier, [escaped]{.hl}: he squeezed through a gap in his tank lid, crossed the floor and slid down a drainpipe to the sea.
+
+_Source: RNZ_
+:::
+
+## R² for mixed models {.smaller}
+
+There is no single R². Nakagawa and Schielzeth (2013) distinguish:
+
+- __Marginal R²__: variance explained by the [fixed effects]{.hl} alone
+- __Conditional R²__: variance explained by fixed [and]{.hl} random effects
+
+. . .
+
+For a model with random intercepts, both are simple ratios of variance components:
+
+```{r}
+m_ri <- lmer(duration ~ voicing + (1 | speaker) + (1 | word), data = vowels)
+var_fixed  <- var(predict(m_ri, re.form = NA))
+var_random <- sum(as.data.frame(VarCorr(m_ri))$vcov[1:2])
+var_resid  <- sigma(m_ri)^2
+
+c(marginal    = var_fixed / (var_fixed + var_random + var_resid),
+  conditional = (var_fixed + var_random) / (var_fixed + var_random + var_resid))
+```
+
+## Reading R² for mixed models
+
+- Voicing alone accounts for only about `r round(100 * var_fixed / (var_fixed + var_random + var_resid))`% of the variation
+- With speakers and words, about `r round(100 * (var_fixed + var_random) / (var_fixed + var_random + var_resid))`%: most variation is [between speakers and words]{.hl}
+
+. . .
+
+For models with random slopes, use a package, e.g. `MuMIn::r.squaredGLMM()`.
+
+## Convergence warnings
+
+Mixed models are fitted by an [optimiser]{.hl}, which searches for the best parameter values. Sometimes it does not finish cleanly:
+
+```
+Model failed to converge with max|grad| = 0.0066 (tol = 0.002)
+```
+
+. . .
+
+A warning, not an error: R still returns a model. But do not report it without checking.
+
+## What to do {.smaller}
+
+1. Check the [data]{.hl} and the [design]{.hl}: is every random slope possible? (see above)
+2. [Centre]{.hl} or [scale]{.hl} continuous predictors (lecture 5)
+3. Try a different [optimiser]{.hl}: `lmer(..., control = lmerControl(optimizer = "bobyqa"))`
+4. Compare [all]{.hl} optimisers with `allFit(model)`: if they agree, the warning is usually harmless
+5. [Simplify]{.hl} the random effects: first remove the correlations with `||`, then slopes with the least variance. `||` only works for `numeric` predictors: code a factor like voicing as 0/1 first
+
+. . .
+
+Barr et al. (2013) recommend starting maximal; Matuschek et al. (2017) show that maximal models can [lose power]{.hl}, and recommend keeping only the random effects the data support.
+
+## Singular fits
+
+```
+boundary (singular) fit: see help('isSingular')
+```
+
+. . .
+
+The model estimated a random-effect [variance]{.hl} of zero, or a [correlation]{.hl} of exactly ±1: the data cannot support that part of the random effects structure.
+
+```{r}
+isSingular(m)
+```
+
+. . .
+
+If a model is singular, consider simplifying the random effects (point 5 above), and report what you did.
+
+## Shrinkage and individual differences
+
+```{r, echo = FALSE, fig.height = 3.6}
+own <- vowels |>
+  summarise(own = mean(duration[voicing == "voiced"]) - mean(duration[voicing == "voiceless"]),
+            .by = speaker)
+shr <- own |>
+  left_join(coef(m)$speaker |> rownames_to_column("speaker") |>
+              select(speaker, model = voicingvoiced), by = "speaker") |>
+  mutate(speaker = fct_reorder(speaker, own))
+
+ggplot(shr, aes(y = speaker)) +
+  geom_vline(xintercept = fixef(m)[2], colour = mist, linetype = "dashed") +
+  geom_segment(aes(x = own, xend = model, yend = speaker), colour = moss,
+               arrow = arrow(length = unit(0.15, "cm"))) +
+  geom_point(aes(x = own), colour = orchid, size = 2.5) +
+  geom_point(aes(x = model), colour = kingfisher, size = 2.5) +
+  labs(x = "Voicing effect (ms)", y = NULL) +
+  theme(axis.text.y = element_text(size = 9))
+```
+
+Pink: each speaker's raw voicing effect. Blue: the model's estimate, [shrunk]{.hl} towards the average. When interpreting individual speakers, remember that their estimates borrow strength from everyone else.
+
+# Your turn
+
+## Real data: `lexdec`
+
+The `lexdec` data from `{languageR}` (Baayen, 2008): 21 participants made lexical decisions on 79 English words. `RT` is the log reaction time; 12 participants are native speakers of English, 9 are not.
+
+```{r}
+library(languageR)
+lexdec |> select(Subject, Word, RT, Frequency, NativeLanguage) |> head(3)
+```
+
+## Exercises
+
+1. Which random slopes does the design allow for `Frequency` (a property of words) and `NativeLanguage` (a property of participants)?
+2. Fit `RT ~ Frequency + NativeLanguage` with the maximal random effects structure justified by the design. What happens?
+3. Refit with the `bobyqa` optimiser. Did the fixed effects change?
+4. Test `NativeLanguage` with a likelihood ratio test.
+
+## Solutions {.smaller}
+
+1. Frequency varies within participants, not within words: `(1 + Frequency | Subject)`. NativeLanguage varies within words, not within participants: `(1 + NativeLanguage | Word)`
+
+```{r, warning = TRUE}
+lex_max <- lmer(RT ~ Frequency + NativeLanguage +
+                  (1 + Frequency | Subject) + (1 + NativeLanguage | Word),
+                data = lexdec)
+```
+
+## Solutions {.smaller}
+
+```{r}
+lex_bob <- update(lex_max, control = lmerControl(optimizer = "bobyqa"))
+cbind(default = fixef(lex_max), bobyqa = fixef(lex_bob))
+```
+
+. . .
+
+The warning disappears, and the estimates barely change.
+
+```{r}
+lex_full <- update(lex_bob, REML = FALSE)
+lex_null <- update(lex_full, . ~ . - NativeLanguage)
+anova(lex_null, lex_full)
+```
+
+With random intercepts only, the same test gives p ≈ .01. The by-word slope for NativeLanguage makes the test more [cautious]{.hl}.
+
+## Summary
+
+::: {.takeaway}
+- Simulate first: you can only check a model against a [known]{.hl} truth
+- `summary()`, `fixef()`, `ranef()`, `coef()`, `VarCorr()`, `confint()`, `predict(re.form = NA)`
+- `lme4` gives no p-values: use [likelihood ratio tests]{.hl} (with ML), or `{lmerTest}`
+- Random slopes only where the predictor varies [within]{.hl} the group
+- Convergence warnings and singular fits: check, change optimiser, then simplify
+- Marginal vs conditional `R²`
+:::
+
+## Slides and code
+
+<div class="qr-block">
+<img src="`r qr_uri`" alt="QR code linking to these slides">
+<div>
+<p>These slides</p>
+<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p>Code, data and all lectures</p>
+<p class="qr-link">github.com/mcanzi/ws26_statistics</p>
+</div>
+</div>

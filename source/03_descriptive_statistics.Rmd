@@ -1,0 +1,724 @@
+---
+title: "Descriptive statistics"
+subtitle: "Describing distributions: centre and spread"
+author: "Dr Massimiliano Canzi"
+knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirname(input), "..", "docs")))
+output:
+  revealjs::revealjs_presentation:
+    theme: black
+    css: theme-light.css
+    highlight: zenburn
+    mathjax: null
+    incremental: true
+    transition: fade
+    background_transition: fade
+    self_contained: true
+    reveal_options:
+      width: 1050
+      height: 700
+      slideNumber: true
+      showSlideNumber: print
+      controls: true
+      touch: true
+      transitionSpeed: fast
+      navigationMode: linear
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = TRUE,
+                      comment = "",
+                      fig.width = 10, fig.height = 4.6, out.width = "100%")
+
+library(tidyverse)
+library(palmerpenguins)
+
+source("slides_setup.R", local = knitr::knit_global())
+
+options(width = 70, pillar.print_min = 4, pillar.print_max = 4)
+
+bill      <- penguins$bill_length_mm
+bill_mean <- mean(bill, na.rm = TRUE)
+bill_med  <- median(bill, na.rm = TRUE)
+bill_sd   <- sd(bill, na.rm = TRUE)
+bill_mad  <- mad(bill, na.rm = TRUE)
+```
+
+# Distributions
+
+<style>
+  :root {
+    --footer-text:  "Descriptive statistics";
+    --qr:           `r qr_css`;
+    --lecture:      `r lecture_label`;
+  }
+</style>
+
+A model is like a [map]{.hl} of a city: it is useful [because]{.hl} it leaves most of the detail out.
+
+. . .
+
+Descriptive statistics are the simplest maps: [one number]{.hl} that stands for a whole distribution.
+
+## Today
+
+- What a [distribution]{.hl} is: empirical and theoretical
+- Measures of [central tendency]{.hl}: mean, median, mode
+- Measures of [spread]{.hl}: standard deviation, MAD, range, quantiles
+- When each map [misleads]{.hl}: skew, outliers, more than one peak
+- [Grouped]{.hl} summaries and plots, building on `{dplyr}`
+
+## Distributions
+
+A (frequency) distribution displays the frequency of occurrence of each possible outcome in a sample.
+
+- [Empirical]{.hl} distribution: the values we actually observed
+- [Theoretical]{.hl} distribution: a mathematical shape, defined by a few [parameters]{.hl}
+
+## Plotting with `{ggplot2}` {.smaller}
+
+Last week's promise: `{ggplot2}` builds a plot in [layers]{.hl}, added with `+`.
+
+```{r, eval = FALSE}
+ggplot(data, aes(x = column)) +   # the data, and which column goes where
+  geom_histogram() +              # how to draw it
+  labs(x = "Axis label")          # labels
+```
+
+- `ggplot()` + `aes()`: the data, and which columns map to `x`, `y`, `colour`, ...
+- `geom_*()`: the shape: `geom_histogram()`, `geom_point()`, `geom_boxplot()`, ...
+- `labs()`, `theme()`: labels and look
+
+. . .
+
+Our slides use a theme set up in the hidden first chunk of the .Rmd: your plots will look different, but show the same data.
+
+## An empirical distribution {.smaller}
+
+```{r, fig.height = 4}
+ggplot(penguins, aes(x = flipper_length_mm)) +
+  geom_histogram(binwidth = 3, fill = "#b3443d", colour = "#f3eee5") +
+  labs(x = "Flipper length (mm)", y = "Count")
+```
+
+Each bar counts the penguins whose flipper length falls in a [3 mm]{.hl} bin.
+
+## Histogram or density? {.smaller}
+
+```{r, fig.height = 4}
+ggplot(penguins, aes(x = flipper_length_mm)) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 3,
+                 fill = "#b3443d", colour = "#f3eee5", alpha = 0.5) +
+  geom_density(colour = "#a8701c", linewidth = 1.2) +
+  labs(x = "Flipper length (mm)", y = "Density")
+```
+
+The [density]{.hl} curve is a smoothed histogram. The area under it is [1]{.hl}.
+
+## The normal distribution
+
+The normal (or __Gaussian__) distribution contains values symmetrically distributed around the mean, with the majority of data points lying close to the mean.
+
+. . .
+
+Two parameters describe it completely: the [mean]{.hl} and the [standard deviation]{.hl}.
+
+. . .
+
+```{r}
+set.seed(42)    # same random numbers every time we knit
+normal <- rnorm(500, mean = 0, sd = 1)
+head(round(normal, 2))
+```
+
+## Sample vs theory {.smaller}
+
+```{r, fig.height = 4.2}
+tibble(value = normal) |>
+  ggplot(aes(x = value)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 30,
+                 fill = "#3f7470", colour = "#f3eee5", alpha = 0.6) +
+  stat_function(fun = dnorm, colour = "#a8701c", linewidth = 1.2) +
+  labs(x = "Value", y = "Density")
+```
+
+Bars: our [500]{.hl} random values. Line: the [theoretical]{.hl} normal curve.
+
+## The 68–95–99.7 rule
+
+```{r, echo = FALSE, fig.height = 4.6}
+curve_df <- tibble(x = seq(-4, 4, by = 0.01), y = dnorm(x))
+
+ggplot(curve_df, aes(x, y)) +
+  geom_area(data = filter(curve_df, abs(x) <= 3), fill = pandan, alpha = 0.25) +
+  geom_area(data = filter(curve_df, abs(x) <= 2), fill = pandan, alpha = 0.35) +
+  geom_area(data = filter(curve_df, abs(x) <= 1), fill = pandan, alpha = 0.55) +
+  geom_line(colour = mist, linewidth = 1) +
+  annotate("text", x = 0, y = 0.18, label = "68%", colour = floor_col,
+           size = 7, fontface = "bold") +
+  annotate("text", x = c(-1.5, 1.5), y = 0.05, label = "95%", colour = mist, size = 5.5) +
+  annotate("text", x = c(-2.5, 2.5), y = 0.012, label = "99.7%", colour = mist, size = 4.5,
+           vjust = -1) +
+  scale_x_continuous(breaks = -3:3,
+                     labels = c("-3 SD", "-2 SD", "-1 SD", "mean", "+1 SD", "+2 SD", "+3 SD")) +
+  labs(x = NULL, y = "Density")
+```
+
+In a normal distribution, about 68% of values lie within [1 SD]{.hl} of the mean, 95% within [2 SD]{.hl}, 99.7% within [3 SD]{.hl}.
+
+## Other distributions {.smaller}
+
+There are many other theoretical distributions, we will see some during the course:
+
+```{r, echo = FALSE, fig.height = 4}
+set.seed(1)
+discrete <- bind_rows(
+  tibble(dist = "Binomial: correct out of 20",
+         x = rbinom(1000, size = 20, prob = 0.85)),
+  tibble(dist = "Poisson: pauses per minute",
+         x = rpois(1000, lambda = 2.5))
+)
+continuous <- tibble(dist = "Log-normal: RTs (ms)",
+                     x = rlnorm(1000, meanlog = log(600), sdlog = 0.3))
+
+ggplot() +
+  geom_bar(data = discrete, aes(x = x), fill = kingfisher, width = 0.8) +
+  geom_histogram(data = continuous, aes(x = x), bins = 35,
+                 fill = orchid, colour = floor_col) +
+  facet_wrap(~ dist, scales = "free") +
+  labs(x = NULL, y = "Count") +
+  theme(strip.text = element_text(size = 13))
+```
+
+- [Binomial]{.hl}: counts of successes, e.g. accuracy
+- [Poisson]{.hl}: counts of events, e.g. pauses per minute (not taught here, but you may meet it)
+- [Gamma]{.hl} / [log-normal]{.hl}: positive and right-skewed, e.g. reaction times, durations
+
+# Central tendency
+
+::: {.fact}
+`Did you know:` tardigrades are animals about [0.5 mm]{.hl} long, with eight stubby legs. The German pastor J.A.E. Goeze first described them in 1773 and called them _kleiner Wasserbär_: "little water bear".
+
+_Source: National Geographic_
+:::
+
+## The tools of the trade
+
+Two types of descriptive measures are used to map our data:
+
+| Central tendency | Spread |
+|---|---|
+| `mean()` | `sd()`, `var()` |
+| `median()` | `mad()`, `IQR()` |
+| mode | `range()`, `quantile()` |
+
+. . .
+
+Always report one of each: a [centre]{.hl} without a [spread]{.hl} hides half the map.
+
+## First: missing values {.smaller}
+
+```{r}
+mean(penguins$bill_length_mm)
+mean(penguins$bill_length_mm, na.rm = TRUE)
+```
+
+. . .
+
+`NA` means "unknown". The mean of numbers that include an unknown is unknown, unless you tell R to drop them.
+
+. . .
+
+Three ways to drop missing values, three different data sets:
+
+```{r}
+nrow(penguins)                               # all rows
+nrow(drop_na(penguins, bill_length_mm))      # NA in bill length only
+nrow(na.omit(penguins))                      # NA in any column
+```
+
+## `na.omit()` changes your result
+
+```{r}
+mean(penguins$bill_length_mm, na.rm = TRUE)   # 342 penguins
+mean(na.omit(penguins)$bill_length_mm)        # 333 penguins
+```
+
+. . .
+
+`na.omit()` also dropped 9 penguins with a known bill length but unknown `sex`.
+
+. . .
+
+Rule of thumb: drop `NA`s only in the columns you are analysing, with `na.rm = TRUE` or `drop_na(column)`.
+
+## `mean()`
+
+The mean is the sum of all values divided by their number
+
+<div class="formula"><span style="text-decoration: overline;">x</span> = (x₁ + x₂ + … + xₙ) / n</div>
+
+. . .
+
+```{r}
+x <- c(4, 8, 15, 16, 23, 42)
+sum(x) / length(x)
+mean(x)
+```
+
+## `mean()` {.smaller}
+
+```{r}
+penguins |>
+  summarise(mean_bill = mean(bill_length_mm, na.rm = TRUE))
+```
+
+```{r, echo = FALSE, fig.height = 3.8}
+ggplot(penguins, aes(x = bill_length_mm)) +
+  geom_density(fill = pandan, colour = pandan, alpha = 0.25, linewidth = 1) +
+  geom_vline(xintercept = bill_mean, colour = kingfisher, linewidth = 1.2, linetype = "dashed") +
+  annotate("label", x = bill_mean, y = 0.005, label = paste("mean =", round(bill_mean, 1)),
+           fill = floor_col, colour = kingfisher, label.size = 0, size = 5) +
+  labs(x = "Bill length (mm)", y = "Density")
+```
+
+## `median()`
+
+The median is the observation at the center of the distribution, when the distribution is ordered from the lowest to the highest value.
+
+. . .
+
+```{r}
+median(c(3, 1, 5))        # sorted: 1 3 5
+median(c(3, 1, 5, 7))     # sorted: 1 3 5 7 -> mean of 3 and 5
+```
+
+. . .
+
+With an [even]{.hl} number of values, the median is the mean of the two middle values.
+
+## `median()` {.smaller}
+
+```{r}
+penguins |>
+  summarise(mean_bill   = mean(bill_length_mm, na.rm = TRUE),
+            median_bill = median(bill_length_mm, na.rm = TRUE))
+```
+
+```{r, echo = FALSE, fig.height = 3.8}
+ggplot(penguins, aes(x = bill_length_mm)) +
+  geom_density(fill = pandan, colour = pandan, alpha = 0.25, linewidth = 1) +
+  geom_vline(xintercept = bill_mean, colour = kingfisher, linewidth = 1.2, linetype = "dashed") +
+  geom_vline(xintercept = bill_med, colour = hornbill, linewidth = 1.2, linetype = "dotted") +
+  annotate("label", x = bill_mean, y = 0.005, label = "mean", hjust = 1.1,
+           fill = floor_col, colour = kingfisher, label.size = 0, size = 5) +
+  annotate("label", x = bill_med, y = 0.005, label = "median", hjust = -0.1,
+           fill = floor_col, colour = hornbill, label.size = 0, size = 5) +
+  labs(x = "Bill length (mm)", y = "Density")
+```
+
+## One number can hide a lot
+
+```{r, echo = FALSE, fig.height = 4.4}
+ggplot(drop_na(penguins, bill_length_mm), aes(x = bill_length_mm)) +
+  geom_density(aes(fill = species, colour = species), alpha = 0.3, linewidth = 0.8) +
+  geom_density(colour = mist, linewidth = 1.2) +
+  geom_vline(xintercept = bill_mean, colour = mist, linewidth = 1, linetype = "dashed") +
+  labs(x = "Bill length (mm)", y = "Density", fill = NULL, colour = NULL)
+```
+
+The overall mean (`r round(bill_mean, 1)` mm) sits in a [dip]{.hl}: few penguins actually have a bill that long. The distribution has [three]{.hl} species in it.
+
+## Skewed data: reaction times
+
+Reaction times cannot be negative, and some responses are very slow:
+
+```{r}
+set.seed(3)
+rt <- tibble(rt = rlnorm(2000, meanlog = log(600), sdlog = 0.35))
+rt |> summarise(mean = mean(rt), median = median(rt))
+```
+
+## Skewed data: reaction times
+
+```{r, echo = FALSE, fig.height = 4.2}
+ggplot(rt, aes(x = rt)) +
+  geom_histogram(bins = 50, fill = orchid, colour = floor_col, alpha = 0.8) +
+  geom_vline(xintercept = mean(rt$rt), colour = kingfisher, linewidth = 1.2, linetype = "dashed") +
+  geom_vline(xintercept = median(rt$rt), colour = hornbill, linewidth = 1.2, linetype = "dotted") +
+  labs(x = "Reaction time (ms)", y = "Count")
+```
+
+A long right [tail]{.hl} pulls the mean (dashed) away from the median (dotted).
+
+## Outliers
+
+One participant fell asleep on one trial:
+
+```{r}
+set.seed(7)
+rts <- round(rlnorm(40, meanlog = log(600), sdlog = 0.25))
+rts_sleepy <- c(rts, 5000)
+
+tibble(data   = c("40 trials", "40 trials + one 5000 ms"),
+       mean   = c(mean(rts), mean(rts_sleepy)),
+       median = c(median(rts), median(rts_sleepy)))
+```
+
+. . .
+
+The mean moves by more than [100 ms]{.hl}. The median barely moves: it is [robust]{.hl}.
+
+## Mode {.smaller}
+
+The mode is the [most frequent]{.hl} value. It is used in __categorical__ distributions.
+
+. . .
+
+With `count()` from last week:
+
+```{r}
+penguins |> count(island) |> slice_max(n)
+```
+
+. . .
+
+```{r}
+words <- tibble(word = c("the", "cat", "saw", "the", "dog", "and", "the", "bird"))
+words |> count(word, sort = TRUE) |> head(3)
+```
+
+## Mode: a trap {.smaller}
+
+R has a function called `mode()`, but it does [not]{.hl} compute the mode:
+
+```{r}
+mode(c("Hello", "Hello", "Goodbye"))
+```
+
+. . .
+
+It returns the [storage type]{.hl}. If you need a function, write your own:
+
+```{r}
+find_mode <- function(x) {
+  u <- unique(x)
+  tab <- tabulate(match(x, u))
+  u[tab == max(tab)]
+}
+find_mode(c("Hello", "Hello", "Goodbye", "Hello", "Penguin", "Dog", "Mountain"))
+```
+
+# Spread
+
+::: {.fact}
+`Did you know:` when their home dries out, tardigrades lose their body water, curl up and enter [cryptobiosis]{.hl}, a deep sleep. They can revive years later, when water returns.
+
+_Sources: National Geographic; ScienceDaily_
+:::
+
+## Same centre, different spread
+
+```{r, echo = FALSE, fig.height = 4.2}
+set.seed(11)
+two_groups <- tibble(
+  group = rep(c("Speaker A: SD = 20 ms", "Speaker B: SD = 60 ms"), each = 1000),
+  duration = c(rnorm(1000, 150, 20), rnorm(1000, 150, 60))
+)
+ggplot(two_groups, aes(x = duration, fill = group, colour = group)) +
+  geom_density(alpha = 0.3, linewidth = 1) +
+  geom_vline(xintercept = 150, colour = mist, linetype = "dashed") +
+  labs(x = "Vowel duration (ms)", y = "Density", fill = NULL, colour = NULL)
+```
+
+Both speakers have a mean of [150 ms]{.hl}. Speaker B is far less [consistent]{.hl}.
+
+## `sd()`
+
+A standard deviation is a measure of how dispersed the data is in relation to the mean: roughly, the [typical distance]{.hl} of a value from the mean.
+
+<div class="formula">s = √( Σ (xᵢ − <span style="text-decoration: overline;">x</span>)² / (n − 1) )</div>
+
+. . .
+
+```{r}
+x <- c(4, 8, 15, 16, 23, 42)
+sqrt(sum((x - mean(x))^2) / (length(x) - 1))
+sd(x)
+var(x)       # the variance is the SD squared
+```
+
+## `sd()` {.smaller}
+
+```{r}
+penguins |>
+  summarise(mean_bill = mean(bill_length_mm, na.rm = TRUE),
+            sd_bill   = sd(bill_length_mm, na.rm = TRUE))
+```
+
+```{r, echo = FALSE, fig.height = 3.8}
+ggplot(penguins, aes(x = bill_length_mm)) +
+  annotate("rect", xmin = bill_mean - bill_sd, xmax = bill_mean + bill_sd,
+           ymin = -Inf, ymax = Inf, fill = kingfisher, alpha = 0.15) +
+  geom_density(fill = pandan, colour = pandan, alpha = 0.25, linewidth = 1) +
+  geom_vline(xintercept = bill_mean, colour = kingfisher, linewidth = 1.2, linetype = "dashed") +
+  annotate("label", x = bill_mean, y = 0.005, label = "mean ± 1 SD",
+           fill = floor_col, colour = kingfisher, label.size = 0, size = 5) +
+  labs(x = "Bill length (mm)", y = "Density")
+```
+
+## `mad()`
+
+The median absolute deviation (MAD) is a robust measure of the variability of a univariate sample of quantitative data: the [median]{.hl} distance from the [median]{.hl}.
+
+. . .
+
+Consider the distribution: 1, 1, 2, __2__, 4, 6, 9
+
+. . .
+
+Consider the absolute deviations from the median: 1, 1, 0, 0, 2, 4, 7
+
+. . .
+
+Take the median of the (sorted) above distribution: 0, 0, 1, __1__, 2, 4, 7
+
+## `mad()` in R {.smaller}
+
+```{r}
+x <- c(1, 1, 2, 2, 4, 6, 9)
+mad(x, constant = 1)
+mad(x)
+```
+
+. . .
+
+By default, `mad()` multiplies the result by [1.4826]{.hl}. With normal data, this makes the MAD estimate the [SD]{.hl}, so the two are comparable.
+
+. . .
+
+```{r}
+c(sd = sd(rts), mad = mad(rts))                    # 40 trials
+c(sd = sd(rts_sleepy), mad = mad(rts_sleepy))      # + one 5000 ms trial
+```
+
+## `mad()` {.smaller}
+
+```{r}
+penguins |>
+  summarise(median_bill = median(bill_length_mm, na.rm = TRUE),
+            mad_bill    = mad(bill_length_mm, na.rm = TRUE))
+```
+
+```{r, echo = FALSE, fig.height = 3.8}
+ggplot(penguins, aes(x = bill_length_mm)) +
+  annotate("rect", xmin = bill_med - bill_mad, xmax = bill_med + bill_mad,
+           ymin = -Inf, ymax = Inf, fill = hornbill, alpha = 0.15) +
+  geom_density(fill = pandan, colour = pandan, alpha = 0.25, linewidth = 1) +
+  geom_vline(xintercept = bill_med, colour = hornbill, linewidth = 1.2, linetype = "dotted") +
+  annotate("label", x = bill_med, y = 0.005, label = "median ± 1 MAD",
+           fill = floor_col, colour = hornbill, label.size = 0, size = 5) +
+  labs(x = "Bill length (mm)", y = "Density")
+```
+
+## `range()`
+
+The `range()` returns the `min()` and `max()` values in a distribution. Their distance is what statisticians call the range.
+
+. . .
+
+```{r}
+range(penguins$bill_length_mm, na.rm = TRUE)
+diff(range(penguins$bill_length_mm, na.rm = TRUE))
+```
+
+. . .
+
+The range depends on [two]{.hl} values only, the most extreme ones. One outlier changes it completely.
+
+## Quantiles / Quartiles
+
+Quantiles are cut points dividing the range of a probability distribution into continuous intervals with equal probabilities, or dividing the observations in a sample in the same way.
+
+. . .
+
+__Quartiles__ are __quantiles__ that divide the data into four [quarters]{.hl}:
+
+```{r}
+quantile(penguins$bill_length_mm, na.rm = TRUE)
+IQR(penguins$bill_length_mm, na.rm = TRUE)     # 75% minus 25%
+```
+
+. . .
+
+The [median]{.hl} is the 50% quantile. The [IQR]{.hl} holds the middle half of the data.
+
+## `summary()`
+
+Most of today in one line:
+
+```{r}
+summary(penguins$bill_length_mm)
+```
+
+. . .
+
+It works on a whole data frame too: try `summary(penguins)`.
+
+## Boxplots draw the quartiles
+
+```{r, echo = FALSE, fig.height = 4.4}
+ggplot(drop_na(penguins, bill_length_mm),
+       aes(x = species, y = bill_length_mm, colour = species)) +
+  geom_jitter(width = 0.2, alpha = 0.35, size = 1.8) +
+  geom_boxplot(fill = NA, outlier.shape = NA, linewidth = 0.9, width = 0.5, colour = mist) +
+  labs(x = NULL, y = "Bill length (mm)") +
+  theme(legend.position = "none")
+```
+
+Box: [25%]{.hl} to [75%]{.hl} (the IQR). Line: the [median]{.hl}. Whiskers: to the furthest point within 1.5 × IQR of the box. Dots: every penguin.
+
+# `group_by` and `summarise`
+
+::: {.fact}
+`Did you know:` in 2007, dried tardigrades flew into orbit on the FOTON-M3 mission and were exposed to [open space]{.hl}: vacuum, cosmic rays and solar UV over 1,000 times stronger than on Earth. Most survived the vacuum, a few even the full UV, and the survivors reproduced normally.
+
+_Sources: Jönsson et al. (2008), Current Biology; ScienceDaily_
+:::
+
+## Summaries per group
+
+Until now, we have summarised [one distribution]{.hl} at a time.
+
+. . .
+
+Usually we want the same summary for [each group]{.hl}: `bill_length_mm` for each species separately.
+
+. . .
+
+The bad way to do it:
+
+```{r}
+Adelie    <- filter(penguins, species == "Adelie")
+Gentoo    <- filter(penguins, species == "Gentoo")
+Chinstrap <- filter(penguins, species == "Chinstrap")
+mean(Adelie$bill_length_mm, na.rm = TRUE)
+mean(Gentoo$bill_length_mm, na.rm = TRUE)
+mean(Chinstrap$bill_length_mm, na.rm = TRUE)
+```
+
+## The good way {.smaller}
+
+Last week: `group_by()` + `summarise()`, or `summarise(.by = )`
+
+```{r}
+penguins |>
+  drop_na(bill_length_mm) |>
+  summarise(n      = n(),
+            mean   = mean(bill_length_mm),
+            sd     = sd(bill_length_mm),
+            median = median(bill_length_mm),
+            IQR    = IQR(bill_length_mm),
+            .by    = species)
+```
+
+. . .
+
+One row per species, one column per summary, [no]{.hl} copies of the data.
+
+## Grouping by two variables {.smaller}
+
+```{r}
+penguins |>
+  drop_na(sex) |>
+  group_by(species, sex) |>
+  summarise(mean_bill = mean(bill_length_mm),
+            median_bill = median(bill_length_mm))
+```
+
+. . .
+
+The message: the result is [still grouped]{.hl} by species. Either add `.groups = "drop"`, `ungroup()` it, or use `.by = c(species, sex)`, which never leaves groups behind.
+
+## `group_by()` or `.by`?
+
+- Use `group_by()` when several steps in a row should work [per group]{.hl}
+- Use `.by` when only [one step]{.hl} needs the groups
+- Remember to `ungroup()` when you use `group_by()`, especially if you are doing other things before you save the result into a variable
+
+## Many columns at once: `across()` {.smaller}
+
+From last week: `across(columns, function)`
+
+```{r}
+penguins |>
+  summarise(across(ends_with("_mm"),
+                   list(mean = \(x) mean(x, na.rm = TRUE),
+                        sd   = \(x) sd(x, na.rm = TRUE))),
+            .by = species) |>
+  select(species, starts_with("bill_length"))
+```
+
+. . .
+
+`list(mean = ..., sd = ...)` applies [two]{.hl} functions to each column, and adds `_mean` and `_sd` to the names.
+
+## Plotting group summaries {.smaller}
+
+```{r, fig.height = 2.7}
+bill_summary <- penguins |>
+  drop_na(bill_length_mm) |>
+  summarise(mean = mean(bill_length_mm), sd = sd(bill_length_mm), .by = species)
+
+ggplot(drop_na(penguins, bill_length_mm), aes(x = species, y = bill_length_mm)) +
+  geom_jitter(aes(colour = species), width = 0.2, alpha = 0.3) +
+  geom_pointrange(data = bill_summary, colour = "#2b2723", linewidth = 1, size = 0.8,
+                  aes(y = mean, ymin = mean - sd, ymax = mean + sd)) +
+  labs(x = NULL, y = "Bill length (mm)") + theme(legend.position = "none")
+```
+
+Points: every penguin. White: [mean ± 1 SD]{.hl} per species.
+
+## Reporting descriptives {.smaller}
+
+In R Markdown, numbers in your text can come [straight from R]{.hl}:
+
+```{r}
+gentoo <- filter(bill_summary, species == "Gentoo")
+```
+
+```markdown
+Gentoo bills were `r '\x60r round(gentoo$mean, 1)\x60'` mm long on average
+(SD = `r '\x60r round(gentoo$sd, 1)\x60'`).
+```
+
+. . .
+
+becomes
+
+> Gentoo bills were `r round(gentoo$mean, 1)` mm long on average (SD = `r round(gentoo$sd, 1)`).
+
+. . .
+
+If the data change, the text [updates itself]{.hl}. No copying numbers by hand.
+
+## Summary
+
+::: {.takeaway}
+- A distribution is the [map]{.hl}; a summary is a [simplified]{.hl} map
+- Centre: `mean()` (sensitive), `median()` (robust), mode with `count()`
+- Spread: `sd()` (sensitive), `mad()` and `IQR()` (robust), `range()`, `quantile()`
+- Always [plot]{.hl} the data: skew, outliers and several peaks hide behind one number
+- Per group: `summarise()` with `.by` or `group_by()`; many columns with `across()`
+:::
+
+## Slides and code
+
+<div class="qr-block">
+<img src="`r qr_uri`" alt="QR code linking to these slides">
+<div>
+<p>These slides</p>
+<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p>Code, data and all lectures</p>
+<p class="qr-link">github.com/mcanzi/ws26_statistics</p>
+</div>
+</div>

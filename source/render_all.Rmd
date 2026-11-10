@@ -1,0 +1,22 @@
+---
+title: "Render all lectures"
+output: html_document
+---
+
+Knit this file, or run its chunks, to render all lectures in this folder. Each deck is rendered in a fresh R session and written straight into `docs`, next to `source`, which is what GitHub Pages serves. Rendering stops at the first lecture that fails, and the error names it.
+
+To render a single lecture, open it and press Knit: each lecture also writes its HTML into `docs`.
+
+```{r render, message = TRUE}
+docs <- normalizePath(file.path("..", "docs"))
+lectures <- list.files(pattern = "^[0-9]{2}_.*\\.Rmd$")
+for (lecture in lectures) {
+  message("Rendering ", lecture)
+  xfun::Rscript_call(rmarkdown::render, list(input = lecture, output_dir = docs, quiet = TRUE))
+}
+```
+
+```{r rendered}
+html <- file.path(docs, sub("\\.Rmd$", ".html", lectures))
+knitr::kable(data.frame(deck = basename(html), updated = format(file.mtime(html), "%d %b %Y %H:%M")))
+```

@@ -1,0 +1,564 @@
+---
+title: "Mixed models 1"
+subtitle: "A conceptual introduction"
+author: "Dr Massimiliano Canzi"
+knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirname(input), "..", "docs")))
+output:
+  revealjs::revealjs_presentation:
+    theme: black
+    css: theme-doglord.css
+    highlight: zenburn
+    mathjax: null
+    incremental: true
+    transition: fade
+    background_transition: fade
+    self_contained: true
+    reveal_options:
+      width: 1050
+      height: 700
+      slideNumber: true
+      showSlideNumber: print
+      controls: true
+      touch: true
+      transitionSpeed: fast
+      navigationMode: linear
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      comment = "",
+                      fig.width = 10, fig.height = 4.4, out.width = "100%")
+
+library(tidyverse)
+library(broom)
+library(lme4)
+
+source("slides_setup.R", local = knitr::knit_global())
+
+options(width = 70, pillar.print_min = 4, pillar.print_max = 4)
+```
+
+# From linear regression to mixed models
+
+<style>
+  :root {
+    --footer-text:  "Mixed models 1";
+    --qr:           `r qr_css`;
+    --lecture:      `r lecture_label`;
+  }
+</style>
+
+::: {.fact}
+`Did you know:` naked mole-rats live underground in East Africa, in colonies of about 70 animals on average, and up to 295. Only one female, the [queen]{.hl}, breeds.
+
+_Source: Smithsonian's National Zoo_
+:::
+
+## Today
+
+- [Repeated measures]{.hl} and the independence assumption
+- Old solutions: [averaging]{.hl} over participants or items
+- Mixed models: varying [intercepts]{.hl} and varying [slopes]{.hl}
+- [Partial pooling]{.hl}: borrowing strength across groups
+- Interpreting random effects, and the `lme4` syntax
+- Why varying slopes [matter]{.hl}
+- What is a random effect, anyway?
+
+## So far
+
+Lectures 4 to 9: `lm()`, with one or several predictors, and how to test them.
+
+. . .
+
+Every one of those models assumed that the data points are __independent__: each one brings [new]{.hl} information.
+
+. . .
+
+In linguistics, that is almost [never]{.hl} true.
+
+## Repeated measures
+
+**Repeated measures** data is collected when measurements are taken on the [same units]{.hl} (participants, speakers, words, schools...) multiple times.
+
+. . .
+
+- A participant responds to [many]{.hl} words
+- A word is read by [many]{.hl} participants
+- A speaker produces [many]{.hl} tokens of the same vowel
+
+. . .
+
+Measures from the same unit are likely to be more [similar]{.hl} to each other than measures from different units. This violates the independence assumption of linear regression.
+
+## The data {.smaller}
+
+A simulated lexical decision experiment: [20]{.hl} participants each respond to the same [40]{.hl} words.
+
+```{r}
+set.seed(21)
+n_subj <- 20
+n_item <- 40
+
+z0 <- rnorm(n_subj)
+z1 <- rnorm(n_subj)
+participants <- tibble(participant = sprintf("P%02d", 1:n_subj),
+                       u0 = 70 * z0,                                   # own speed
+                       u1 = 18 * (-0.6 * z0 + sqrt(1 - 0.36) * z1))    # own frequency effect
+words <- tibble(word     = sprintf("w%02d", 1:n_item),
+                log_freq = round(runif(n_item, 1, 6), 2),
+                w0       = rnorm(n_item, 0, 30))                        # own difficulty
+
+lexdec <- crossing(participants, words) |>
+  mutate(freq_c = log_freq - mean(words$log_freq),
+         rt = round(650 + u0 + w0 + (-30 + u1) * freq_c + rnorm(n(), 0, 50))) |>
+  select(participant, word, log_freq, freq_c, rt)
+```
+
+. . .
+
+The true frequency effect is [−30 ms]{.hl} per log unit. But participants differ in [speed]{.hl} and in the [size]{.hl} of their frequency effect, and words differ in [difficulty]{.hl}.
+
+## 800 rows, but not 800 independent observations
+
+```{r}
+lexdec
+count(lexdec, participant) |> head(3)
+```
+
+## Everyone together
+
+```{r, echo = FALSE, fig.height = 4.4}
+ggplot(lexdec, aes(x = freq_c, y = rt)) +
+  geom_point(colour = pandan, alpha = 0.3, size = 1.6) +
+  geom_smooth(method = "lm", colour = hornbill, se = FALSE, linewidth = 1.5) +
+  labs(x = "log frequency (centred)", y = "Reaction time (ms)")
+```
+
+One cloud of 800 points, one line. This is what `lm(rt ~ freq_c)` sees.
+
+## One participant at a time
+
+```{r, echo = FALSE, fig.height = 4.6}
+ggplot(lexdec, aes(x = freq_c, y = rt)) +
+  geom_point(colour = pandan, alpha = 0.35, size = 0.9) +
+  geom_smooth(method = "lm", colour = hornbill, se = FALSE, linewidth = 0.9) +
+  facet_wrap(~ participant, nrow = 3) +
+  labs(x = "log frequency (centred)", y = "RT (ms)") +
+  theme(strip.text = element_text(size = 11), axis.text = element_text(size = 9))
+```
+
+Every participant has their own [level]{.hl} (fast or slow) and their own [slope]{.hl} (a strong or weak frequency effect).
+
+# The independence assumption
+
+::: {.fact}
+`Did you know:` each naked mole-rat colony has its own [dialect]{.hl}. Researchers analysed over 30,000 soft chirps from seven colonies: the animals answered calls in their own colony's dialect and largely ignored the others.
+
+_Sources: Barker et al. (2021), Science; Science News_
+:::
+
+## What goes wrong with `lm()`?
+
+```{r}
+tidy(lm(rt ~ freq_c, data = lexdec))
+```
+
+. . .
+
+The estimate is fine. The [standard error]{.hl} is computed as if we had 800 independent observations.
+
+. . .
+
+But we only have [20]{.hl} participants. If we ran the experiment again with 20 [new]{.hl} participants, the slope could easily change by more than this SE suggests.
+
+## The residuals give it away
+
+```{r, echo = FALSE, fig.height = 4.2}
+augment(lm(rt ~ freq_c, data = lexdec)) |>
+  mutate(participant = lexdec$participant) |>
+  ggplot(aes(x = reorder(participant, .resid, FUN = median), y = .resid)) +
+  geom_hline(yintercept = 0, colour = mist, linetype = "dashed") +
+  geom_boxplot(fill = NA, colour = kingfisher, outlier.size = 0.8) +
+  labs(x = "Participant (ordered by median residual)", y = "Residual (ms)") +
+  theme(axis.text.x = element_text(size = 10, angle = 90, vjust = 0.5))
+```
+
+The residuals of one participant are mostly [positive]{.hl} or mostly [negative]{.hl}. Knowing who produced a data point tells us something about its residual: they are [not independent]{.hl}.
+
+## Two sources of non-independence
+
+- __Participants__: some are faster, some show bigger effects
+- __Items__ (here, words): some words are harder than others, for everyone
+
+. . .
+
+Clark (1973) called ignoring item variation the __language-as-fixed-effect fallacy__: if our conclusions should hold for words [in general]{.hl}, not just the 40 we tested, the words are a [sample]{.hl} too.
+
+# Design and averaging
+
+## The traditional fix: averaging
+
+Collapse the data so that each unit contributes [one]{.hl} number. A __by-participant__ (F1) analysis: one frequency slope per participant, then test the 20 slopes.
+
+```{r}
+by_participant <- lexdec |>
+  summarise(slope = coef(lm(rt ~ freq_c))[2], .by = participant)
+
+t.test(by_participant$slope)$conf.int
+```
+
+## By-item analysis
+
+A __by-item__ (F2) analysis: average over participants, one RT per word.
+
+```{r}
+by_word <- lexdec |> summarise(rt = mean(rt), freq_c = first(freq_c), .by = word)
+tidy(lm(rt ~ freq_c, data = by_word))[2, ]
+```
+
+## Problems with averaging
+
+- [Two]{.hl} separate analyses, which can disagree: which one do we report?
+- Averaging [throws away]{.hl} information: variation within participants is lost
+- With missing data or unbalanced designs, averages are based on different numbers of observations
+- It is hard to include predictors that vary [within]{.hl} a unit, such as trial number
+
+. . .
+
+Mixed models handle participants [and]{.hl} items, in [one]{.hl} model, on the raw data.
+
+# Varying intercepts and slopes
+
+::: {.fact}
+`Did you know:` the dialects are [learned]{.hl}: pups raised in another colony took on that colony's dialect. When a queen died, her colony's dialect became more variable, until a new queen took over.
+
+_Sources: Barker et al. (2021), Science; Science News_
+:::
+
+## Fixed and random effects
+
+A __linear mixed effects model__ is an extension of linear regression for repeated measures and other non-independent data. It has two kinds of terms:
+
+- __Fixed effects__: the effects of the predictors we are interested in, here `freq_c`. They are interpreted like the coefficients of `lm()`.
+- __Random effects__: by-participant and by-word [adjustments]{.hl} to those coefficients, which capture how the grouping units vary.
+
+. . .
+
+"Mixed" because the model mixes the two.
+
+## Three ways to pool {.smaller}
+
+```{r, echo = FALSE, fig.height = 4.4}
+grid <- crossing(participant = unique(lexdec$participant),
+                 freq_c = range(lexdec$freq_c))
+
+m_complete <- lm(rt ~ freq_c, data = lexdec)
+m_partial  <- lmer(rt ~ freq_c + (1 + freq_c | participant), data = lexdec)
+
+lines <- bind_rows(
+  grid |> mutate(fit = predict(m_complete, newdata = grid),
+                 panel = "Complete pooling: one line"),
+  lexdec |> group_by(participant) |>
+    group_modify(\(d, k) tibble(freq_c = range(lexdec$freq_c),
+                                fit = predict(lm(rt ~ freq_c, data = d),
+                                              newdata = tibble(freq_c = range(lexdec$freq_c))))) |>
+    ungroup() |> mutate(panel = "No pooling: 20 separate lines"),
+  grid |> mutate(fit = predict(m_partial, newdata = grid),
+                 panel = "Partial pooling: mixed model")
+) |>
+  mutate(panel = fct_inorder(panel))
+
+ggplot(lines, aes(x = freq_c, y = fit, group = participant)) +
+  geom_line(colour = kingfisher, alpha = 0.7, linewidth = 0.8) +
+  facet_wrap(~ panel) +
+  labs(x = "log frequency (centred)", y = "Predicted RT (ms)")
+```
+
+- __Complete pooling__: ignore participants. Overconfident.
+- __No pooling__: treat each participant as unrelated to the others. Noisy.
+- __Partial pooling__: participants are [different]{.hl}, but [similar]{.hl}, drawn from one population.
+
+## Varying intercepts
+
+Each participant gets their own intercept: the overall intercept plus an adjustment.
+
+<div class="formula">rt = (b₀ + u₀ⱼ) + b₁ · freq + e</div>
+
+- `b₀`, `b₁`: the fixed effects, shared by everyone
+- `u₀ⱼ`: participant j's adjustment, drawn from a normal distribution with mean 0 and an estimated [SD]{.hl}
+
+## Varying intercepts, visually
+
+```{r, echo = FALSE, fig.height = 4}
+m_int <- lmer(rt ~ freq_c + (1 | participant), data = lexdec)
+grid |>
+  mutate(fit = predict(m_int, newdata = grid)) |>
+  ggplot(aes(x = freq_c, y = fit, group = participant)) +
+  geom_line(colour = hornbill, alpha = 0.8, linewidth = 0.8) +
+  labs(x = "log frequency (centred)", y = "RT (ms)")
+```
+
+Parallel lines: participants differ in [speed]{.hl}, not in the frequency effect.
+
+## Varying slopes
+
+Each participant also gets their own [slope]{.hl}:
+
+<div class="formula">rt = (b₀ + u₀ⱼ) + (b₁ + u₁ⱼ) · freq + e</div>
+
+```{r, echo = FALSE, fig.height = 3.2}
+grid |>
+  mutate(fit = predict(m_partial, newdata = grid)) |>
+  ggplot(aes(x = freq_c, y = fit, group = participant)) +
+  geom_line(colour = hornbill, alpha = 0.8, linewidth = 0.8) +
+  labs(x = "log frequency (centred)", y = "RT (ms)")
+```
+
+Now the lines [fan out]{.hl}: some participants are much more sensitive to frequency than others.
+
+## What the model estimates
+
+The model does [not]{.hl} estimate 20 separate intercepts and 20 separate slopes as free parameters. It estimates:
+
+- the fixed effects: the [average]{.hl} intercept and slope
+- the [SD]{.hl} of the intercepts across participants
+- the [SD]{.hl} of the slopes across participants
+- the [correlation]{.hl} between intercepts and slopes
+- the residual SD
+
+. . .
+
+The participants' individual adjustments are then predicted from these, and from each participant's own data.
+
+## Partial pooling = shrinkage
+
+```{r, echo = FALSE, fig.height = 4.2}
+shrink <- by_participant |>
+  rename(no_pooling = slope) |>
+  left_join(coef(m_partial)$participant |>
+              rownames_to_column("participant") |>
+              select(participant, partial_pooling = freq_c),
+            by = "participant") |>
+  mutate(participant = fct_reorder(participant, no_pooling))
+
+ggplot(shrink, aes(y = participant)) +
+  geom_vline(xintercept = fixef(m_partial)["freq_c"], colour = mist, linetype = "dashed") +
+  geom_segment(aes(x = no_pooling, xend = partial_pooling, yend = participant),
+               colour = moss, arrow = arrow(length = unit(0.15, "cm"))) +
+  geom_point(aes(x = no_pooling), colour = orchid, size = 2.5) +
+  geom_point(aes(x = partial_pooling), colour = kingfisher, size = 2.5) +
+  labs(x = "Frequency slope (ms per log unit)", y = NULL) +
+  theme(axis.text.y = element_text(size = 9))
+```
+
+Pink: each participant's own slope (no pooling). Blue: the mixed model's estimate. Extreme slopes are pulled, [shrunk]{.hl}, towards the average (dashed): the model borrows strength from the other participants.
+
+# Interpreting random effects
+
+## Random effect SDs {.smaller}
+
+```{r}
+m_full <- lmer(rt ~ freq_c + (1 + freq_c | participant) + (1 | word), data = lexdec)
+VarCorr(m_full)
+```
+
+. . .
+
+- __participant (Intercept)__: participants' average RTs vary with an SD of about `r round(attr(VarCorr(m_full)$participant, "stddev")[1])` ms
+- __participant freq_c__: their frequency slopes vary with an SD of about `r round(attr(VarCorr(m_full)$participant, "stddev")[2])` ms per log unit
+- __word (Intercept)__: words vary in difficulty with an SD of about `r round(attr(VarCorr(m_full)$word, "stddev")[1])` ms
+- __Residual__: what is left, trial by trial
+
+## What an SD of 18 means
+
+The average slope is `r round(fixef(m_full)["freq_c"], 1)` ms per log unit. With an SD of `r round(attr(VarCorr(m_full)$participant, "stddev")[2])` across participants, about 95% of participants should have slopes within ±2 SD:
+
+```{r}
+fixef(m_full)["freq_c"] + c(-2, 2) * attr(VarCorr(m_full)$participant, "stddev")["freq_c"]
+```
+
+. . .
+
+A large random-effect SD means that participants differ [a lot]{.hl}, even after accounting for frequency. A small one means they behave much alike.
+
+## Random effect correlations
+
+```{r, echo = FALSE, fig.height = 3.8}
+coef(m_full)$participant |>
+  ggplot(aes(x = `(Intercept)`, y = freq_c)) +
+  geom_point(colour = kingfisher, size = 3) +
+  geom_smooth(method = "lm", se = FALSE, colour = hornbill, linetype = "dashed") +
+  labs(x = "Participant intercept (ms, average RT)", y = "Participant frequency slope")
+```
+
+The model estimates a correlation of about `r round(attr(VarCorr(m_full)$participant, "correlation")[1, 2], 2)`: [slower]{.hl} participants show [stronger]{.hl} (more negative) frequency effects. Correlations like this can be theoretically interesting in their own right.
+
+# The lme4 syntax
+
+::: {.fact}
+`Did you know:` naked mole-rats can survive at least [18 minutes]{.hl} without any oxygen, by running their brain and heart on fructose instead of glucose.
+
+_Sources: Park et al. (2017), Science; Max Delbrück Center_
+:::
+
+## Random effects in `lmer()` {.smaller}
+
+The `{lme4}` package: `lmer()` works like `lm()`, plus random effects in brackets, `(effects | group)`.
+
+- `(1 | participant)`: varying intercepts by participant
+- `(1 + freq_c | participant)`: varying intercepts and slopes, and their correlation
+- `(1 + freq_c || participant)`: varying intercepts and slopes, [no]{.hl} correlation
+- `(0 + freq_c | participant)`: varying slopes only
+- `(1 | participant) + (1 | word)`: [crossed]{.hl} random effects, every participant sees every word
+- `(1 | school / class)`: [nested]{.hl} random effects, each class belongs to one school
+
+## Our model
+
+```{r, eval = FALSE}
+library(lme4)
+lmer(rt ~ freq_c + (1 + freq_c | participant) + (1 | word), data = lexdec)
+```
+
+- `rt ~ freq_c`: the fixed effects, exactly as in `lm()`
+- `(1 + freq_c | participant)`: each participant has their own intercept and frequency slope
+- `(1 | word)`: each word has its own intercept
+
+. . .
+
+Why no `(1 + freq_c | word)`? Each word has [one]{.hl} frequency. A slope needs variation in the predictor [within]{.hl} the group: frequency varies within participants, but not within words.
+
+## A first look at the output
+
+```{r}
+fixef(m_full)
+```
+
+. . .
+
+The fixed effects read like `lm()` coefficients: an average RT of `r round(fixef(m_full)[1])` ms at average frequency, and `r round(fixef(m_full)[2], 1)` ms per log unit of frequency.
+
+. . .
+
+Next week: the full output, significance testing, likelihood ratio tests, and what to do when models do not converge.
+
+# Why varying slopes matter
+
+## Same estimate, different certainty {.smaller}
+
+```{r}
+models <- list(
+  "lm(rt ~ freq_c)"                                = lm(rt ~ freq_c, data = lexdec),
+  "+ (1 | participant)"                            = lmer(rt ~ freq_c + (1 | participant), data = lexdec),
+  "+ (1 + freq_c | participant)"                   = lmer(rt ~ freq_c + (1 + freq_c | participant), data = lexdec),
+  "+ (1 + freq_c | participant) + (1 | word)"      = m_full
+)
+```
+
+```{r, echo = FALSE}
+tibble(model = names(models),
+       estimate = map_dbl(models, \(m) coef(summary(m))["freq_c", "Estimate"]),
+       SE       = map_dbl(models, \(m) coef(summary(m))["freq_c", "Std. Error"])) |>
+  mutate(across(where(is.numeric), \(x) round(x, 2))) |>
+  knitr::kable()
+```
+
+. . .
+
+The estimate is the [same]{.hl} in every model. The standard error is not: random intercepts alone make it [smaller]{.hl} than `lm()`, and varying slopes make it about [three times larger]{.hl} than with random intercepts alone.
+
+## Why?
+
+With random intercepts only, the model assumes every participant has the [same]{.hl} frequency effect. All 800 trials then count as evidence about one slope.
+
+. . .
+
+But participants [differ]{.hl} in their slopes. To generalise to [new]{.hl} participants, the model must know how much slopes vary, and that uncertainty belongs in the SE.
+
+. . .
+
+Barr et al. (2013) showed that random-intercept-only models can have Type I error rates [well above]{.hl} 5%, and recommend the __maximal random effects structure justified by the design__ for confirmatory tests.
+
+## Compare with averaging
+
+```{r, echo = FALSE}
+tibble(
+  analysis = c("By-participant (F1) analysis",
+               "Mixed model, (1 + freq_c | participant)"),
+  SE = c(sd(by_participant$slope) / sqrt(nrow(by_participant)),
+         coef(summary(models[[3]]))["freq_c", "Std. Error"])
+) |>
+  mutate(SE = round(SE, 2)) |>
+  knitr::kable()
+```
+
+. . .
+
+With varying slopes, the mixed model is about as cautious as the by-participant analysis, while keeping [all]{.hl} the data, and adding [words]{.hl} in the same model.
+
+# Different interpretations
+
+## What is a random effect?
+
+There is no single answer. Gelman (2005) lists [five]{.hl} definitions in use, summarised by Coretta (2021):
+
+1. __Constant vs varying__: fixed coefficients are constant across individuals; random coefficients vary (Kreft & de Leeuw, 1998)
+2. __Researcher's interest__: effects are fixed if the research question is about them; random if the interest lies in the underlying [population]{.hl} (Searle, Casella & McCulloch)
+3. __Sampling__: "When a sample exhausts the population, the corresponding variable is fixed"; when the sample is a negligible part of it, the variable is random (Green & Tukey, 1960)
+
+## What is a random effect?
+
+4. __Random variable__: "If an effect is assumed to be a realized value of a random variable, it is called a random effect" (LaMotte, 1983)
+5. __Estimation__: fixed effects are estimated by least squares or maximum likelihood; random effects are estimated with [shrinkage]{.hl}, that is, partial pooling (Snijders & Bosker)
+
+. . .
+
+The definitions often [disagree]{.hl}. Is "word" random because the words are a sample (3), because they vary (1), or because their estimates are shrunk (5)?
+
+## So which is it?
+
+- Gelman recommends avoiding "fixed" and "random" altogether: effects are [constant]{.hl} or [varying]{.hl} across groups
+- In Bayesian work, [population-level]{.hl} and [group-level]{.hl} effects are increasingly common terms
+- In practice: a grouping factor gets random effects when its levels are a [sample]{.hl} from a larger population (participants, words, speakers), and you want to [generalise]{.hl} beyond them
+
+. . .
+
+Whatever the label, ask: which units are [repeated]{.hl} in my data, and which effects can [vary]{.hl} across them?
+
+# Your turn
+
+## Which random effects?
+
+For each design, name the grouping factors, and the varying slopes the design allows:
+
+1. 30 speakers each read 50 sentences, half of them [questions]{.hl} and half [statements]{.hl}. Outcome: final pitch rise.
+2. 24 children are recorded at ages [2, 3 and 4]{.hl}. Outcome: vocabulary size.
+3. 40 participants rate 60 words for [emotional valence]{.hl}. Each word has one [frequency]{.hl} and one [length]{.hl}.
+
+## Possible answers
+
+1. Speakers and sentences. `(1 + type | speaker) + (1 | sentence)`: type varies within speakers, but each sentence is one type
+2. Children. `(1 + age | child)`: age varies within each child
+3. Participants and words. `(1 + frequency + length | participant) + (1 | word)`: frequency and length vary within participants, not within words
+
+## Summary
+
+::: {.takeaway}
+- Repeated measures violate [independence]{.hl}: data points from the same unit are alike
+- Ignoring this makes SEs [too small]{.hl}; averaging throws information away
+- Mixed models add [varying intercepts]{.hl} and [varying slopes]{.hl} for each grouping factor
+- They estimate the [SD]{.hl} of these adjustments, and [shrink]{.hl} individual estimates towards the average
+- `(1 + x | participant) + (1 | item)`: slopes only for predictors that vary [within]{.hl} the group
+- "Random effect" has several meanings: think [constant]{.hl} vs [varying]{.hl}
+:::
+
+## Slides and code
+
+<div class="qr-block">
+<img src="`r qr_uri`" alt="QR code linking to these slides">
+<div>
+<p>These slides</p>
+<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p>Code, data and all lectures</p>
+<p class="qr-link">github.com/mcanzi/ws26_statistics</p>
+</div>
+</div>

@@ -1,0 +1,590 @@
+---
+title: "Significance testing"
+subtitle: "Effect sizes, standard errors, confidence intervals and p-values"
+author: "Dr Massimiliano Canzi"
+knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirname(input), "..", "docs")))
+output:
+  revealjs::revealjs_presentation:
+    theme: black
+    css: theme-doglord.css
+    highlight: zenburn
+    mathjax: null
+    incremental: true
+    transition: fade
+    background_transition: fade
+    self_contained: true
+    reveal_options:
+      width: 1050
+      height: 700
+      slideNumber: true
+      showSlideNumber: print
+      controls: true
+      touch: true
+      transitionSpeed: fast
+      navigationMode: linear
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      comment = "",
+                      fig.width = 10, fig.height = 4.4, out.width = "100%")
+
+library(tidyverse)
+library(broom)
+library(effsize)
+
+source("slides_setup.R", local = knitr::knit_global())
+
+options(width = 70, pillar.print_min = 4, pillar.print_max = 4)
+
+set.seed(7)
+vowels <- tibble(
+  voicing  = rep(c("voiceless", "voiced"), each = 60),
+  duration = round(c(rnorm(60, 120, 20), rnorm(60, 160, 22)))
+) |>
+  mutate(voicing = fct_relevel(voicing, "voiceless"))
+```
+
+# From sample to population
+
+<style>
+  :root {
+    --footer-text:  "Significance testing";
+    --qr:           `r qr_css`;
+    --lecture:      `r lecture_label`;
+  }
+</style>
+
+::: {.fact}
+`Did you know:` when George Shaw of the British Museum examined one of the first platypus specimens, around 1799, he suspected a [hoax]{.hl}, and cut into it to look for stitches.
+
+_Source: Discover Magazine_
+:::
+
+## Today
+
+- [Samples]{.hl} and [populations]{.hl}
+- How big is an effect? [Cohen's d]{.hl}
+- How precise is an estimate? [Standard errors]{.hl} and [confidence intervals]{.hl}
+- [Null hypotheses]{.hl} and the `t` statistic
+- What a [p-value]{.hl} is, and what it is not
+
+## So far
+
+Lectures 3 to 8: [describing]{.hl} the data we have.
+
+- Means, SDs, slopes, differences between groups
+
+. . .
+
+But we never care about [these]{.hl} 120 vowels. We care about vowels before voiced consonants [in general]{.hl}.
+
+. . .
+
+Today: how far can we [trust]{.hl} a number computed from a sample?
+
+## Samples and populations
+
+- __Population__: everything we want to draw conclusions about: all speakers of a language, all tokens of a vowel
+- __Sample__: the part of it we actually measured
+- __Parameter__: a number describing the population, e.g. its mean `μ`. Usually [unknown]{.hl}.
+- __Statistic__: the same number computed from the sample, e.g. <span style="text-decoration: overline;">x</span>. Our [estimate]{.hl} of the parameter.
+
+## A population we know
+
+To see how samples behave, simulate a population whose truth we [know]{.hl}:
+
+```{r}
+set.seed(1)
+pop <- rnorm(100000, mean = 140, sd = 25)    # 100,000 vowel durations (ms)
+c(mean = mean(pop), sd = sd(pop))
+```
+
+## Samples differ
+
+Draw a sample of 10, and compute its mean:
+
+```{r}
+set.seed(2)
+mean(sample(pop, 10))
+mean(sample(pop, 10))
+mean(sample(pop, 10))
+```
+
+Every sample gives a [different]{.hl} estimate.
+
+## Sampling variation
+
+```{r, echo = FALSE, fig.height = 4.2}
+set.seed(2)
+means <- bind_rows(
+  tibble(n = "n = 10", mean = replicate(2000, mean(sample(pop, 10)))),
+  tibble(n = "n = 50", mean = replicate(2000, mean(sample(pop, 50))))
+)
+ggplot(means, aes(x = mean, fill = n)) +
+  geom_histogram(bins = 50, colour = floor_col) +
+  geom_vline(xintercept = 140, colour = mist, linetype = "dashed", linewidth = 1) +
+  facet_wrap(~ n) +
+  labs(x = "Sample mean (ms)", y = "Count") +
+  theme(legend.position = "none")
+```
+
+2000 samples each. Dashed: the true mean, 140 ms. Larger samples give [less variable]{.hl} estimates.
+
+# Effect size
+
+::: {.fact}
+`Did you know:` a platypus's bill has about [40,000]{.hl} electroreceptors. Underwater, it closes its eyes, ears and nose, and finds prey by the weak electric signals of their muscles.
+
+_Source: American Museum of Natural History_
+:::
+
+## How big is a difference?
+
+Back to lecture 7's vowels:
+
+```{r}
+vowels |> summarise(mean = mean(duration), sd = sd(duration), n = n(), .by = voicing)
+```
+
+. . .
+
+A difference of about [38 ms]{.hl}. Big or small?
+
+. . .
+
+It depends on how much durations [vary]{.hl} anyway. 38 ms is huge if tokens vary by 5 ms, and tiny if they vary by 200 ms.
+
+## Cohen's d
+
+The difference between two means, in units of their [standard deviation]{.hl}:
+
+<div class="formula">d = (mean₂ − mean₁) / pooled SD</div>
+
+. . .
+
+The __pooled SD__ combines the two groups' SDs, weighted by their sample sizes:
+
+```{r}
+s <- vowels |> summarise(m = mean(duration), sd = sd(duration), n = n(), .by = voicing)
+
+pooled_sd <- sqrt(((s$n[1] - 1) * s$sd[1]^2 + (s$n[2] - 1) * s$sd[2]^2) / (sum(s$n) - 2))
+(s$m[2] - s$m[1]) / pooled_sd
+```
+
+. . .
+
+The voiced mean is almost [2 SDs]{.hl} above the voiceless mean.
+
+## Cohen's d in R
+
+With the `{effsize}` package (install once with `install.packages("effsize")`):
+
+```{r}
+library(effsize)
+cohen.d(duration ~ voicing, data = vowels)
+```
+
+. . .
+
+`cohen.d()` subtracts the [second]{.hl} level from the first, so d is negative here. The [size]{.hl} is what matters: `r round(abs(cohen.d(duration ~ voicing, data = vowels)$estimate), 2)`.
+
+## Interpreting d
+
+```{r, echo = FALSE, fig.height = 3.8}
+tibble(d = c(0.2, 0.5, 0.8, 2)) |>
+  mutate(label = paste("d =", d)) |>
+  crossing(x = seq(-4, 6, by = 0.02)) |>
+  mutate(a = dnorm(x, 0), b = dnorm(x, d)) |>
+  pivot_longer(c(a, b), names_to = "group", values_to = "density") |>
+  ggplot(aes(x, density, fill = group)) +
+  geom_area(position = "identity", alpha = 0.5, colour = NA) +
+  facet_wrap(~ label, nrow = 1) +
+  labs(x = NULL, y = NULL) +
+  theme(legend.position = "none", axis.text = element_blank())
+```
+
+Cohen's benchmarks: [0.2]{.hl} small, [0.5]{.hl} medium, [0.8]{.hl} large. They are rough conventions, not laws: what counts as large depends on the [field]{.hl} and the [measure]{.hl}.
+
+# Standard errors and confidence intervals
+
+::: {.fact}
+`Did you know:` male platypuses have a venomous [spur]{.hl} on each ankle, most active in the breeding season. The venom is not lethal to humans, but very painful.
+
+_Source: Australian Museum_
+:::
+
+## The standard error {.smaller}
+
+How much would a sample mean vary from sample to sample? The __standard error__:
+
+<div class="formula">SE = SD / √n</div>
+
+. . .
+
+Check it against the simulation behind the plot, 2000 sample means for each sample size:
+
+```{r}
+set.seed(2)
+means <- bind_rows(
+  tibble(n = "n = 10", mean = replicate(2000, mean(sample(pop, 10)))),
+  tibble(n = "n = 50", mean = replicate(2000, mean(sample(pop, 50))))
+)
+c(simulated_n10 = sd(means$mean[means$n == "n = 10"]), formula_n10 = 25 / sqrt(10),
+  simulated_n50 = sd(means$mean[means$n == "n = 50"]), formula_n50 = 25 / sqrt(50))
+```
+
+. . .
+
+The SD describes the [data]{.hl}. The SE describes the [estimate]{.hl}.
+
+## The SE shrinks with n
+
+```{r, echo = FALSE, fig.height = 4}
+tibble(n = 2:200) |>
+  mutate(se = 25 / sqrt(n)) |>
+  ggplot(aes(n, se)) +
+  geom_line(colour = hornbill, linewidth = 1.5) +
+  labs(x = "Sample size (n)", y = "Standard error (ms)")
+```
+
+To [halve]{.hl} the SE, you need [four times]{.hl} as many observations.
+
+## Confidence intervals
+
+A __95% confidence interval__: the estimate, plus and minus about [two]{.hl} standard errors.
+
+```{r}
+set.seed(3)
+x  <- sample(pop, 20)
+se <- sd(x) / sqrt(length(x))
+t_crit <- qt(0.975, df = length(x) - 1)      # about 2.09 for n = 20
+
+c(lower = mean(x) - t_crit * se, mean = mean(x), upper = mean(x) + t_crit * se)
+t.test(x)$conf.int
+```
+
+## 95% of intervals
+
+```{r, echo = FALSE, fig.height = 4.2}
+set.seed(3)
+cis <- map_dfr(1:100, \(i) {
+  x <- sample(pop, 20)
+  ci <- t.test(x)$conf.int
+  tibble(i, mean = mean(x), lower = ci[1], upper = ci[2])
+}) |>
+  mutate(hit = lower < 140 & upper > 140)
+
+ggplot(cis, aes(x = i, y = mean, ymin = lower, ymax = upper, colour = hit)) +
+  geom_hline(yintercept = 140, colour = mist, linetype = "dashed") +
+  geom_pointrange(size = 0.25, linewidth = 0.7) +
+  scale_colour_manual(values = c(`TRUE` = kingfisher, `FALSE` = orchid)) +
+  labs(x = "Sample", y = "Mean and 95% CI (ms)") +
+  theme(legend.position = "none")
+```
+
+100 samples of 20. Pink: the `r sum(!cis$hit)` intervals that miss the true mean. In the long run, [95%]{.hl} of intervals contain it.
+
+## What a confidence interval means
+
+- The [procedure]{.hl} captures the true value in 95% of samples
+- It is a range of values [compatible]{.hl} with the data
+- Narrow interval: a [precise]{.hl} estimate. Wide interval: an imprecise one
+
+. . .
+
+It does [not]{.hl} mean "there is a 95% probability that the true value lies in this particular interval". The true value is fixed; it is the [interval]{.hl} that varies.
+
+# Null hypotheses
+
+::: {.fact}
+`Did you know:` the platypus is one of the few mammals that [lay eggs]{.hl}, usually two. The young then drink milk from two patches of fur on their mother's belly.
+
+_Source: Australian Museum_
+:::
+
+## Null and alternative hypotheses
+
+- __Null hypothesis__, H₀: there is [no]{.hl} difference: μ_voiced = μ_voiceless
+- __Alternative hypothesis__, H₁: there [is]{.hl} a difference: μ_voiced ≠ μ_voiceless
+
+. . .
+
+Significance testing asks: how [compatible]{.hl} are our data with H₀?
+
+. . .
+
+If the data would be very [surprising]{.hl} in a world where H₀ is true, we treat that as evidence against H₀.
+
+## A small study
+
+Only 8 vowels per group:
+
+```{r}
+set.seed(21)
+small <- tibble(
+  voicing  = rep(c("voiceless", "voiced"), each = 8),
+  duration = round(c(rnorm(8, 120, 20), rnorm(8, 140, 22)))
+) |>
+  mutate(voicing = fct_relevel(voicing, "voiceless"))
+
+obs_diff <- diff(tapply(small$duration, small$voicing, mean))
+obs_diff
+```
+
+. . .
+
+Voiced vowels are about `r round(obs_diff)` ms longer. Could a difference this big appear [by chance]{.hl}, if voicing had no effect at all?
+
+## Simulating the null
+
+If H₀ is true, the labels "voiced" and "voiceless" are [arbitrary]{.hl}. Shuffle them, and see which differences chance alone produces:
+
+```{r}
+set.seed(5)
+null_diffs <- replicate(5000, {
+  shuffled <- sample(small$voicing)
+  diff(tapply(small$duration, shuffled, mean))
+})
+mean(abs(null_diffs) >= abs(obs_diff))
+```
+
+. . .
+
+In about `r round(mean(abs(null_diffs) >= abs(obs_diff)) * 100)`% of shuffles, the difference is at least as large as ours.
+
+## Simulating the null
+
+```{r, echo = FALSE, fig.height = 4.2}
+tibble(d = null_diffs) |>
+  mutate(extreme = abs(d) >= abs(obs_diff)) |>
+  ggplot(aes(x = d, fill = extreme)) +
+  geom_histogram(binwidth = 2, colour = floor_col, boundary = 0) +
+  geom_vline(xintercept = c(-1, 1) * obs_diff, colour = mist, linetype = "dashed", linewidth = 1) +
+  scale_fill_manual(values = c(`FALSE` = kingfisher, `TRUE` = orchid)) +
+  labs(x = "Difference in means under H₀ (ms)", y = "Count") +
+  theme(legend.position = "none")
+```
+
+Pink: differences at least as extreme as the observed one (dashed). Our result is [not]{.hl} surprising under H₀.
+
+## The t statistic
+
+Instead of simulating, we can measure the difference in units of its [standard error]{.hl}:
+
+<div class="formula">t = difference / SE of the difference</div>
+
+```{r}
+s_small <- small |> summarise(m = mean(duration), v = var(duration), n = n(), .by = voicing)
+se_diff <- sqrt(sum(s_small$v / s_small$n))
+
+obs_diff / se_diff
+```
+
+. . .
+
+A t of about `r round(abs(obs_diff / se_diff), 1)`: the difference is only a little larger than its SE.
+
+# p-values
+
+::: {.fact}
+`Did you know:` platypus fur [glows]{.hl} green or cyan under UV light. The glow was found in museum specimens in 2020; nobody knows yet what it is for.
+
+_Source: Anich et al. (2020), Mammalia_
+:::
+
+## The t-distribution {.smaller}
+
+If H₀ is true, t follows a known shape: the __t-distribution__, which depends on the [degrees of freedom]{.hl} (roughly, the sample size).
+
+```{r, echo = FALSE, fig.height = 3.6}
+t_obs <- t.test(duration ~ voicing, data = small)
+df_obs <- t_obs$parameter
+t_val  <- abs(t_obs$statistic)
+
+tibble(t = seq(-5, 5, by = 0.01)) |>
+  mutate(density = dt(t, df = df_obs), tail = abs(t) >= t_val) |>
+  ggplot(aes(t, density)) +
+  geom_area(data = \(d) filter(d, t <= -t_val), fill = orchid, alpha = 0.8) +
+  geom_area(data = \(d) filter(d, t >= t_val), fill = orchid, alpha = 0.8) +
+  geom_line(colour = mist, linewidth = 1.2) +
+  geom_vline(xintercept = c(-1, 1) * t_val, colour = mist, linetype = "dashed") +
+  labs(x = "t", y = "Density")
+```
+
+The [p-value]{.hl} is the pink area: the probability of a t at least this extreme, if H₀ were true.
+
+## Computing p {.smaller}
+
+```{r}
+t_obs  <- t.test(duration ~ voicing, data = small)
+df_obs <- t_obs$parameter          # degrees of freedom
+t_val  <- abs(t_obs$statistic)     # observed t, ignoring its sign
+2 * pt(-t_val, df = df_obs)        # both tails
+```
+
+. . .
+
+Or let `t.test()` do everything:
+
+```{r}
+t.test(duration ~ voicing, data = small)
+```
+
+## Two tails
+
+- Two-tailed test: H₁ is "a difference in [either]{.hl} direction"; both tails count
+- One-tailed tests only count one direction. Use them only if the direction was fixed [before]{.hl} seeing the data
+
+. . .
+
+`t.test()` is two-tailed by default. Note the `p` matches the shuffling simulation: `r round(2 * pt(-t_val, df = df_obs), 2)` vs `r round(mean(abs(null_diffs) >= abs(obs_diff)), 2)`.
+
+## What a p-value is
+
+The probability of obtaining data [at least as extreme]{.hl} as ours, assuming H₀ is true.
+
+. . .
+
+It is [not]{.hl}:
+
+- the probability that H₀ is true
+- the probability that the result is due to chance
+- a measure of how [big]{.hl} or [important]{.hl} the effect is
+
+. . .
+
+Chapter 10 of Winter is about these misinterpretations: we come back to it in lecture 13.
+
+## Significance
+
+By convention, if `p < α`, with α usually [0.05]{.hl}, the result is called __statistically significant__ and H₀ is rejected.
+
+. . .
+
+- α = 0.05 is a [convention]{.hl}, not a law of nature
+- "Significant" means only "surprising under H₀", not "important"
+- p = 0.049 and p = 0.051 are practically the [same]{.hl} evidence
+
+## Back to the 120 vowels
+
+```{r}
+t.test(duration ~ voicing, data = vowels)
+```
+
+. . .
+
+With 60 tokens per group, t is about `r round(abs(t.test(duration ~ voicing, data = vowels)$statistic), 1)`: a difference this large would be extremely unlikely if voicing had no effect.
+
+## Significance is not size {.smaller}
+
+```{r}
+set.seed(4)
+big <- tibble(group = rep(c("a", "b"), each = 5000),
+              y     = c(rnorm(5000, 100, 15), rnorm(5000, 101, 15)))
+```
+
+```{r, echo = FALSE}
+tibble(
+  study = c("Small study: 8 vowels per group", "Huge study: 5000 per group"),
+  `Cohen's d` = c(abs(cohen.d(duration ~ voicing, data = small)$estimate),
+                  abs(cohen.d(y ~ group, data = big)$estimate)),
+  p = c(t.test(duration ~ voicing, data = small)$p.value, t.test(y ~ group, data = big)$p.value)
+) |>
+  mutate(`Cohen's d` = round(`Cohen's d`, 2), p = signif(p, 2)) |>
+  knitr::kable()
+```
+
+. . .
+
+A [medium]{.hl} effect that is not significant, and a [tiny]{.hl} effect that is. The p-value mixes effect size [and]{.hl} sample size.
+
+. . .
+
+Always report the [effect size]{.hl} and its [confidence interval]{.hl}, not only p.
+
+## t-tests are linear models
+
+```{r}
+tidy(lm(duration ~ voicing, data = vowels))
+t.test(duration ~ voicing, data = vowels, var.equal = TRUE)$statistic
+```
+
+. . .
+
+The slope's `t value` and `p.value` in `lm()` are exactly a t-test (with equal variances assumed). Significance tests for regression coefficients: Chapter 11.
+
+## Reporting
+
+```{r, echo = FALSE}
+tt <- t.test(duration ~ voicing, data = vowels)
+dd <- abs(cohen.d(duration ~ voicing, data = vowels)$estimate)
+diff_ms <- -diff(tt$estimate)
+```
+
+With inline R (lecture 3), every number comes from the analysis:
+
+> Vowels before voiced consonants were `r round(-diff_ms, 1)` ms longer than before voiceless consonants (95% CI [`r round(-tt$conf.int[2], 1)`, `r round(-tt$conf.int[1], 1)`]), t(`r round(tt$parameter, 1)`) = `r round(abs(tt$statistic), 2)`, p < .001, d = `r round(dd, 2)`.
+
+. . .
+
+- The [effect]{.hl} and its [CI]{.hl}, in the units of the data
+- The test statistic, its [degrees of freedom]{.hl}, and p
+- A standardised [effect size]{.hl}
+
+# Your turn
+
+## Exercises
+
+With `palmerpenguins::penguins`, keep only Adelie and Chinstrap penguins (use `filter()` and then `droplevels()`):
+
+1. Compare their `body_mass_g`: compute Cohen's d and run a t-test
+2. Do the same for `flipper_length_mm`
+3. Which difference is significant? Report each with its 95% CI
+4. Does the first result show that the two species [weigh the same]{.hl}?
+
+## Solutions {.smaller}
+
+```{r}
+two <- palmerpenguins::penguins |>
+  filter(species %in% c("Adelie", "Chinstrap")) |>
+  drop_na(body_mass_g, flipper_length_mm) |>
+  mutate(species = droplevels(species))
+
+cohen.d(body_mass_g ~ species, data = two)$estimate
+t.test(body_mass_g ~ species, data = two)[c("statistic", "p.value", "conf.int")]
+```
+
+## Solutions {.smaller}
+
+```{r}
+cohen.d(flipper_length_mm ~ species, data = two)$estimate
+t.test(flipper_length_mm ~ species, data = two)[c("statistic", "p.value", "conf.int")]
+```
+
+. . .
+
+Flipper length differs clearly; body mass does not reach significance. But a non-significant result is [not]{.hl} evidence of no difference: the CI for body mass still includes differences of over 100 g.
+
+## Summary
+
+::: {.takeaway}
+- We estimate population [parameters]{.hl} from sample [statistics]{.hl}
+- [Cohen's d]{.hl}: a difference in SD units
+- `SE = SD / √n`: how much an estimate varies across samples
+- [95% CI]{.hl}: a range of values compatible with the data
+- `t` = difference / SE; `p` = how surprising t would be if H₀ were true
+- Significant ≠ large ≠ important: report [effect sizes]{.hl} and [CIs]{.hl}
+:::
+
+## Slides and code
+
+<div class="qr-block">
+<img src="`r qr_uri`" alt="QR code linking to these slides">
+<div>
+<p>These slides</p>
+<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p>Code, data and all lectures</p>
+<p class="qr-link">github.com/mcanzi/ws26_statistics</p>
+</div>
+</div>

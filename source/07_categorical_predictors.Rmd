@@ -1,0 +1,520 @@
+---
+title: "Categorical predictors"
+subtitle: "Treatment coding, sum coding and factors"
+author: "Dr Massimiliano Canzi"
+knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirname(input), "..", "docs")))
+output:
+  revealjs::revealjs_presentation:
+    theme: black
+    css: theme-dark.css
+    highlight: zenburn
+    mathjax: null
+    incremental: true
+    transition: fade
+    background_transition: fade
+    self_contained: true
+    reveal_options:
+      width: 1050
+      height: 700
+      slideNumber: true
+      showSlideNumber: print
+      controls: true
+      touch: true
+      transitionSpeed: fast
+      navigationMode: linear
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      comment = "",
+                      fig.width = 10, fig.height = 4.4, out.width = "100%")
+
+library(tidyverse)
+library(palmerpenguins)
+library(broom)
+
+source("slides_setup.R", local = knitr::knit_global())
+
+options(width = 70, pillar.print_min = 4, pillar.print_max = 4)
+```
+
+# Categorical predictors
+
+<style>
+  :root {
+    --footer-text:  "Categorical predictors";
+    --qr:           `r qr_css`;
+    --lecture:      `r lecture_label`;
+  }
+</style>
+
+::: {.fact}
+`Did you know:` mantis shrimp have [12]{.hl} types of photoreceptor for colour in their eyes. Humans have three.
+
+_Source: Thoen et al. (2014), Science_
+:::
+
+## Today
+
+- What a [categorical]{.hl} predictor is, and how R stores it: [factors]{.hl}
+- [Treatment]{.hl} coding: the default in R
+- Dummy coding [by hand]{.hl}, and changing the [reference level]{.hl}
+- [Sum]{.hl} coding
+- Predictors with [more than two]{.hl} levels
+- [Combining]{.hl} categorical and continuous predictors
+
+## So far
+
+- Lectures 4 to 6: [continuous]{.hl} predictors: frequency, length, body mass
+- `y ~ x1 + x2`: each slope is a change in `y` per unit of `x`
+
+. . .
+
+Many linguistic predictors are [categories]{.hl}, not numbers:
+
+- Voicing: voiced, voiceless
+- Speaking style: casual, clear, loud
+- Language, condition, speaker group, word class...
+
+. . .
+
+What does "one unit more" mean for `voicing`?
+
+## The data
+
+Vowels are longer before [voiced]{.hl} consonants (_bead_) than before [voiceless]{.hl} ones (_beat_). A simulated production study:
+
+```{r}
+set.seed(7)
+vowels <- tibble(
+  voicing  = rep(c("voiceless", "voiced"), each = 60),
+  duration = round(c(rnorm(60, 120, 20), rnorm(60, 160, 22)))   # ms
+)
+vowels |> summarise(mean = mean(duration), sd = sd(duration), n = n(), .by = voicing)
+```
+
+## The data
+
+```{r, echo = FALSE, fig.height = 4.4}
+ggplot(vowels, aes(x = voicing, y = duration, colour = voicing)) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 2) +
+  stat_summary(fun = mean, geom = "point", size = 6, shape = 18, colour = mist) +
+  labs(x = "Following consonant", y = "Vowel duration (ms)") +
+  theme(legend.position = "none")
+```
+
+White: the [mean]{.hl} of each group. A model with voicing as a predictor should recover these two means.
+
+# Treatment coding
+
+::: {.fact}
+`Did you know:` mantis shrimp come in two kinds: [smashers]{.hl} break open crabs, clams and snails with club-like limbs, and [spearers]{.hl} ambush fish from their burrows and impale them.
+
+_Source: UC Berkeley News_
+:::
+
+## `lm()` with a categorical predictor {.smaller}
+
+```{r}
+m <- lm(duration ~ voicing, data = vowels)
+coef(m)
+```
+
+. . .
+
+Compare with the group means:
+
+```{r}
+vowels |> summarise(mean = mean(duration), .by = voicing)
+```
+
+. . .
+
+- The __intercept__ is the mean of `voiced`
+- The __slope__ `voicingvoiceless` is the [difference]{.hl}: voiceless minus voiced
+
+## The reference level
+
+Why is `voiced` the intercept?
+
+. . .
+
+R turns text into a `factor`, and puts its levels in [alphabetical]{.hl} order:
+
+```{r}
+levels(factor(vowels$voicing))
+```
+
+. . .
+
+The [first]{.hl} level becomes the __reference level__. Every other level is compared [against]{.hl} it.
+
+. . .
+
+R names the coefficient `voicingvoiceless`: the predictor, then the level being compared with the reference.
+
+## Treatment coding, visually
+
+```{r, echo = FALSE, fig.height = 4.2}
+means <- vowels |> summarise(duration = mean(duration), .by = voicing) |>
+  mutate(x = if_else(voicing == "voiced", 0, 1))
+
+vowels |>
+  mutate(x = if_else(voicing == "voiced", 0, 1)) |>
+  ggplot(aes(x = x, y = duration)) +
+  geom_jitter(aes(colour = voicing), width = 0.06, alpha = 0.4, size = 2) +
+  geom_line(data = means, colour = mist, linewidth = 1.3) +
+  geom_point(data = means, colour = mist, size = 5) +
+  annotate("text", x = 0.08, y = means$duration[means$x == 0] + 6, hjust = 0, colour = mist, size = 5,
+           label = "intercept = mean of voiced") +
+  annotate("text", x = 0.55, y = mean(means$duration) + 8, hjust = 0, colour = hornbill, size = 5,
+           label = paste("slope =", round(diff(rev(means$duration)), 1), "ms")) +
+  scale_x_continuous(breaks = c(0, 1), labels = c("voiced\n(0)", "voiceless\n(1)"),
+                     limits = c(-0.25, 1.25)) +
+  labs(x = NULL, y = "Vowel duration (ms)") +
+  theme(legend.position = "none")
+```
+
+Code the reference level as [0]{.hl} and the other as [1]{.hl}: the regression line goes through the two [means]{.hl}. A one-unit change in x [is]{.hl} the change from one category to the other.
+
+## Dummy coding by hand
+
+This is exactly what R does behind the scenes:
+
+```{r}
+vowels <- vowels |>
+  mutate(voiceless01 = if_else(voicing == "voiceless", 1, 0))
+
+coef(lm(duration ~ voiceless01, data = vowels))
+```
+
+. . .
+
+Same numbers as before. A variable coded [0]{.hl} and [1]{.hl} like this is called a __dummy variable__.
+
+## Changing the reference level
+
+Voiceless is the more natural [baseline]{.hl} here. Set the order of the levels with `fct_relevel()` from `{forcats}`:
+
+```{r}
+vowels <- vowels |>
+  mutate(voicing = fct_relevel(voicing, "voiceless"))
+
+levels(vowels$voicing)
+coef(lm(duration ~ voicing, data = vowels))
+```
+
+. . .
+
+The intercept is now the `voiceless` mean, and the slope is [+38 ms]{.hl} for voiced. Same model, same fit: only the [comparison]{.hl} has changed.
+
+## Choosing the reference level
+
+- Choose the level that makes the coefficients [easiest to read]{.hl}
+- Often a natural baseline: a [control]{.hl} condition, the [standard]{.hl} variety, the most [frequent]{.hl} category
+- Set it [explicitly]{.hl}, rather than relying on the alphabet
+
+. . .
+
+In R, the reference level of a factor is simply its [first]{.hl} level.
+
+# Sum coding
+
+::: {.fact}
+`Did you know:` the peacock mantis shrimp strikes snail shells at up to [23 m/s]{.hl} (about 83 km/h), with accelerations of up to 8,000 times gravity. The strike also makes bubbles that collapse with destructive force.
+
+_Sources: Patek, Korff & Caldwell (2004), Nature; UC Berkeley News_
+:::
+
+## Sum coding
+
+Instead of [0]{.hl} and [1]{.hl}, code the two levels as [+1]{.hl} and [−1]{.hl}:
+
+```{r}
+contrasts(vowels$voicing) <- contr.sum(2)
+contrasts(vowels$voicing)
+```
+
+. . .
+
+```{r}
+coef(lm(duration ~ voicing, data = vowels))
+```
+
+## Reading sum-coded coefficients
+
+```{r}
+means <- vowels |> summarise(mean = mean(duration), .by = voicing)
+mean(means$mean)                      # the mean of the group means
+diff(means$mean) / 2                  # half the difference
+```
+
+. . .
+
+- The __intercept__ is the [grand mean]{.hl}: the average of the group means
+- The __coefficient__ is how far each group lies [from]{.hl} that grand mean: `+` for the first level, `−` for the second
+
+## Sum coding, visually
+
+```{r, echo = FALSE, fig.height = 4.2}
+grand <- mean(means$mean)
+ggplot(vowels, aes(x = voicing, y = duration, colour = voicing)) +
+  geom_jitter(width = 0.15, alpha = 0.4, size = 2) +
+  geom_hline(yintercept = grand, colour = mist, linetype = "dashed", linewidth = 1) +
+  geom_segment(data = means, aes(x = voicing, xend = voicing, y = grand, yend = mean),
+               colour = mist, linewidth = 1.2,
+               arrow = arrow(length = unit(0.25, "cm"))) +
+  geom_point(data = means, aes(y = mean), colour = mist, size = 5) +
+  annotate("text", x = 1.5, y = grand + 4, label = "grand mean = intercept",
+           colour = mist, size = 5) +
+  labs(x = "Following consonant", y = "Vowel duration (ms)") +
+  theme(legend.position = "none")
+```
+
+Arrows: the sum-coded coefficient, `±` `r round(abs(diff(means$mean)) / 2, 1)` ms from the grand mean.
+
+## Treatment or sum coding?
+
+| | Treatment (0 / 1) | Sum (+1 / −1) |
+|---|---|---|
+| Intercept | mean of the [reference]{.hl} level | [grand mean]{.hl} |
+| Coefficient | difference from the reference | deviation from the grand mean |
+| Default in R | yes | no: `contr.sum()` |
+
+. . .
+
+The [fit]{.hl} is identical. The choice changes what the intercept means, which matters most when you add [interactions]{.hl} (next week).
+
+# More than two levels
+
+::: {.fact}
+`Did you know:` despite their 12 receptors, mantis shrimp were [worse]{.hl} than humans, bees and butterflies at telling similar colours apart. They seem to encode colour unlike any other animal studied: perhaps by recognising colours rather than comparing them.
+
+_Sources: Thoen et al. (2014), Science; Sci.News_
+:::
+
+## Speaking style
+
+A simulated study of vowel duration in three [speaking styles]{.hl}:
+
+```{r}
+set.seed(9)
+styles <- tibble(
+  style    = rep(c("casual", "clear", "loud"), each = 50),
+  duration = round(c(rnorm(50, 110, 18), rnorm(50, 150, 20), rnorm(50, 132, 19)))
+)
+styles |> summarise(mean = mean(duration), .by = style)
+```
+
+## Speaking style
+
+```{r, echo = FALSE, fig.height = 4.4}
+ggplot(styles, aes(x = style, y = duration, colour = style)) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 2) +
+  stat_summary(fun = mean, geom = "point", size = 6, shape = 18, colour = mist) +
+  labs(x = "Speaking style", y = "Vowel duration (ms)") +
+  theme(legend.position = "none")
+```
+
+## Three levels, two coefficients
+
+```{r}
+m_style <- lm(duration ~ style, data = styles)
+coef(m_style)
+```
+
+. . .
+
+- __Intercept__: the mean of `casual`, the reference level
+- `styleclear`: clear [minus]{.hl} casual
+- `styleloud`: loud [minus]{.hl} casual
+
+. . .
+
+A predictor with `k` levels gets `k − 1` coefficients: each level against the reference.
+
+## Behind the scenes {.smaller}
+
+R creates one dummy variable per non-reference level:
+
+```{r}
+model.matrix(~ style, data = styles)[c(1, 51, 101), ]
+```
+
+. . .
+
+| style | styleclear | styleloud | predicted duration |
+|---|---|---|---|
+| casual | 0 | 0 | b₀ |
+| clear | 1 | 0 | b₀ + b₁ |
+| loud | 0 | 1 | b₀ + b₂ |
+
+## What is missing?
+
+The model does not directly compare `clear` with `loud`.
+
+. . .
+
+Change the reference level to get that comparison:
+
+```{r}
+styles |>
+  mutate(style = fct_relevel(style, "clear")) |>
+  lm(duration ~ style, data = _) |>
+  coef()
+```
+
+. . .
+
+`data = _` uses the native pipe's placeholder: the data come from the pipe.
+
+## Sum coding with three levels
+
+```{r}
+styles <- styles |> mutate(style = factor(style))
+contrasts(styles$style) <- contr.sum(3)
+coef(lm(duration ~ style, data = styles))
+```
+
+. . .
+
+- Intercept: the [grand mean]{.hl} of the three styles
+- `style1`: casual's deviation from it; `style2`: clear's deviation
+- Loud's deviation is not shown: it is [minus the sum]{.hl} of the other two
+
+## Model fit and assumptions {.smaller}
+
+```{r}
+glance(m_style)[, 1:2]
+```
+
+```{r, echo = FALSE, fig.height = 3.2}
+augment(m_style) |>
+  ggplot(aes(x = style, y = .resid, colour = style)) +
+  geom_hline(yintercept = 0, colour = mist, linetype = "dashed") +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 1.8) +
+  labs(x = NULL, y = "Residual (ms)") +
+  theme(legend.position = "none")
+```
+
+The same assumptions as before. With categories, check that the residuals have a similar [spread]{.hl} in every group.
+
+# Mixing predictors
+
+## Categorical and continuous together
+
+Back to the warning from lecture 4: bill length by bill depth.
+
+```{r}
+bills <- drop_na(penguins, bill_length_mm, bill_depth_mm)
+coef(lm(bill_length_mm ~ bill_depth_mm, data = bills))
+```
+
+. . .
+
+Add `species` as a second predictor:
+
+```{r}
+m_bills <- lm(bill_length_mm ~ bill_depth_mm + species, data = bills)
+coef(m_bills)
+```
+
+. . .
+
+The bill depth slope turns [positive]{.hl}: Simpson's paradox, solved.
+
+## Three parallel lines
+
+```{r, echo = FALSE, fig.height = 4.2}
+bills_fit <- augment(m_bills)
+ggplot(bills_fit, aes(x = bill_depth_mm, colour = species)) +
+  geom_point(aes(y = bill_length_mm), alpha = 0.45, size = 2) +
+  geom_line(aes(y = .fitted), linewidth = 1.5) +
+  labs(x = "Bill depth (mm)", y = "Bill length (mm)", colour = NULL)
+```
+
+One slope for bill depth, and a different [intercept]{.hl} for each species (Adelie is the reference). The lines are parallel: no interaction.
+
+## Reading the mixed model
+
+```{r}
+tidy(m_bills)[, 1:2]
+```
+
+. . .
+
+- `bill_depth_mm`: `+` `r round(coef(m_bills)["bill_depth_mm"], 2)` mm of length per mm of depth, [within]{.hl} a species
+- `speciesChinstrap`: Chinstrap bills are `r round(coef(m_bills)["speciesChinstrap"], 1)` mm longer than Adelie bills of the [same depth]{.hl}
+- `speciesGentoo`: Gentoo, `r round(coef(m_bills)["speciesGentoo"], 1)` mm longer than Adelie
+
+## Other coding schemes
+
+Treatment and sum coding are the two you will meet most. There are others, for example:
+
+- [Helmert]{.hl} coding: each level against the mean of the [previous]{.hl} levels
+- [Successive differences]{.hl}: each level against the [previous]{.hl} one, for ordered categories
+
+. . .
+
+All of them give the [same fit]{.hl}. They differ only in which comparisons the coefficients show: choose the one that matches your [research question]{.hl}.
+
+# Your turn
+
+## Exercises
+
+With `penguins`:
+
+1. Model `body_mass_g` by `species`. Check that the coefficients match the group means.
+2. Make `Gentoo` the reference level and refit. What changed?
+3. Refit with [sum coding]{.hl}. What is the intercept now?
+4. Model `body_mass_g` by `sex` and `flipper_length_mm` together. Interpret both coefficients.
+
+## Solutions {.smaller}
+
+```{r}
+pengs <- drop_na(penguins, body_mass_g, sex, flipper_length_mm)
+
+coef(lm(body_mass_g ~ species, data = pengs))
+pengs |> summarise(mean = mean(body_mass_g), .by = species)
+
+pengs |>
+  mutate(species = fct_relevel(species, "Gentoo")) |>
+  lm(body_mass_g ~ species, data = _) |>
+  coef()
+```
+
+## Solutions {.smaller}
+
+```{r}
+pengs_sum <- pengs
+contrasts(pengs_sum$species) <- contr.sum(3)
+coef(lm(body_mass_g ~ species, data = pengs_sum))
+
+coef(lm(body_mass_g ~ sex + flipper_length_mm, data = pengs))
+```
+
+. . .
+
+Males are about `r round(coef(lm(body_mass_g ~ sex + flipper_length_mm, data = pengs))["sexmale"])` g heavier than females with the [same flipper length]{.hl}.
+
+## Summary
+
+::: {.takeaway}
+- R stores categories as [factors]{.hl}; the [first]{.hl} level is the reference
+- [Treatment coding]{.hl}: intercept = reference mean, coefficients = differences from it
+- [Sum coding]{.hl}: intercept = grand mean, coefficients = deviations from it
+- `k` levels → `k − 1` coefficients; change the reference to see other comparisons
+- Categorical and continuous predictors can be [combined]{.hl}: one slope, several intercepts
+:::
+
+## Slides and code
+
+<div class="qr-block">
+<img src="`r qr_uri`" alt="QR code linking to these slides">
+<div>
+<p>These slides</p>
+<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p>Code, data and all lectures</p>
+<p class="qr-link">github.com/mcanzi/ws26_statistics</p>
+</div>
+</div>

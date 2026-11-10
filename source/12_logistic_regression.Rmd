@@ -1,0 +1,514 @@
+---
+title: "Mixed logistic regression"
+subtitle: "Binary outcomes with glmer()"
+author: "Dr Massimiliano Canzi"
+knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirname(input), "..", "docs")))
+output:
+  revealjs::revealjs_presentation:
+    theme: black
+    css: theme-doglord.css
+    highlight: zenburn
+    mathjax: null
+    incremental: true
+    transition: fade
+    background_transition: fade
+    self_contained: true
+    reveal_options:
+      width: 1050
+      height: 700
+      slideNumber: true
+      showSlideNumber: print
+      controls: true
+      touch: true
+      transitionSpeed: fast
+      navigationMode: linear
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      comment = "",
+                      fig.width = 10, fig.height = 4.4, out.width = "100%")
+
+library(tidyverse)
+library(lme4)
+
+source("slides_setup.R", local = knitr::knit_global())
+
+options(width = 72, pillar.print_min = 4, pillar.print_max = 4)
+```
+
+# Beyond the normal distribution
+
+<style>
+  :root {
+    --footer-text:  "Mixed logistic regression";
+    --qr:           `r qr_css`;
+    --lecture:      `r lecture_label`;
+  }
+</style>
+
+::: {.fact}
+`Did you know:` the name [axolotl]{.hl} comes from Nahuatl, the language of the Aztecs, and is thought to mean roughly "water monster". Legend links it to Xolotl, a god who disguised himself as a salamander.
+
+_Source: National Geographic_
+:::
+
+## Today
+
+- [Binary]{.hl} outcomes, and why `lm()` is the wrong tool for them
+- The [generalised linear model]{.hl}: distribution, linear predictor, link function
+- Probabilities, [odds]{.hl} and [log odds]{.hl}
+- Fitting a mixed logistic regression with `glmer()`
+- [Interpreting]{.hl} coefficients: log odds, odds ratios and probabilities
+- Testing, convergence and reporting
+
+## So far
+
+Lectures 4 to 11: a [continuous]{.hl} outcome, normally distributed residuals.
+
+- Reaction times, vowel durations, body mass
+
+. . .
+
+Many linguistic outcomes are [binary]{.hl}: one of two things happens.
+
+- A response is [correct]{.hl} or [incorrect]{.hl}
+- A speaker chooses [one variant]{.hl} or the other: _give her the book_ vs _give the book to her_
+- A listener says [yes]{.hl} or [no]{.hl}: is this sentence acceptable?
+- A final /t/ is [pronounced]{.hl} or [deleted]{.hl}
+
+## The data {.smaller}
+
+A simulated lexical decision task: is the response [correct]{.hl} (1) or not (0)?
+
+```{r}
+set.seed(1)
+n_part <- 30
+n_word <- 60
+
+participants <- tibble(participant = sprintf("P%02d", 1:n_part),
+                       u0 = rnorm(n_part, 0, 0.8),     # own accuracy
+                       u1 = rnorm(n_part, 0, 0.3))     # own frequency effect
+words <- tibble(word     = sprintf("w%02d", 1:n_word),
+                log_freq = round(runif(n_word, 1, 6), 2),
+                w0       = rnorm(n_word, 0, 0.5))      # own difficulty
+
+acc <- crossing(participants, words) |>
+  mutate(freq_c  = log_freq - mean(words$log_freq),
+         logit   = 1.5 + u0 + w0 + (0.8 + u1) * freq_c,
+         correct = rbinom(n(), size = 1, prob = plogis(logit))) |>
+  select(participant, word, log_freq, freq_c, correct)
+```
+
+. . .
+
+`rbinom(n, size = 1, prob)` flips `n` weighted coins: 1 with probability `prob`, 0 otherwise. `plogis()` turns log odds into probabilities: more on both below.
+
+## The data
+
+```{r}
+acc
+mean(acc$correct)
+```
+
+About `r round(100 * mean(acc$correct))`% of responses are correct.
+
+## Accuracy and frequency
+
+```{r, echo = FALSE, fig.height = 4.2}
+acc |>
+  mutate(bin = cut_number(freq_c, 8)) |>
+  summarise(freq_c = mean(freq_c), p = mean(correct), n = n(), .by = bin) |>
+  ggplot(aes(x = freq_c, y = p)) +
+  geom_point(data = acc, aes(y = correct), position = position_jitter(height = 0.03, width = 0),
+             colour = moss, alpha = 0.15, size = 1) +
+  geom_line(colour = hornbill, linewidth = 1.2) +
+  geom_point(colour = hornbill, size = 4) +
+  scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1)) +
+  labs(x = "log frequency (centred)", y = "Proportion correct")
+```
+
+Grey: every response, 0 or 1. Orange: the [proportion]{.hl} correct in 8 frequency bins. Frequent words are recognised more accurately.
+
+## Why not `lm()`?
+
+```{r, echo = FALSE, fig.height = 3.6}
+m_lm <- lm(correct ~ freq_c, data = acc)
+grid <- tibble(freq_c = seq(-8, 8, by = 0.05))
+m_glm <- glm(correct ~ freq_c, data = acc, family = binomial)
+
+bind_rows(
+  grid |> mutate(p = predict(m_lm, newdata = grid), model = "lm(): a straight line"),
+  grid |> mutate(p = predict(m_glm, newdata = grid, type = "response"), model = "logistic: an S-curve")
+) |>
+  ggplot(aes(freq_c, p, colour = model)) +
+  annotate("rect", xmin = -Inf, xmax = Inf, ymin = 1, ymax = Inf, fill = orchid, alpha = 0.15) +
+  annotate("rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 0, fill = orchid, alpha = 0.15) +
+  geom_line(linewidth = 1.4) +
+  labs(x = "log frequency (centred)", y = "Predicted probability", colour = NULL)
+```
+
+- A straight line predicts probabilities [above 1]{.hl} and [below 0]{.hl} (pink zones)
+- The residuals can only take two values: they cannot be [normal]{.hl}
+- The variance depends on the mean: it is largest at p = 0.5
+
+# The generalised linear model
+
+::: {.fact}
+`Did you know:` axolotls keep juvenile features such as feathery external gills all their lives ([neoteny]{.hl}). Turning into a land salamander is a yes-or-no outcome that in the wild almost always comes out [no]{.hl}.
+
+_Source: National Geographic_
+:::
+
+## Data-generating processes
+
+Winter (2019, section 12.2): think about the process that [generates]{.hl} each data point.
+
+. . .
+
+- Normal: each value is a [mean]{.hl} plus normally distributed noise, with some [SD]{.hl}
+- __Bernoulli__: each response is a [weighted coin]{.hl}. It comes up 1 with probability `p`, and 0 otherwise
+
+. . .
+
+```{r}
+rbinom(10, size = 1, prob = 0.8)       # 10 responses, each correct with p = 0.8
+```
+
+. . .
+
+A logistic regression models how `p` changes with the predictors.
+
+## Three ingredients
+
+A __generalised linear model__ (GLM) has:
+
+1. A [distribution]{.hl} for the outcome: here, the binomial (Bernoulli) distribution
+2. A [linear predictor]{.hl}: b₀ + b₁ · x, exactly as before
+3. A [link function]{.hl}, which connects the two: here, the __logit__
+
+. . .
+
+Why a link function? The linear predictor can take [any]{.hl} value, from −∞ to +∞. A probability must stay between [0]{.hl} and [1]{.hl}.
+
+## Probabilities, odds and log odds
+
+```{r}
+tibble(p = c(0.1, 0.25, 0.5, 0.75, 0.9)) |>
+  mutate(odds     = p / (1 - p),
+         log_odds = log(odds)) |>
+  print(n = 5)
+```
+
+. . .
+
+- __Odds__: how much more likely it happens than not. p = 0.75 gives odds of 3: [3 to 1]{.hl}
+- __Log odds__ (__logits__): the log of the odds. They range from −∞ to +∞, and are [0]{.hl} when p = 0.5
+
+## The logistic function
+
+```{r, echo = FALSE, fig.height = 3.8}
+tibble(logit = seq(-6, 6, by = 0.05), p = plogis(logit)) |>
+  ggplot(aes(logit, p)) +
+  geom_hline(yintercept = c(0, 1), colour = moss, linetype = "dotted") +
+  geom_vline(xintercept = 0, colour = moss, linetype = "dotted") +
+  geom_line(colour = hornbill, linewidth = 1.6) +
+  annotate("point", x = 0, y = 0.5, colour = mist, size = 4) +
+  annotate("text", x = 0.3, y = 0.45, hjust = 0, colour = mist, size = 5.5,
+           label = "log odds 0 = probability 0.5") +
+  labs(x = "Log odds", y = "Probability")
+```
+
+The model is linear on the [log odds]{.hl} scale. On the probability scale, it becomes an S-shaped curve that never goes below 0 or above 1.
+
+## In R
+
+```{r}
+qlogis(0.75)      # probability -> log odds
+plogis(1.0986)    # log odds -> probability
+```
+
+. . .
+
+- `qlogis()`: the logit function
+- `plogis()`: its inverse, the logistic function
+
+# Fitting with `glmer()`
+
+::: {.fact}
+`Did you know:` axolotls can [regrow]{.hl} lost or damaged limbs, hearts and spinal cords, and even parts of their brain, usually without scarring.
+
+_Source: National Geographic_
+:::
+
+## Which random effects?
+
+The same reasoning as for `lmer()` (lectures 10 and 11):
+
+- Frequency varies [within]{.hl} participants: `(1 + freq_c | participant)`
+- Frequency does [not]{.hl} vary within words: `(1 | word)`
+
+. . .
+
+```{r}
+m <- glmer(correct ~ freq_c + (1 + freq_c | participant) + (1 | word),
+           data = acc, family = binomial)
+```
+
+. . .
+
+`glmer()` = `lmer()` + `family`. `family = binomial` tells R that the outcome is 0/1, and uses the logit link by default.
+
+## `summary()` {.smaller}
+
+```{r}
+print(summary(m), correlation = FALSE, signif.stars = FALSE)
+```
+
+## Reading the output
+
+- [Laplace Approximation]{.hl}: how the model was fitted. GLMMs use maximum likelihood: there is no REML
+- __Random effects__: SDs on the [log odds]{.hl} scale. There is [no residual]{.hl} variance: for 0/1 data, it is fixed by the distribution
+- __Fixed effects__: estimates on the [log odds]{.hl} scale, with __z values__ and __p-values__
+
+. . .
+
+The p-values are [Wald]{.hl} tests: estimate / SE, compared with a normal distribution. They are approximate; likelihood ratio tests are usually preferred (below).
+
+# Interpreting coefficients
+
+::: {.fact}
+`Did you know:` wild axolotls live only in the lakes and canals of Xochimilco and Chalco, near Mexico City. They are [critically endangered]{.hl}: one assessment found only 50 to 1,000 left in the wild.
+
+_Source: National Geographic_
+:::
+
+## The intercept
+
+```{r}
+fixef(m)
+```
+
+. . .
+
+The intercept, `r round(fixef(m)[1], 2)`, is the log odds of a correct response for a word of [average]{.hl} frequency, by an [average]{.hl} participant (truth: 1.5).
+
+. . .
+
+```{r}
+plogis(fixef(m)[1])
+```
+
+On the probability scale: about `r round(100 * plogis(fixef(m)[1]))`% correct.
+
+## The slope: log odds
+
+The slope, `r round(fixef(m)[2], 2)`: each extra unit of log frequency adds `r round(fixef(m)[2], 2)` to the [log odds]{.hl} of a correct response (truth: 0.8).
+
+. . .
+
+Log odds are hard to think in. Two ways out:
+
+1. Exponentiate, to get an __odds ratio__
+2. Compute [predicted probabilities]{.hl}
+
+## Odds ratios
+
+```{r}
+exp(fixef(m)[2])
+```
+
+. . .
+
+Each extra unit of log frequency [multiplies]{.hl} the odds of a correct response by about `r round(exp(fixef(m)[2]), 2)`.
+
+. . .
+
+- Odds ratio `> 1`: the outcome becomes more likely
+- Odds ratio `< 1`: less likely
+- Odds ratio `= 1`, that is a log odds slope of 0: no effect
+
+## Predicted probabilities
+
+```{r}
+new <- tibble(freq_c = c(-2, -1, 0, 1, 2))
+new |> mutate(p = predict(m, newdata = new, re.form = NA, type = "response")) |>
+  print(n = 5)
+```
+
+```{r, include = FALSE}
+pp <- round(100 * predict(m, newdata = new, re.form = NA, type = "response"))
+```
+
+. . .
+
+`type = "response"`: probabilities, not log odds. `re.form = NA`: an average participant and word.
+
+. . .
+
+The same slope, [different]{.hl} changes in probability: +`r pp[2] - pp[1]` points from −2 to −1, only +`r pp[5] - pp[4]` from 1 to 2.
+
+## The divide-by-4 rule
+
+The logistic curve is steepest at p = 0.5, where its slope is exactly [1/4]{.hl} of the log odds slope.
+
+```{r}
+fixef(m)[2] / 4
+```
+
+. . .
+
+So one unit of log frequency changes the probability of a correct response by [at most]{.hl} about `r round(100 * fixef(m)[2] / 4)` percentage points. Elsewhere on the curve, the change is smaller.
+
+## Predicted curves
+
+```{r, echo = FALSE, fig.height = 4.2}
+grid_p <- crossing(participant = unique(acc$participant), freq_c = seq(-2.6, 2.6, by = 0.1))
+grid_p$p <- predict(m, newdata = grid_p, type = "response",
+                    re.form = ~ (1 + freq_c | participant))
+pop <- tibble(freq_c = seq(-2.6, 2.6, by = 0.1))
+pop$p <- predict(m, newdata = pop, type = "response", re.form = NA)
+
+ggplot(grid_p, aes(freq_c, p, group = participant)) +
+  geom_line(colour = kingfisher, alpha = 0.4, linewidth = 0.7) +
+  geom_line(data = pop, aes(group = 1), colour = hornbill, linewidth = 2) +
+  labs(x = "log frequency (centred)", y = "Predicted probability correct")
+```
+
+Blue: each participant's curve, with their own intercept and slope on the log odds scale. Orange: the average participant.
+
+# Testing and checking
+
+::: {.fact}
+`Did you know:` wild axolotls are mostly [greyish-brown]{.hl}. The white and pink axolotls you see in pictures are usually bred as pets.
+
+_Source: National Geographic_
+:::
+
+## Likelihood ratio tests {.smaller}
+
+As in lecture 11: compare the model with and without the predictor.
+
+```{r}
+m_null <- glmer(correct ~ 1 + (1 + freq_c | participant) + (1 | word),
+                data = acc, family = binomial)
+anova(m_null, m)
+```
+
+. . .
+
+No `REML = FALSE` needed: `glmer()` always uses maximum likelihood.
+
+## Convergence {.smaller}
+
+Mixed logistic models are [harder]{.hl} to fit than `lmer()` models, and convergence warnings are common. The checklist from lecture 11 still applies:
+
+1. Is every random slope [possible]{.hl} in the design?
+2. [Centre]{.hl} or scale continuous predictors
+3. Try other optimisers, or more iterations: `glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))`
+4. Compare optimisers with `allFit()`
+5. [Simplify]{.hl} the random effects, and report what you did
+
+. . .
+
+Binary data carry [less information]{.hl} per observation than continuous data: complex random effects need a lot of data.
+
+## Reporting
+
+```{r, echo = FALSE}
+lrt <- anova(m_null, m)
+```
+
+> Responses were more accurate for more frequent words: each unit of log frequency increased the log odds of a correct response by `r round(fixef(m)[2], 2)` (SE = `r round(coef(summary(m))[2, 2], 2)`; odds ratio = `r round(exp(fixef(m)[2]), 2)`). A likelihood ratio test showed that frequency improved the model, χ²(1) = `r round(lrt$Chisq[2], 1)`, p < .001. The model included by-participant random intercepts and slopes for frequency, and by-word random intercepts.
+
+. . .
+
+Report estimates on the log odds scale, and help your reader with odds ratios or predicted [probabilities]{.hl}.
+
+## Counts and proportions
+
+Sometimes data come as [counts]{.hl}: 17 correct out of 20 trials. The binomial family handles this too, with successes and failures:
+
+```{r, eval = FALSE}
+glmer(cbind(n_correct, n_incorrect) ~ predictor + (1 | participant),
+      data = counts, family = binomial)
+```
+
+. . .
+
+When you have the individual trials, model them [directly]{.hl}, as we did today: you keep the information about words.
+
+# Your turn
+
+## Real data: accuracy in `lexdec`
+
+```{r}
+library(languageR)
+lexdec |> count(Correct)
+```
+
+. . .
+
+`Correct` is a factor: `correct` or `incorrect`.
+
+## Exercises
+
+1. Create a column `correct`, coded [1]{.hl} for correct responses and [0]{.hl} otherwise
+2. Fit `correct ~ Frequency + NativeLanguage` with `glmer()`, by-subject and by-word random intercepts
+3. Interpret the `Frequency` effect as an odds ratio. What is the predicted probability of a correct response for a native and a non-native speaker, at the mean frequency?
+4. Test `NativeLanguage` with a likelihood ratio test
+
+*Careful*: if you give `glmer()` the factor `Correct` directly, it models the probability of the [second]{.hl} level, `"incorrect"`.
+
+## Solutions {.smaller}
+
+```{r}
+lex <- lexdec |> mutate(correct = as.numeric(Correct == "correct"))
+
+m_lex <- glmer(correct ~ Frequency + NativeLanguage + (1 | Subject) + (1 | Word),
+               data = lex, family = binomial)
+fixef(m_lex)
+exp(fixef(m_lex)["Frequency"])
+```
+
+. . .
+
+Each unit of log frequency multiplies the odds of a correct response by about `r round(exp(fixef(m_lex)["Frequency"]), 2)`.
+
+## Solutions {.smaller}
+
+```{r}
+new_lex <- tibble(Frequency = mean(lex$Frequency),
+                  NativeLanguage = factor(c("English", "Other"), levels = levels(lex$NativeLanguage)))
+predict(m_lex, newdata = new_lex, re.form = NA, type = "response")
+
+m_lex_null <- update(m_lex, . ~ . - NativeLanguage)
+anova(m_lex_null, m_lex)
+```
+
+. . .
+
+Both groups are very accurate, and native language does not reliably improve the model.
+
+## Summary
+
+::: {.takeaway}
+- Binary outcomes: `glmer(..., family = binomial)`, not `lmer()`
+- A GLM: a [distribution]{.hl}, a [linear predictor]{.hl}, a [link function]{.hl}
+- Coefficients are on the [log odds]{.hl} scale: `exp()` gives odds ratios, `plogis()` probabilities
+- The same slope means different changes in probability along the S-curve; divide by 4 for the [maximum]{.hl}
+- Test with [likelihood ratio tests]{.hl}; expect more convergence issues
+- The random effects logic is the [same]{.hl} as for `lmer()`
+:::
+
+## Slides and code
+
+<div class="qr-block">
+<img src="`r qr_uri`" alt="QR code linking to these slides">
+<div>
+<p>These slides</p>
+<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p>Code, data and all lectures</p>
+<p class="qr-link">github.com/mcanzi/ws26_statistics</p>
+</div>
+</div>

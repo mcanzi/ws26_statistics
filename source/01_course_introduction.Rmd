@@ -1,0 +1,495 @@
+---
+title: "Course introduction"
+subtitle: "Organisation, R and RStudio, and first steps in R"
+author: "Dr Massimiliano Canzi"
+knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirname(input), "..", "docs")))
+output:
+  revealjs::revealjs_presentation:
+    theme: black
+    css: theme-light.css
+    highlight: zenburn
+    incremental: true
+    transition: fade
+    background_transition: fade
+    self_contained: true
+    reveal_options:
+      width: 1050
+      height: 700
+      slideNumber: true
+      showSlideNumber: print
+      controls: true
+      touch: true
+      transitionSpeed: fast
+      navigationMode: linear
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = TRUE,
+                      comment = "")
+library(tidyverse)
+
+source("slides_setup.R", local = knitr::knit_global())
+options(width = 70)
+```
+
+# Introduction
+
+<style>
+  :root {
+    --footer-text:  "massimiliano.canzi@uni-konstanz.de";
+    --qr:           `r qr_css`;
+    --lecture:      `r lecture_label`;
+  }
+</style>
+
+::: {.fact}
+`Did you know:` the aye-aye, a lemur from [Madagascar]{.hl}, finds insect larvae by [tapping]{.hl} on wood with its long, thin middle finger and listening for hollow tunnels. Then it gnaws a hole and hooks the larvae out with the same finger.
+
+_Source: Duke Lemur Center_
+:::
+
+## Who I am
+
+I am Dr Massimiliano Canzi, [Max]{.hl} for short.
+
+. . .
+
+I studied linguistics in [Milan]{.hl} (BA), [Manchester]{.hl} (MA) and [York]{.hl} (MSc), and returned to [Manchester]{.hl} for my PhD.
+
+. . .
+
+I work on how listeners [perceive]{.hl} speech and how speakers [produce]{.hl} it, mostly with experiments and quantitative methods. Other interests: forensic speech science, and `R`.
+
+## My research
+
+Some of the questions I have worked on:
+
+- [What PMN?]{.hl} Processing phonological mismatch in semantics-free speech perception
+- Do the [somatic features]{.hl} of a speaker mediate how we perceive their voice?
+- A quantitative analysis of the acoustic differences between [neutral]{.hl} and [loud]{.hl} speech
+
+## Who are you?
+
+Tell us briefly:
+
+- Your [name]{.hl} and your [programme]{.hl}
+- The [data]{.hl} you work with, or would like to work with
+- Your experience with `R`: none, some, lots
+- One thing you would like to [take away]{.hl} from this course
+
+# The course
+
+::: {.fact}
+`Did you know:` aye-ayes have [incisors that never stop growing]{.hl}, like a rodent's. No other primate has them.
+
+_Source: Duke Lemur Center_
+:::
+
+## How the course works
+
+- [Lecture]{.hl}, Fridays at 11:45: new concepts, and the code that goes with them
+- [Tutorial]{.hl}, Wednesdays at 13:30: you practise, with help at hand
+- [Office hours]{.hl}, Fridays 10:00 to 11:30, by appointment
+- [Ilias]{.hl}: announcements, homework and submissions
+
+## Assessment
+
+| Component | Weight |
+|---|---|
+| [Final assignment]{.hl} | 90% |
+| [Homework]{.hl}: four of the five exercises count | 10% |
+
+. . .
+
+The homework exercises are short, a few questions each, and practise what we covered in class.
+
+## The final assignment
+
+You analyse a set of [linguistic data]{.hl} and write it up as a scientific report of about [3000 words]{.hl}, in the style of an experimental paper.
+
+. . .
+
+You hand in [one file]{.hl} that contains the text of your paper alongside the code of your analysis. Anyone who opens it can rerun your analysis and get the same numbers.
+
+## Your own work
+
+- The [text]{.hl} and the [code]{.hl} you submit must be your own
+- [Cite]{.hl} every source you build on: papers, books, tutorials, code you adapt
+- If in doubt, [ask]{.hl} before you submit
+
+. . .
+
+As The Smiths warn in _Cemetry Gates_ (1986): plagiarism tends to get noticed.
+
+## Dissertations
+
+I can supervise up to [two dissertations]{.hl} per semester as first supervisor, and up to [two]{.hl} as second supervisor.
+
+. . .
+
+If you would like to write a quantitative dissertation, get in touch [early]{.hl}.
+
+## Slides and materials
+
+The slides are written in [R Markdown]{.hl} and shown with `reveal.js`. Each week you get:
+
+- the [slides]{.hl} (.html)
+- the [code]{.hl} behind them (.Rmd)
+- the [homework]{.hl} exercises
+
+. . .
+
+Open the .Rmd in RStudio and run it yourself: every number, table and plot on the slides comes from that code. Slides and code are also online, at `github.com/mcanzi/ws26_statistics`.
+
+## The book
+
+Winter, B. (2019). _Statistics for linguists: An introduction using R_. Routledge.
+
+. . .
+
+- Written [for linguists]{.hl}, with linguistic data throughout
+- Uses `R` and the `tidyverse`, like this course
+- Builds everything around the [linear model]{.hl}
+
+## Syllabus
+
+Each lecture follows one or more chapters of Winter (2019).
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.6em; align-items: start;">
+<div>
+
+| | Lecture | Chapter |
+|---|---|---|
+| 1 | Course introduction | 1 |
+| 2 | Data wrangling | 2 |
+| 3 | Descriptive statistics | 3 |
+| 4 | Linear models | 4 |
+| 5 | Transformations | 5 |
+| 6 | Multiple regression | 6 |
+| 7 | Categorical predictors | 7 |
+
+</div>
+<div>
+
+| | Lecture | Chapter |
+|---|---|---|
+| 8 | Interactions | 8 |
+| 9 | Significance testing | 9 |
+| 10 | Mixed models 1 | 14 |
+| 11 | Mixed models 2 | 15 |
+| 12 | Mixed logistic regression | 12, 15.8 |
+| 13 | Power and model building | 10, 11, 16 |
+
+</div>
+</div>
+
+# Getting started
+
+::: {.fact}
+`Did you know:` the aye-aye is the world's largest [nocturnal primate]{.hl}, at 2.5 to 2.8 kg. In parts of Madagascar many people see it as a bad omen (_fady_) that must be killed on sight.
+
+_Source: Duke Lemur Center_
+:::
+
+## Software
+
+You need two free programs:
+
+1. `R`, the language itself. Download it from [CRAN](https://cloud.r-project.org/)
+2. `RStudio`, the program you write and run R code in. Download it from [Posit](https://docs.posit.co/ide/user/download.html)
+
+. . .
+
+RStudio needs R to work, so install [R first]{.hl}.
+
+## RStudio at a glance
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px; height: 450px; font-size: 0.75em; margin-top: 0.4em;">
+<div style="background: var(--understory); border-left: 3px solid var(--pandan); border-radius: 6px; padding: 0.6em 0.8em;"><strong>Source</strong><br>Your scripts and <code>.Rmd</code> files. Code here is saved.</div>
+<div style="background: var(--understory); border-left: 3px solid var(--kingfisher); border-radius: 6px; padding: 0.6em 0.8em;"><strong>Environment</strong><br>The objects you have created: data sets, values, models.</div>
+<div style="background: var(--understory); border-left: 3px solid var(--hornbill); border-radius: 6px; padding: 0.6em 0.8em;"><strong>Console</strong><br>Where R runs your code and prints results. Code here is not saved.</div>
+<div style="background: var(--understory); border-left: 3px solid var(--orchid); border-radius: 6px; padding: 0.6em 0.8em;"><strong>Files, Plots, Packages, Help</strong><br>Your folders, your plots, installed packages and the documentation.</div>
+</div>
+
+## Install the packages (once)
+
+Type this in the RStudio `Console`:
+
+```{r, eval=FALSE}
+install.packages(c("tidyverse", "palmerpenguins", "swirl"))
+```
+
+. . .
+
+Check that everything worked:
+
+```{r, eval=FALSE}
+R.version.string          # your version of R
+packageVersion("dplyr")   # should be 1.2.0 or newer
+```
+
+. . .
+
+You [install]{.hl} a package once. You [load]{.hl} it with `library()` in every session.
+
+# First steps in R
+
+## Hello, world
+
+```{r}
+print("Hello, world!")
+```
+
+. . .
+
+R is also a calculator:
+
+```{r}
+2 + 2
+10 / 4
+2 ^ 3
+(3 + 2) * 4
+```
+
+. . .
+
+Brackets work as in maths: without them, `3 + 2 * 4` gives `r 3 + 2 * 4`.
+
+## Your first script
+
+Code typed in the `Console` is gone once you close RStudio. Write it in a [script]{.hl} instead: _File > New File > R Script_.
+
+. . .
+
+```{r}
+# everything after a hash is a comment: R ignores it
+2 + 2   # comments can also follow code
+```
+
+. . .
+
+Run the current line with `Ctrl + Enter` (`Cmd + Enter` on a Mac). Save the script, and you can rerun the whole analysis tomorrow.
+
+## Storing values
+
+`<-` stores a value in an [object]{.hl} (read it as "gets"):
+
+```{r}
+x <- 2 * 3
+x
+x + 1
+```
+
+. . .
+
+- The object now appears in your `Environment`
+- Names are [case sensitive]{.hl}: `x` and `X` are two different objects
+- Names cannot start with a number or contain spaces: `word_freq` works, [word freq]{.hl} does not
+
+## Vectors
+
+`c()` combines values into a `vector`. Arithmetic works on every element at once:
+
+```{r}
+ages <- c(23, 31, 19, 45)
+ages * 12
+mean(ages)
+```
+
+. . .
+
+Sequences of numbers:
+
+```{r}
+1:10
+seq(0, 100, by = 25)
+```
+
+## Indexing
+
+Square brackets pick out [elements]{.hl} by position:
+
+```{r}
+x <- c(4, 8, 15, 16, 23, 42)
+x[1]
+x[2:4]
+x[-1]          # everything except the first
+```
+
+. . .
+
+Or by a [condition]{.hl}:
+
+```{r}
+x[x > 15]
+```
+
+## Logical vectors
+
+A comparison returns `TRUE` or `FALSE` for each element:
+
+```{r}
+x > 15
+```
+
+. . .
+
+`TRUE` counts as 1 and `FALSE` as 0, so you can count and take proportions:
+
+```{r}
+sum(x > 15)    # how many?
+mean(x > 15)   # what proportion?
+```
+
+. . .
+
+Comparisons: `==` equal, `!=` not equal, `>`, `<`, `>=`, `<=`
+
+## Text and categories
+
+Text goes in `"quotes"`: a `character` vector.
+
+```{r}
+words <- c("cat", "dog", "cat", "bird", "cat")
+table(words)
+```
+
+. . .
+
+A `factor` stores categories, with a fixed set of `levels`:
+
+```{r}
+animal <- factor(words)
+levels(animal)
+```
+
+. . .
+
+Levels are sorted [alphabetically]{.hl} by default: this matters later.
+
+## Data frames
+
+A [data frame]{.hl} is a table whose columns are vectors of equal length:
+
+```{r}
+d <- data.frame(word = c("cat", "dog", "bird"),
+                freq = c(120, 95, 30))
+d
+```
+
+. . .
+
+```{r}
+d$freq          # one column
+d[2, ]          # second row, all columns
+```
+
+## Functions and arguments
+
+A function takes [arguments]{.hl} inside its brackets. Name them to make code readable:
+
+```{r}
+round(3.14159, digits = 2)
+```
+
+. . .
+
+`NA` marks a missing value. Most summaries return `NA` if one is present, unless you say otherwise:
+
+```{r}
+mean(c(4, NA, 8))
+mean(c(4, NA, 8), na.rm = TRUE)
+```
+
+## Getting help
+
+- `?mean` opens the help page for `mean()`: read the [Arguments]{.hl}, and run the [Examples]{.hl} at the bottom
+- Copy an [error message]{.hl} into a search engine: someone has almost always seen it before
+- Ask in the [tutorial]{.hl}, or in office hours
+
+. . .
+
+R and its packages are written by researchers. Cite them in your work:
+
+```{r, eval=FALSE}
+citation()                 # how to cite R
+citation("tidyverse")      # how to cite a package
+```
+
+## `swirl`
+
+`swirl` teaches you R, inside R. Its interactive lessons range from the basics to modelling, and some of your homework will use them ([swirlstats.com](https://swirlstats.com/students.html)).
+
+. . .
+
+You installed it already. To start a lesson:
+
+```{r, eval=FALSE}
+library(swirl)
+swirl()
+```
+
+The first time, `swirl` asks you to choose and install a course.
+
+. . .
+
+Inside a lesson: `bye()` quits and saves your progress, `skip()` skips a question, `main()` goes back to the menu.
+
+## The `tidyverse`
+
+The `tidyverse` is a collection of R packages, created by [Hadley Wickham](https://hadley.nz/) and colleagues, for importing, reshaping and plotting data.
+
+. . .
+
+It replaces many base R functions with alternatives that are easier to [write]{.hl}, [read]{.hl} and [reproduce]{.hl}. Think of it as a [dialect]{.hl} of R, with base R as the standard variety.
+
+. . .
+
+We start using it next week. It builds on everything you saw today: vectors, data frames and functions.
+
+# Statistics
+
+## Objective or subjective?
+
+Discuss:
+
+- Two researchers analyse the [same data]{.hl}. Do they reach the [same conclusion]{.hl}?
+- Which decisions in an analysis are [yours]{.hl} to make?
+
+## Objective or subjective?
+
+Coretta et al. (2023) gave [one speech production data set]{.hl} and [one research question]{.hl} to [46 teams]{.hl} of analysts.
+
+. . .
+
+- The teams reported [substantially different]{.hl} effect sizes and interpretations
+- Neither prior beliefs nor expertise explained the differences
+
+. . .
+
+Statistics does not remove [choices]{.hl}. It makes them [explicit]{.hl}, so others can check them.
+
+## What you will learn
+
+By the end of the course you will be able to:
+
+- [describe]{.hl} and [plot]{.hl} linguistic data in R
+- build, interpret and check [regression models]{.hl}, from simple linear models to mixed effects and logistic regression
+- [report]{.hl} an analysis so that others can follow it and reproduce it
+
+## And now
+
+. . .
+
+Let's open `RStudio` and try all of this ourselves.
+
+## Slides and code
+
+<div class="qr-block">
+<img src="`r qr_uri`" alt="QR code linking to these slides">
+<div>
+<p>These slides</p>
+<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p>Code, data and all lectures</p>
+<p class="qr-link">github.com/mcanzi/ws26_statistics</p>
+</div>
+</div>

@@ -1,0 +1,477 @@
+---
+title: "Interactions"
+subtitle: "When the effect of one predictor depends on another"
+author: "Dr Massimiliano Canzi"
+knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirname(input), "..", "docs")))
+output:
+  revealjs::revealjs_presentation:
+    theme: black
+    css: theme-dark.css
+    highlight: zenburn
+    mathjax: null
+    incremental: true
+    transition: fade
+    background_transition: fade
+    self_contained: true
+    reveal_options:
+      width: 1050
+      height: 700
+      slideNumber: true
+      showSlideNumber: print
+      controls: true
+      touch: true
+      transitionSpeed: fast
+      navigationMode: linear
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      comment = "",
+                      fig.width = 10, fig.height = 4.4, out.width = "100%")
+
+library(tidyverse)
+library(broom)
+
+source("slides_setup.R", local = knitr::knit_global())
+
+options(width = 70, pillar.print_min = 4, pillar.print_max = 4)
+```
+
+# What an interaction is
+
+<style>
+  :root {
+    --footer-text:  "Interactions";
+    --qr:           `r qr_css`;
+    --lecture:      `r lecture_label`;
+  }
+</style>
+
+::: {.fact}
+`Did you know:` the greater honeyguide, an African bird, leads people to wild [bees' nests]{.hl}. People take the honey, and the bird gets the leftover honeycomb.
+
+_Sources: Spottiswoode et al. (2016), Science; National Geographic_
+:::
+
+## Today
+
+- What an [interaction]{.hl} is, and why lines stop being parallel
+- Categorical × [continuous]{.hl} interactions
+- Categorical × [categorical]{.hl} interactions
+- Continuous × continuous interactions and [curved]{.hl} regression planes
+- Why [centering]{.hl} and [sum coding]{.hl} matter so much here
+- A word on [higher-order]{.hl} interactions
+
+## So far
+
+Lectures 6 and 7: several predictors, each with [one]{.hl} effect.
+
+. . .
+
+```{r, echo = FALSE, fig.height = 3.4}
+tibble(x = rep(0:10, 2), group = rep(c("A", "B"), each = 11)) |>
+  mutate(no = if_else(group == "A", 10 + 2 * x, 18 + 2 * x),
+         yes = if_else(group == "A", 10 + 2 * x, 18 + 0.5 * x)) |>
+  pivot_longer(c(no, yes), names_to = "panel", values_to = "y") |>
+  mutate(panel = if_else(panel == "no", "No interaction: y ~ x + group",
+                                        "Interaction: y ~ x * group"),
+         panel = fct_rev(panel)) |>
+  ggplot(aes(x, y, colour = group)) +
+  geom_line(linewidth = 1.5) +
+  facet_wrap(~ panel) +
+  labs(x = "x", y = "y", colour = NULL)
+```
+
+. . .
+
+An __interaction__: the effect of one predictor [depends on]{.hl} the value of another. The lines are no longer parallel.
+
+## Interactions in R
+
+`*` adds both predictors [and]{.hl} their interaction:
+
+```{r, eval = FALSE}
+lm(y ~ x * group)            # is the same as
+lm(y ~ x + group + x:group)
+```
+
+. . .
+
+- `x` and `group`: the __main effects__ (better: [simple effects]{.hl}, see below)
+- `x:group`: the __interaction term__, how much the effect of `x` changes with `group`
+
+# Categorical × continuous
+
+::: {.fact}
+`Did you know:` Yao honey hunters in Mozambique call honeyguides with a special [brrr-hm]{.hl}. In experiments, honeyguides were about twice as likely to start guiding when they heard it than when they heard other sounds.
+
+_Sources: Spottiswoode et al. (2016), Science; National Geographic_
+:::
+
+## The data
+
+A simulated lexical decision task with first-language (`L1`) and second-language (`L2`) speakers:
+
+```{r}
+set.seed(10)
+lex <- tibble(group    = rep(c("L1", "L2"), each = 200),
+              log_freq = runif(400, 1, 6)) |>
+  mutate(rt = if_else(group == "L1", 700 - 25 * log_freq,
+                                     900 - 55 * log_freq) + rnorm(400, 0, 40))
+```
+
+. . .
+
+In this simulation, frequency matters [more]{.hl} for L2 speakers: −55 ms per log unit, against −25 ms for L1 speakers.
+
+## The data
+
+```{r, echo = FALSE, fig.height = 4.4}
+ggplot(lex, aes(x = log_freq, y = rt, colour = group)) +
+  geom_point(alpha = 0.4, size = 1.8) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1.5) +
+  labs(x = "log10 frequency", y = "Reaction time (ms)", colour = NULL)
+```
+
+Two [different]{.hl} slopes. Can last week's model capture that?
+
+## Without an interaction
+
+```{r}
+m_add <- lm(rt ~ log_freq + group, data = lex)
+coef(m_add)
+```
+
+```{r, echo = FALSE, fig.height = 3.2}
+augment(m_add) |>
+  ggplot(aes(x = log_freq, colour = group)) +
+  geom_point(aes(y = rt), alpha = 0.3, size = 1.5) +
+  geom_line(aes(y = .fitted), linewidth = 1.5) +
+  labs(x = "log10 frequency", y = "RT (ms)", colour = NULL)
+```
+
+One slope for [both]{.hl} groups: too shallow for L2, too steep for L1.
+
+## With an interaction
+
+```{r}
+m_int <- lm(rt ~ log_freq * group, data = lex)
+coef(m_int)
+```
+
+. . .
+
+- `log_freq`: the frequency slope for the [reference]{.hl} group, L1
+- `groupL2`: the difference between L2 and L1 `when log_freq = 0`
+- `log_freq:groupL2`: how much [steeper]{.hl} the slope is for L2
+
+. . .
+
+L2 slope = `r round(coef(m_int)["log_freq"], 1)` + (`r round(coef(m_int)["log_freq:groupL2"], 1)`) = `r round(coef(m_int)["log_freq"] + coef(m_int)["log_freq:groupL2"], 1)` ms per log unit.
+
+## The "main effect" trap
+
+`groupL2` = `r round(coef(m_int)["groupL2"])` ms: is that the L1–L2 difference?
+
+. . .
+
+Only at `log_freq = 0`, a frequency that does not exist in our data (1 to 6).
+
+. . .
+
+With an interaction, each lower-order coefficient is a __simple effect__: the effect of one predictor when the other is [0]{.hl} (or at its reference level).
+
+## Centering rescues the coefficients
+
+From lecture 5: centre the continuous predictor, so that [0]{.hl} means "average frequency".
+
+```{r}
+lex <- lex |> mutate(log_freq_c = log_freq - mean(log_freq))
+coef(lm(rt ~ log_freq_c * group, data = lex))
+```
+
+. . .
+
+- `groupL2`: now the L1–L2 difference for a word of [average]{.hl} frequency
+- The slope and the interaction do [not]{.hl} change
+
+## Did the interaction help?
+
+```{r}
+c(additive    = glance(m_add)$adj.r.squared,
+  interaction = glance(m_int)$adj.r.squared)
+```
+
+. . .
+
+Adjusted R² goes [up]{.hl}: separate slopes describe these data better. Whether the interaction is [reliable]{.hl} beyond this sample is a question for inference, later in the course.
+
+# Categorical × categorical
+
+::: {.fact}
+`Did you know:` Hadza hunters in Tanzania [whistle]{.hl} instead. Honeyguides in Tanzania were over three times more likely to cooperate with the Hadza whistle than with the Yao call, and in Mozambique almost twice as likely with the Yao call: the effect of the call [depends on the place]{.hl}.
+
+_Source: Spottiswoode & Wood (2023), Science_
+:::
+
+## The data
+
+Vowel duration by `voicing` of the following consonant and speaking `style`, simulated:
+
+```{r}
+set.seed(11)
+cells <- tribble(
+  ~style,   ~voicing,    ~mu,
+  "casual", "voiceless", 110,
+  "casual", "voiced",    145,
+  "clear",  "voiceless", 125,
+  "clear",  "voiced",    180
+)
+vs <- cells |>
+  uncount(40) |>                                    # 40 tokens per cell
+  mutate(duration = round(rnorm(n(), mu, 18)),
+         voicing  = fct_relevel(voicing, "voiceless")) |>
+  select(-mu)
+```
+
+## Four cell means
+
+```{r}
+vs |> summarise(mean = mean(duration), .by = c(style, voicing))
+```
+
+## An interaction plot
+
+```{r, echo = FALSE, fig.height = 4.2}
+vs |>
+  summarise(mean = mean(duration), .by = c(style, voicing)) |>
+  ggplot(aes(x = style, y = mean, colour = voicing, group = voicing)) +
+  geom_line(linewidth = 1.5) +
+  geom_point(size = 5) +
+  labs(x = "Speaking style", y = "Mean duration (ms)", colour = NULL)
+```
+
+Clear speech lengthens vowels, [more so]{.hl} before voiced consonants: the lines are not parallel.
+
+## Treatment-coded interaction {.smaller}
+
+```{r}
+m_vs <- lm(duration ~ voicing * style, data = vs)
+coef(m_vs)
+```
+
+. . .
+
+| Coefficient | Meaning |
+|---|---|
+| `(Intercept)` | mean of [voiceless, casual]{.hl} (both reference levels) |
+| `voicingvoiced` | voicing effect in [casual]{.hl} speech only |
+| `styleclear` | style effect for `voiceless` only |
+| `voicingvoiced:styleclear` | how much [bigger]{.hl} the voicing effect is in clear speech |
+
+## Rebuilding the cell means
+
+```{r}
+b <- coef(m_vs)
+c(voiceless_casual = b[[1]],
+  voiced_casual    = b[[1]] + b[[2]],
+  voiceless_clear  = b[[1]] + b[[3]],
+  voiced_clear     = b[[1]] + b[[2]] + b[[3]] + b[[4]])
+```
+
+. . .
+
+The interaction coefficient is added [only]{.hl} in the cell where both non-reference levels meet.
+
+## Sum coding, as promised
+
+```{r}
+vs_sum <- vs |> mutate(style = factor(style))
+contrasts(vs_sum$voicing) <- contr.sum(2)
+contrasts(vs_sum$style)   <- contr.sum(2)
+coef(lm(duration ~ voicing * style, data = vs_sum))
+```
+
+. . .
+
+- Intercept: the [grand mean]{.hl} of the four cells
+- `voicing1`, `style1`: effects [averaged]{.hl} over the other predictor, the classic main effects
+- Same fit, same predictions: only the [meaning]{.hl} of the coefficients changed
+
+## Which coding?
+
+- __Treatment__ coding: each effect is [relative to the reference]{.hl} level of the other predictor
+- __Sum__ coding: each effect is the [average]{.hl} across the levels of the other predictor
+
+. . .
+
+With interactions, always check which coding you used [before]{.hl} interpreting a "main effect".
+
+# Continuous × continuous
+
+::: {.fact}
+`Did you know:` honeyguides lay their eggs in other birds' nests. The chick hatches with a [hooked bill]{.hl}, which it uses to kill its foster nest-mates.
+
+_Source: University of Cape Town, FitzPatrick Institute_
+:::
+
+## The data
+
+Back to word frequency and length, simulated, now [with]{.hl} an interaction:
+
+```{r}
+set.seed(12)
+w <- tibble(log_freq = runif(400, 1, 6),
+            length   = round(runif(400, 3, 12))) |>
+  mutate(lf_c  = log_freq - mean(log_freq),
+         len_c = length - mean(length),
+         rt    = 760 - 30 * lf_c + 14 * len_c - 5 * lf_c * len_c + rnorm(400, 0, 40))
+```
+
+. . .
+
+The interaction term multiplies the two predictors: here, length matters [less]{.hl} for frequent words.
+
+## Uncentred: a surprise
+
+```{r}
+coef(lm(rt ~ log_freq * length, data = w))
+```
+
+. . .
+
+The frequency slope is [positive]{.hl}? It is the effect of frequency for a word of length [0]{.hl}.
+
+. . .
+
+```{r}
+coef(lm(rt ~ lf_c * len_c, data = w))
+```
+
+Centred, the simple effects describe a word of [average]{.hl} frequency and length. The interaction is the [same]{.hl} in both models.
+
+## Simple slopes
+
+```{r, echo = FALSE, fig.height = 4.2}
+m_w <- lm(rt ~ lf_c * len_c, data = w)
+lf_mean <- mean(w$log_freq)
+grid_w <- crossing(length = 3:12, log_freq = c(2, 3.5, 5)) |>
+  mutate(lf_c = log_freq - lf_mean, len_c = length - mean(w$length))
+grid_w$fit <- predict(m_w, newdata = grid_w)
+
+ggplot(w, aes(x = length, y = rt)) +
+  geom_jitter(width = 0.15, colour = moss, alpha = 0.3, size = 1.5) +
+  geom_line(data = grid_w, aes(y = fit, colour = factor(log_freq)), linewidth = 1.5) +
+  labs(x = "Length (letters)", y = "Reaction time (ms)", colour = "log10 frequency")
+```
+
+The effect of length at three frequencies. Compare lecture 6: the lines now [fan out]{.hl}.
+
+## A twisted plane
+
+```{r, echo = FALSE, fig.height = 4.4}
+plane <- crossing(log_freq = seq(1, 6, length.out = 80), length = seq(3, 12, length.out = 80)) |>
+  mutate(lf_c = log_freq - lf_mean, len_c = length - mean(w$length))
+plane$fit <- predict(m_w, newdata = plane)
+
+ggplot(plane, aes(x = log_freq, y = length)) +
+  geom_raster(aes(fill = fit)) +
+  geom_contour(aes(z = fit), colour = floor_col, alpha = 0.7, binwidth = 40) +
+  geom_jitter(data = w, height = 0.2, colour = mist, alpha = 0.35, size = 1) +
+  scale_fill_gradient(low = dim_col, high = hornbill) +
+  labs(x = "log10 frequency", y = "Length (letters)", fill = "Predicted RT (ms)") +
+  theme(legend.key.width = unit(2, "cm"))
+```
+
+Without an interaction, the contour lines were straight and parallel (lecture 6). With one, they [bend]{.hl}: the plane is twisted.
+
+# Higher-order interactions
+
+## Three-way interactions
+
+```{r, eval = FALSE}
+lm(y ~ a * b * c)
+```
+
+. . .
+
+expands to 7 coefficients beyond the intercept:
+
+- three main (simple) effects: `a`, `b`, `c`
+- three two-way interactions: `a:b`, `a:c`, `b:c`
+- one three-way interaction: `a:b:c`, "the interaction between a and b depends on c"
+
+. . .
+
+Three-way interactions are hard to interpret and need a lot of data. Include them only when your [research question]{.hl} asks for one.
+
+## Reading interactions: a checklist
+
+1. [Plot]{.hl} the data: do the lines or groups look non-parallel?
+2. [Centre]{.hl} continuous predictors and choose your [coding]{.hl} before fitting
+3. Read the interaction term as a [change in an effect]{.hl}
+4. Read lower-order terms as [simple effects]{.hl}, at 0 or the reference level
+5. Plot the [model predictions]{.hl}, not just the coefficients
+
+# Your turn
+
+## Exercises
+
+With `palmerpenguins::penguins`, after `drop_na()`:
+
+1. Model `body_mass_g` by `flipper_length_mm * species`. Plot the fitted lines.
+2. What is the flipper slope for Gentoo penguins?
+3. Centre flipper length and refit. Which coefficients changed?
+4. Model `body_mass_g` by `species * sex`, first with treatment coding, then with sum coding. Interpret the intercept of each.
+
+## Solutions {.smaller}
+
+```{r}
+pengs <- palmerpenguins::penguins |>
+  drop_na(body_mass_g, flipper_length_mm, sex) |>
+  mutate(flipper_c = flipper_length_mm - mean(flipper_length_mm))
+
+b_p <- coef(lm(body_mass_g ~ flipper_length_mm * species, data = pengs))
+b_p
+b_p[["flipper_length_mm"]] + b_p[["flipper_length_mm:speciesGentoo"]]   # Gentoo slope
+
+coef(lm(body_mass_g ~ flipper_c * species, data = pengs))
+```
+
+## Solutions {.smaller}
+
+```{r}
+coef(lm(body_mass_g ~ species * sex, data = pengs))
+
+pengs_sum <- pengs
+contrasts(pengs_sum$species) <- contr.sum(3)
+contrasts(pengs_sum$sex)     <- contr.sum(2)
+coef(lm(body_mass_g ~ species * sex, data = pengs_sum))
+```
+
+. . .
+
+Treatment: the intercept is the mean of [female Adelie]{.hl} penguins. Sum: the [grand mean]{.hl} of the six species × sex cells.
+
+## Summary
+
+::: {.takeaway}
+- An interaction: the effect of one predictor [depends on]{.hl} another; lines stop being parallel
+- `y ~ x * z` = `x + z + x:z`
+- The interaction term is a [change in an effect]{.hl}
+- Lower-order terms become [simple effects]{.hl}: centre continuous predictors, choose your coding
+- Continuous × continuous interactions [twist]{.hl} the regression plane
+- Higher-order interactions: only when the research question needs them
+:::
+
+## Slides and code
+
+<div class="qr-block">
+<img src="`r qr_uri`" alt="QR code linking to these slides">
+<div>
+<p>These slides</p>
+<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p>Code, data and all lectures</p>
+<p class="qr-link">github.com/mcanzi/ws26_statistics</p>
+</div>
+</div>
