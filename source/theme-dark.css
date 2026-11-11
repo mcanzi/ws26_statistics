@@ -1,7 +1,6 @@
 /* theme-dark.css
    The dark theme of mcanzi.github.io for {revealjs}: a rainforest at night,
-   green-black, with silver sage for headings, pale moon yellow and leaf green
-   for accents, and dimmed rafflesias scattered over the background.
+   green-black, with leaf green for headings and moon yellow for accents, and dimmed rafflesias scattered over the background.
    The theme of Statistics for Linguists. The website has two more themes
    with the same rules and another palette and background: the light one
    (ggplot2_workshop) and the purple one (forensic speech science). */
@@ -48,9 +47,9 @@
   --vine:       #24332c;   /* borders, grid lines */
   --mist:       #e3e8e1;   /* body text: moonlit */
   --muted:      #8e9e96;   /* secondary text */
-  --pandan:     #c9d8cf;   /* silver sage: headings, functions */
-  --hornbill:   #e8e2b0;   /* pale moon yellow: inline code, keywords */
-  --kingfisher: #88c9a8;   /* leaf green: links, numbers */
+  --pandan:     #72c699;   /* leaf green: headings, functions */
+  --hornbill:   #f2d45c;   /* moon yellow: inline code, keywords */
+  --kingfisher: #9fd3b8;   /* pale leaf green: links, numbers */
   --orchid:     #c3b6d6;   /* strings */
   --moss:       #6f8a7a;   /* list markers */
   --comment:    #6f8a7a;   /* code comments */
@@ -60,7 +59,7 @@
   --glow-1:     rgba(220, 230, 225, 0.08);   /* moonlight */
   --glow-2:     rgba(136, 201, 168, 0.04);
   --on-accent:  #0b110e;
-  --marker:     rgba(232, 226, 176, 0.25);   /* emphasis highlighter */
+  --marker:     rgba(242, 212, 92, 0.25);   /* emphasis highlighter */
   --output-bg:  #0f1713;   /* R output under the code */
   --error:      #e0675f;
 
