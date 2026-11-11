@@ -6,7 +6,7 @@ Course materials for *Statistics for Linguists* (Dr Massimiliano Canzi, Departme
 
 ## Rendering the slides
 
-Knit `source/render_all.Rmd` to render every lecture into `docs`, which GitHub Pages serves. Knitting a single lecture also writes its HTML into `docs`. Each lecture picks its look with one line in its header (`css: theme-light.css`, `theme-dark.css` or `theme-purple.css`); `source/slides_setup.R` reads that line and matches the plot colours to it. The fonts are in `source/fonts` and are embedded in each HTML file.
+Knit `source/render_all.Rmd` to render every lecture into `docs`, which GitHub Pages serves. Knitting a single lecture also writes its HTML into `docs`. All lectures use the dark theme of mcanzi.github.io (`source/theme-dark.css`); `source/slides_setup.R` sets the plot colours to match it. The fonts are in `source/fonts` and are embedded in each HTML file.
 
 ## License
 

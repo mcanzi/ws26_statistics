@@ -1,10 +1,9 @@
 /* theme-dark.css
    The dark theme of mcanzi.github.io for {revealjs}: charcoal, with indian red
    for headings, and rafflesias scattered over the background.
-   One of three themes for Statistics for Linguists, made to match
-   mcanzi.github.io: theme-dark.css, theme-light.css, theme-purple.css.
-   All three share the same rules; only the palette and the background
-   differ. */
+   The theme of Statistics for Linguists. The website has two more themes
+   with the same rules and another palette and background: the light one
+   (ggplot2_workshop) and the purple one (forensic speech science). */
 
 /* ---- fonts: the website's own files (fonts/, licences: fonts/OFL-*.txt).
    Pandoc embeds them in the HTML, so the slides need no internet and send

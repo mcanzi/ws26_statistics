@@ -6,7 +6,7 @@ knit: (function(input, ...) rmarkdown::render(input, output_dir = file.path(dirn
 output:
   revealjs::revealjs_presentation:
     theme: black
-    css: theme-light.css
+    css: theme-dark.css
     highlight: zenburn
     mathjax: null
     incremental: true

@@ -1,25 +1,9 @@
-slide_palettes <- list(
-  dark = list(
-    pandan = "#cb6d67", hornbill = "#e8a33d", kingfisher = "#45b4c8", orchid = "#e39ac0",
-    mist = "#e4e7d8", moss = "#7f9b78", muted = "#a3abb3", floor_col = "#141619",
-    vine = "#343a42", dim_col = "#2a2f35", qr_dark = "#141619", qr_light = "#e4e7d8"
-  ),
-  light = list(
-    pandan = "#b3443d", hornbill = "#a8701c", kingfisher = "#3f7470", orchid = "#6b5b95",
-    mist = "#2b2723", moss = "#8a8c74", muted = "#6e675e", floor_col = "#f3eee5",
-    vine = "#e0d8cb", dim_col = "#ebe4d8", qr_dark = "#2b2723", qr_light = "#fbf9f5"
-  ),
-  purple = list(
-    pandan = "#9d6bf0", hornbill = "#c9a23f", kingfisher = "#e2772f", orchid = "#d16fb8",
-    mist = "#e7e0f2", moss = "#8a7aa6", muted = "#9b8fb0", floor_col = "#0c0911",
-    vine = "#2f2541", dim_col = "#1c1527", qr_dark = "#0c0911", qr_light = "#e7e0f2"
-  )
+slide_palette <- list(
+  pandan = "#cb6d67", hornbill = "#e8a33d", kingfisher = "#45b4c8", orchid = "#e39ac0",
+  mist = "#e4e7d8", moss = "#7f9b78", muted = "#a3abb3", floor_col = "#141619",
+  vine = "#343a42", dim_col = "#2a2f35", qr_dark = "#141619", qr_light = "#e4e7d8"
 )
-
-slide_css <- tryCatch(rmarkdown::metadata$output[[1]]$css, error = function(e) NULL)
-slide_theme <- if (length(slide_css) == 0) "dark" else sub("^theme-(.*)\\.css$", "\\1", basename(slide_css[1]))
-if (!slide_theme %in% names(slide_palettes)) slide_theme <- "dark"
-list2env(slide_palettes[[slide_theme]], envir = environment())
+list2env(slide_palette, envir = environment())
 
 knitr::opts_chunk$set(
   comment = "",
