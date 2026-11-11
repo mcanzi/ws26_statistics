@@ -231,7 +231,7 @@ You [install]{.hl} a package once. You [load]{.hl} it with `library()` in every 
 
 # First steps in R
 
-## Hello, world
+## Hello, world {.smaller}
 
 ```{r}
 print("Hello, world!")
@@ -244,7 +244,6 @@ R is also a calculator:
 ```{r}
 2 + 2
 10 / 4
-2 ^ 3
 (3 + 2) * 4
 ```
 
@@ -283,7 +282,7 @@ x + 1
 - Names are [case sensitive]{.hl}: `x` and `X` are two different objects
 - Names cannot start with a number or contain spaces: `word_freq` works, word freq does not
 
-## Vectors
+## Vectors {.smaller}
 
 `c()` combines values into a `vector`. Arithmetic works on every element at once:
 
@@ -302,7 +301,7 @@ Sequences of numbers:
 seq(0, 100, by = 25)
 ```
 
-## Indexing
+## Indexing {.smaller}
 
 Square brackets pick out elements by position:
 
@@ -321,7 +320,7 @@ Or by a condition:
 x[x > 15]
 ```
 
-## Logical vectors
+## Logical vectors {.smaller}
 
 A comparison returns `TRUE` or `FALSE` for each element:
 
@@ -364,7 +363,7 @@ levels(animal)
 
 Levels are sorted alphabetically by default: this matters later.
 
-## Data frames
+## Data frames {.smaller}
 
 A [data frame]{.hl} is a table whose columns are vectors of equal length:
 

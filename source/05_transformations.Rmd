@@ -248,8 +248,8 @@ From lecture 3: in a normal distribution about 95% of values lie within 2 SD. A 
 Which predicts flipper length more strongly: body mass (g) or bill length (mm)?
 
 ```{r}
-coef(lm(flipper_length_mm ~ body_mass_g,    data = pengs))[2]
-coef(lm(flipper_length_mm ~ bill_length_mm, data = pengs))[2]
+c(coef(lm(flipper_length_mm ~ body_mass_g,    data = pengs))[2],
+  coef(lm(flipper_length_mm ~ bill_length_mm, data = pengs))[2])
 ```
 
 . . .
@@ -258,9 +258,8 @@ Grams and millimetres cannot be compared. Standardise both:
 
 ```{r}
 pengs <- pengs |> mutate(bill_length_z = as.numeric(scale(bill_length_mm)))
-
-coef(lm(flipper_length_mm ~ body_mass_z,   data = pengs))[2]
-coef(lm(flipper_length_mm ~ bill_length_z, data = pengs))[2]
+c(coef(lm(flipper_length_mm ~ body_mass_z,   data = pengs))[2],
+  coef(lm(flipper_length_mm ~ bill_length_z, data = pengs))[2])
 ```
 
 . . .
@@ -448,7 +447,7 @@ ggplot(quartet, aes(x, y)) +
 
 Four data sets with the same means, the same regression line and the same correlation, __r = 0.82__. Only one of them looks like a straight-line relationship. Always plot first.
 
-## Correlation by group
+## Correlation by group {.smaller}
 
 Bill length and bill depth, from last week's warning:
 
@@ -499,7 +498,7 @@ range(words$freq)
 
 The most frequent word is 2000 times more frequent than the least frequent one. `rt`: a simulated lexical decision time for each word, in ms.
 
-## What is a logarithm?
+## What is a logarithm? {.smaller}
 
 The logarithm is the inverse function to exponentiation.
 

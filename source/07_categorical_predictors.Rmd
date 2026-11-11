@@ -192,7 +192,7 @@ coef(lm(duration ~ voiceless01, data = vowels))
 
 Same numbers as before. A variable coded 0 and 1 like this is called a __dummy variable__.
 
-## Changing the reference level
+## Changing the reference level {.smaller}
 
 Voiceless is the more natural baseline here. Set the order of the levels with `fct_relevel()` from `{forcats}`:
 

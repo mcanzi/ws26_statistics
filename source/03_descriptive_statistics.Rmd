@@ -455,7 +455,7 @@ penguins |>
             sd_bill   = sd(bill_length_mm, na.rm = TRUE))
 ```
 
-```{r, echo = FALSE, fig.height = 3.8}
+```{r, echo = FALSE, fig.height = 3.4}
 ggplot(penguins, aes(x = bill_length_mm)) +
   annotate("rect", xmin = bill_mean - bill_sd, xmax = bill_mean + bill_sd,
            ymin = -Inf, ymax = Inf, fill = kingfisher, alpha = 0.15) +
@@ -537,7 +537,7 @@ The range depends on two values only, the most extreme ones. One outlier changes
 
 ## Quantiles / Quartiles
 
-Quantiles are cut points dividing the range of a probability distribution into continuous intervals with equal probabilities, or dividing the observations in a sample in the same way.
+Quantiles are cut points that divide a distribution, or the ordered values of a sample, into intervals of equal probability.
 
 . . .
 
@@ -585,7 +585,7 @@ Box: 25% to 75% (the IQR). Line: the median. Whiskers: to the furthest point wit
 _Sources: Jönsson et al. (2008), Current Biology; ScienceDaily_
 :::
 
-## Summaries per group
+## Summaries per group {.smaller}
 
 Until now, we have summarised one distribution at a time.
 
