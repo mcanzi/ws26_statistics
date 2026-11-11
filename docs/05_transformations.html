@@ -1221,22 +1221,17 @@ within 2 SD. A value with <code>z = 3</code> is unusual.</p>
 <h2 class="smaller">Comparing predictors</h2>
 <p>Which predicts flipper length more strongly: body mass (g) or bill
 length (mm)?</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> body_mass_g,    <span class="at">data =</span> pengs))[<span class="dv">2</span>]</span></code></pre></div>
-<pre class="r-output"><code>body_mass_g 
- 0.01527592 </code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> bill_length_mm, <span class="at">data =</span> pengs))[<span class="dv">2</span>]</span></code></pre></div>
-<pre class="r-output"><code>bill_length_mm 
-      1.690062 </code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="fu">coef</span>(<span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> body_mass_g,    <span class="at">data =</span> pengs))[<span class="dv">2</span>],</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coef</span>(<span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> bill_length_mm, <span class="at">data =</span> pengs))[<span class="dv">2</span>])</span></code></pre></div>
+<pre class="r-output"><code>   body_mass_g bill_length_mm 
+    0.01527592     1.69006185 </code></pre>
 <div class="fragment">
 <p>Grams and millimetres cannot be compared. Standardise both:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pengs <span class="ot">&lt;-</span> pengs <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">bill_length_z =</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(bill_length_mm)))</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> body_mass_z,   <span class="at">data =</span> pengs))[<span class="dv">2</span>]</span></code></pre></div>
-<pre class="r-output"><code>body_mass_z 
-   12.25059 </code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> bill_length_z, <span class="at">data =</span> pengs))[<span class="dv">2</span>]</span></code></pre></div>
-<pre class="r-output"><code>bill_length_z 
-     9.227034 </code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pengs <span class="ot">&lt;-</span> pengs <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">bill_length_z =</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(bill_length_mm)))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="fu">coef</span>(<span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> body_mass_z,   <span class="at">data =</span> pengs))[<span class="dv">2</span>],</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coef</span>(<span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> bill_length_z, <span class="at">data =</span> pengs))[<span class="dv">2</span>])</span></code></pre></div>
+<pre class="r-output"><code>  body_mass_z bill_length_z 
+    12.250590      9.227034 </code></pre>
 </div>
 <div class="fragment">
 <p>Per standard deviation, body mass goes with a larger change in
@@ -1249,17 +1244,17 @@ flipper length.</p>
 <div class="fragment">
 <p>Speakers with longer vocal tracts have lower formants overall. Raw F1
 and F2 mix up which vowel and which speaker.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">8</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>vowel_means <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>vowel, <span class="sc">~</span>F1, <span class="sc">~</span>F2,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;i&quot;</span>,    <span class="dv">300</span>, <span class="dv">2300</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;a&quot;</span>,    <span class="dv">750</span>, <span class="dv">1300</span>,</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;u&quot;</span>,    <span class="dv">320</span>,  <span class="dv">800</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>formants <span class="ot">&lt;-</span> <span class="fu">crossing</span>(<span class="at">speaker =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>), vowel_means, <span class="at">token =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) <span class="sc">|&gt;</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">k  =</span> <span class="fu">if_else</span>(speaker <span class="sc">==</span> <span class="st">&quot;A&quot;</span>, <span class="dv">1</span>, <span class="fl">1.2</span>),   <span class="co"># speaker B: shorter vocal tract</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">F1 =</span> F1 <span class="sc">*</span> k <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">n</span>(), <span class="dv">0</span>, <span class="dv">40</span>),</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">F2 =</span> F2 <span class="sc">*</span> k <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">n</span>(), <span class="dv">0</span>, <span class="dv">120</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">8</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>vowel_means <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>vowel, <span class="sc">~</span>F1, <span class="sc">~</span>F2,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;i&quot;</span>,    <span class="dv">300</span>, <span class="dv">2300</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;a&quot;</span>,    <span class="dv">750</span>, <span class="dv">1300</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;u&quot;</span>,    <span class="dv">320</span>,  <span class="dv">800</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>formants <span class="ot">&lt;-</span> <span class="fu">crossing</span>(<span class="at">speaker =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>), vowel_means, <span class="at">token =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">k  =</span> <span class="fu">if_else</span>(speaker <span class="sc">==</span> <span class="st">&quot;A&quot;</span>, <span class="dv">1</span>, <span class="fl">1.2</span>),   <span class="co"># speaker B: shorter vocal tract</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">F1 =</span> F1 <span class="sc">*</span> k <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">n</span>(), <span class="dv">0</span>, <span class="dv">40</span>),</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">F2 =</span> F2 <span class="sc">*</span> k <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">n</span>(), <span class="dv">0</span>, <span class="dv">120</span>))</span></code></pre></div>
 </div>
 </section>
 <section id="raw-formants" class="slide level2">
@@ -1271,9 +1266,9 @@ and F2 mix up which vowel and which speaker.</p>
 <h2>Lobanov normalisation</h2>
 <p>z-score each formant within each speaker (Lobanov, 1971). With
 <code>.by</code> from lecture 2:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>formants_z <span class="ot">&lt;-</span> formants <span class="sc">|&gt;</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(F1, F2), \(x) <span class="fu">as.numeric</span>(<span class="fu">scale</span>(x))),</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">.by =</span> speaker)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>formants_z <span class="ot">&lt;-</span> formants <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(F1, F2), \(x) <span class="fu">as.numeric</span>(<span class="fu">scale</span>(x))),</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">.by =</span> speaker)</span></code></pre></div>
 <div class="fragment">
 <p><code>.by = speaker</code>: each speaker’s F1 and F2 are z-scored
 using that speaker’s own mean and SD.</p>
@@ -1369,16 +1364,16 @@ in g, kg or tonnes</li>
 </section>
 <section id="cor-in-r" class="slide level2 smaller">
 <h2 class="smaller"><code>cor()</code> in R</h2>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(penguins<span class="sc">$</span>flipper_length_mm, penguins<span class="sc">$</span>body_mass_g)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(penguins<span class="sc">$</span>flipper_length_mm, penguins<span class="sc">$</span>body_mass_g)</span></code></pre></div>
 <pre class="r-output"><code>[1] NA</code></pre>
 <div class="fragment">
 <p>Missing values again. Use only complete pairs:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(penguins<span class="sc">$</span>flipper_length_mm, penguins<span class="sc">$</span>body_mass_g, <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(penguins<span class="sc">$</span>flipper_length_mm, penguins<span class="sc">$</span>body_mass_g, <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>)</span></code></pre></div>
 <pre class="r-output"><code>[1] 0.8712018</code></pre>
 </div>
 <div class="fragment">
 <p>Per group, with <code>summarise()</code> and <code>.by</code>:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>pengs <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">r =</span> <span class="fu">cor</span>(flipper_length_mm, body_mass_g), <span class="at">.by =</span> species)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pengs <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">r =</span> <span class="fu">cor</span>(flipper_length_mm, body_mass_g), <span class="at">.by =</span> species)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 3 × 2
   species       r
   &lt;fct&gt;     &lt;dbl&gt;
@@ -1391,18 +1386,18 @@ in g, kg or tonnes</li>
 <h2 class="smaller">Correlation and regression</h2>
 <p>Standardise both variables, and the regression slope is the
 correlation:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pengs <span class="ot">&lt;-</span> pengs <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">flipper_z =</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(flipper_length_mm)))</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(flipper_z <span class="sc">~</span> body_mass_z, <span class="at">data =</span> pengs))</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>pengs <span class="ot">&lt;-</span> pengs <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">flipper_z =</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(flipper_length_mm)))</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(flipper_z <span class="sc">~</span> body_mass_z, <span class="at">data =</span> pengs))</span></code></pre></div>
 <pre class="r-output"><code>  (Intercept)   body_mass_z 
 -1.011386e-15  8.712018e-01 </code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(pengs<span class="sc">$</span>flipper_length_mm, pengs<span class="sc">$</span>body_mass_g)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(pengs<span class="sc">$</span>flipper_length_mm, pengs<span class="sc">$</span>body_mass_g)</span></code></pre></div>
 <pre class="r-output"><code>[1] 0.8712018</code></pre>
 <div class="fragment">
 <p>And in simple regression, <code>R² = r²</code>:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(pengs<span class="sc">$</span>flipper_length_mm, pengs<span class="sc">$</span>body_mass_g)<span class="sc">^</span><span class="dv">2</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(pengs<span class="sc">$</span>flipper_length_mm, pengs<span class="sc">$</span>body_mass_g)<span class="sc">^</span><span class="dv">2</span></span></code></pre></div>
 <pre class="r-output"><code>[1] 0.7589925</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glance</span>(m)<span class="sc">$</span>r.squared</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glance</span>(m)<span class="sc">$</span>r.squared</span></code></pre></div>
 <pre class="r-output"><code>[1] 0.7589925</code></pre>
 </div>
 </section>
@@ -1414,13 +1409,13 @@ correlation:</p>
 same correlation, <strong>r = 0.82</strong>. Only one of them looks like
 a straight-line relationship. Always plot first.</p>
 </section>
-<section id="correlation-by-group" class="slide level2">
-<h2>Correlation by group</h2>
+<section id="correlation-by-group" class="slide level2 smaller">
+<h2 class="smaller">Correlation by group</h2>
 <p>Bill length and bill depth, from last week’s warning:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>bills <span class="ot">&lt;-</span> <span class="fu">drop_na</span>(penguins, bill_length_mm, bill_depth_mm)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(bills<span class="sc">$</span>bill_length_mm, bills<span class="sc">$</span>bill_depth_mm)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bills <span class="ot">&lt;-</span> <span class="fu">drop_na</span>(penguins, bill_length_mm, bill_depth_mm)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(bills<span class="sc">$</span>bill_length_mm, bills<span class="sc">$</span>bill_depth_mm)</span></code></pre></div>
 <pre class="r-output"><code>[1] -0.2350529</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>bills <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">r =</span> <span class="fu">cor</span>(bill_length_mm, bill_depth_mm), <span class="at">.by =</span> species)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>bills <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">r =</span> <span class="fu">cor</span>(bill_length_mm, bill_depth_mm), <span class="at">.by =</span> species)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 3 × 2
   species       r
   &lt;fct&gt;     &lt;dbl&gt;
@@ -1460,12 +1455,12 @@ the study.</p>
 <h2>Magnitudes</h2>
 <p>Some linguistic variables span many orders of magnitude. Word
 frequency is the classic example:</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5</span>)</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>words <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">rank =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2000</span>,</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">freq =</span> <span class="fu">round</span>(<span class="fl">1e6</span> <span class="sc">/</span> rank)) <span class="sc">|&gt;</span>        <span class="co"># Zipf-like frequencies</span></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rt =</span> <span class="fu">exp</span>(<span class="fl">6.75</span> <span class="sc">-</span> <span class="fl">0.06</span> <span class="sc">*</span> <span class="fu">log10</span>(freq) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">n</span>(), <span class="dv">0</span>, <span class="fl">0.18</span>)))</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(words<span class="sc">$</span>freq)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>words <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">rank =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2000</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">freq =</span> <span class="fu">round</span>(<span class="fl">1e6</span> <span class="sc">/</span> rank)) <span class="sc">|&gt;</span>        <span class="co"># Zipf-like frequencies</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rt =</span> <span class="fu">exp</span>(<span class="fl">6.75</span> <span class="sc">-</span> <span class="fl">0.06</span> <span class="sc">*</span> <span class="fu">log10</span>(freq) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">n</span>(), <span class="dv">0</span>, <span class="fl">0.18</span>)))</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(words<span class="sc">$</span>freq)</span></code></pre></div>
 <pre class="r-output"><code>[1] 5e+02 1e+06</code></pre>
 <div class="fragment">
 <p>The most frequent word is 2000 times more frequent than the least
@@ -1473,21 +1468,21 @@ frequent one. <code>rt</code>: a simulated lexical decision time for
 each word, in ms.</p>
 </div>
 </section>
-<section id="what-is-a-logarithm" class="slide level2">
-<h2>What is a logarithm?</h2>
+<section id="what-is-a-logarithm" class="slide level2 smaller">
+<h2 class="smaller">What is a logarithm?</h2>
 <p>The logarithm is the inverse function to exponentiation.</p>
 <div class="fragment">
 <p>That means the logarithm of a number x to the base b is the exponent
 to which b must be raised, to produce x.</p>
 </div>
 <div class="fragment">
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log10</span>(<span class="dv">1000</span>)        <span class="co"># 10^3 = 1000</span></span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log10</span>(<span class="dv">1000</span>)        <span class="co"># 10^3 = 1000</span></span></code></pre></div>
 <pre class="r-output"><code>[1] 3</code></pre>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log2</span>(<span class="dv">8</span>)            <span class="co"># 2^3  = 8</span></span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log2</span>(<span class="dv">8</span>)            <span class="co"># 2^3  = 8</span></span></code></pre></div>
 <pre class="r-output"><code>[1] 3</code></pre>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="fu">exp</span>(<span class="dv">2</span>))        <span class="co"># natural log, base e = 2.718...</span></span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="fu">exp</span>(<span class="dv">2</span>))        <span class="co"># natural log, base e = 2.718...</span></span></code></pre></div>
 <pre class="r-output"><code>[1] 2</code></pre>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">log</span>(<span class="dv">50</span>))       <span class="co"># exp() undoes log()</span></span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">log</span>(<span class="dv">50</span>))       <span class="co"># exp() undoes log()</span></span></code></pre></div>
 <pre class="r-output"><code>[1] 50</code></pre>
 </div>
 </section>
@@ -1527,9 +1522,9 @@ Choose the base that is easiest to explain.</p>
 </section>
 <section id="zeros-and-negatives" class="slide level2">
 <h2>Zeros and negatives</h2>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="dv">0</span>)</span></code></pre></div>
 <pre class="r-output"><code>[1] -Inf</code></pre>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="sc">-</span><span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="sc">-</span><span class="dv">5</span>)</span></code></pre></div>
 <pre class="r-output"><code>[1] NaN</code></pre>
 <div class="fragment">
 <p>The log is only defined for positive numbers.</p>
@@ -1537,7 +1532,7 @@ Choose the base that is easiest to explain.</p>
 <div class="fragment">
 <p>Frequency counts often contain zeros (a word that never occurs in a
 corpus). A common fix is to add 1 first:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log1p</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">9</span>, <span class="dv">99</span>))     <span class="co"># same as log(c(0, 9, 99) + 1)</span></span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log1p</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">9</span>, <span class="dv">99</span>))     <span class="co"># same as log(c(0, 9, 99) + 1)</span></span></code></pre></div>
 <pre class="r-output"><code>[1] 0.000000 2.302585 4.605170</code></pre>
 </div>
 </section>
@@ -1550,8 +1545,8 @@ linear.</p>
 </section>
 <section id="logging-a-predictor-1" class="slide level2">
 <h2>Logging a predictor</h2>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>m_freq <span class="ot">&lt;-</span> <span class="fu">lm</span>(rt <span class="sc">~</span> <span class="fu">log10</span>(freq), <span class="at">data =</span> words)</span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(m_freq)</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>m_freq <span class="ot">&lt;-</span> <span class="fu">lm</span>(rt <span class="sc">~</span> <span class="fu">log10</span>(freq), <span class="at">data =</span> words)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(m_freq)</span></code></pre></div>
 <pre class="r-output"><code>(Intercept) log10(freq) 
   876.69485   -48.27585 </code></pre>
 <div class="fragment">
@@ -1573,11 +1568,11 @@ the linear model assumes (lecture 4).</p>
 </section>
 <section id="reading-a-log-outcome" class="slide level2 smaller">
 <h2 class="smaller">Reading a log outcome</h2>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>m_log <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(rt) <span class="sc">~</span> <span class="fu">log10</span>(freq), <span class="at">data =</span> words)</span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(m_log)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>m_log <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(rt) <span class="sc">~</span> <span class="fu">log10</span>(freq), <span class="at">data =</span> words)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(m_log)</span></code></pre></div>
 <pre class="r-output"><code>(Intercept) log10(freq) 
  6.78462766 -0.06845576 </code></pre>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">coef</span>(m_log)[<span class="dv">2</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">coef</span>(m_log)[<span class="dv">2</span>])</span></code></pre></div>
 <pre class="r-output"><code>log10(freq) 
   0.9338348 </code></pre>
 <div class="fragment">
@@ -1586,7 +1581,7 @@ frequency multiplies the RT by 0.934: responses about 6.6% faster.</p>
 </div>
 <div class="fragment">
 <p>Back to milliseconds with <code>exp()</code>:</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">predict</span>(m_log, <span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">freq =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">1000</span>, <span class="dv">100000</span>))))</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">predict</span>(m_log, <span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">freq =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">1000</span>, <span class="dv">100000</span>))))</span></code></pre></div>
 <pre class="r-output"><code>       1        2        3 
 825.6508 720.0066 627.8799 </code></pre>
 </div>
@@ -1624,8 +1619,8 @@ more normal, e.g. with a log</li>
 phonetics, e.g. Lobanov</li>
 </ul>
 <div class="fragment">
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">15</span>, <span class="dv">16</span>, <span class="dv">23</span>, <span class="dv">42</span>)</span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>(x <span class="sc">-</span> <span class="fu">min</span>(x)) <span class="sc">/</span> (<span class="fu">max</span>(x) <span class="sc">-</span> <span class="fu">min</span>(x))     <span class="co"># min-max scaling</span></span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">15</span>, <span class="dv">16</span>, <span class="dv">23</span>, <span class="dv">42</span>)</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>(x <span class="sc">-</span> <span class="fu">min</span>(x)) <span class="sc">/</span> (<span class="fu">max</span>(x) <span class="sc">-</span> <span class="fu">min</span>(x))     <span class="co"># min-max scaling</span></span></code></pre></div>
 <pre class="r-output"><code>[1] 0.0000000 0.1052632 0.2894737 0.3157895 0.5000000 1.0000000</code></pre>
 </div>
 <div class="fragment">
