@@ -1031,7 +1031,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
 <p>By the end of this class you will be able to</p>
 <ul>
 <li class="fragment">explain what the <code>tidyverse</code> is and what
-<span class="hl">tidy data</span> looks like</li>
+tidy data looks like</li>
 <li class="fragment">read and write <code>.csv</code> files with
 <code>{readr}</code></li>
 <li class="fragment">use the core <code>{dplyr}</code> verbs:
@@ -1048,23 +1048,22 @@ document.addEventListener('DOMContentLoaded', function(e) {
 <h1>The tidyverse</h1>
 <p><em>“R is not a language driven by the purity of its philosophy; R is
 a language designed to get shit done.”</em></p>
-<p><span class="hl">Hadley Wickham</span> (Chief Scientist at Posit,
-formerly RStudio)</p>
+<p>Hadley Wickham (Chief Scientist at Posit, formerly RStudio)</p>
 </section>
 <section id="tidyverse" class="slide level2 smaller">
 <h2 class="smaller">Tidyverse</h2>
-<p>A collection of R packages that share the same <span class="hl">design</span>, <span class="hl">grammar</span> and <span class="hl">data structures</span>.</p>
+<p>A collection of R packages that share the same design, grammar and
+data structures.</p>
 <ul>
-<li class="fragment">A <span class="hl">dialect</span> of R: everything
-you know from base R still works</li>
-<li class="fragment">Functions are <span class="hl">verbs</span> named
-after what they do</li>
-<li class="fragment">The <span class="hl">data</span> always comes
-first, so functions can be chained</li>
+<li class="fragment">A dialect of R: everything you know from base R
+still works</li>
+<li class="fragment">Functions are verbs named after what they do</li>
+<li class="fragment">The data always comes first, so functions can be
+chained</li>
 <li class="fragment">Output is (almost) always a <span class="hl">data
 frame</span>, so the next step knows what to expect</li>
-<li class="fragment">Together with <span class="hl">Quarto</span> /
-<span class="hl">R Markdown</span>: reproducible analyses</li>
+<li class="fragment">Together with Quarto / R Markdown: reproducible
+analyses</li>
 </ul>
 </section>
 <section id="base-r-vs-tidyverse" class="slide level2 smaller">
@@ -1072,7 +1071,7 @@ frame</span>, so the next step knows what to expect</li>
 <p>Same question: <em>mean body mass of Gentoo penguins, in kg</em></p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><span class="hl">Base R</span></p>
+<p>Base R</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>gentoo <span class="ot">&lt;-</span> penguins[penguins<span class="sc">$</span>species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>, ]</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(gentoo<span class="sc">$</span>body_mass_g <span class="sc">/</span> <span class="dv">1000</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div><div class="column" style="width:50%;">
@@ -1083,7 +1082,8 @@ frame</span>, so the next step knows what to expect</li>
 </div>
 </div>
 <div class="fragment">
-<p>Neither is “wrong”. The tidyverse version reads like a sentence.</p>
+<p>Both give the same answer; the tidyverse version reads more like a
+sentence.</p>
 </div>
 </section>
 <section id="the-core-tidyverse" class="slide level2 smaller">
@@ -1152,7 +1152,7 @@ frame</span>, so the next step knows what to expect</li>
 <code>{ggplot2}</code> (next class)</li>
 <li class="fragment"><span class="hl">model</span>: the rest of this
 course</li>
-<li class="fragment"><span class="hl">communicate</span>: <span class="hl">Quarto</span></li>
+<li class="fragment"><span class="hl">communicate</span>: Quarto</li>
 </ul>
 </section>
 <section id="tidy-data" class="slide level2 smaller">
@@ -1243,8 +1243,8 @@ row</li>
 <ul>
 <li class="fragment">Prints only the first rows and the columns that
 fit</li>
-<li class="fragment">Shows the <span class="hl">type</span> of each
-column: <code>&lt;fct&gt;</code>, <code>&lt;dbl&gt;</code>,
+<li class="fragment">Shows the type of each column:
+<code>&lt;fct&gt;</code>, <code>&lt;dbl&gt;</code>,
 <code>&lt;int&gt;</code>, <code>&lt;chr&gt;</code></li>
 </ul>
 </section>
@@ -1285,8 +1285,7 @@ palmerpenguins documentation</em></p>
 <section id="penguins-in-base-r" class="slide level2 smaller">
 <h2 class="smaller"><code>penguins</code> in base R</h2>
 <p><code>Heads up!</code> Since R 4.5.0, base R also ships a
-<code>penguins</code> data set, but with <span class="hl">shorter column
-names</span>:</p>
+<code>penguins</code> data set, but with shorter column names:</p>
 <table>
 <thead>
 <tr class="header">
@@ -1361,9 +1360,8 @@ dbl (2): rt, accuracy
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <div class="fragment">
 <ul>
-<li class="fragment"><span class="hl">Rows</span> and <span class="hl">columns</span> read</li>
-<li class="fragment">The <span class="hl">type</span> it guessed for
-each column</li>
+<li class="fragment">Rows and columns read</li>
+<li class="fragment">The type it guessed for each column</li>
 <li class="fragment">If a guess is wrong, set it yourself:</li>
 </ul>
 </div>
@@ -1425,11 +1423,9 @@ Jules Dumont d’Urville named after his wife, Adèle, in 1840.</p>
 <ol type="1">
 <li class="fragment">The first argument is a <span class="hl">data
 frame</span></li>
-<li class="fragment">The other arguments say <span class="hl">what to
-do</span>, using column names <span class="hl">without
-quotes</span></li>
-<li class="fragment">The output is a <span class="hl">new data
-frame</span></li>
+<li class="fragment">The other arguments say what to do, using column
+names without quotes</li>
+<li class="fragment">The output is a new data frame</li>
 </ol>
 </section>
 <section id="six-verbs" class="slide level2">
@@ -1490,7 +1486,8 @@ frame</span></li>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(penguins)</span></code></pre></div>
 <pre class="r-output"><code>[1] 344</code></pre>
 <div class="fragment">
-<p>Nothing happened to <code>penguins</code>! To keep the result, <span class="hl">assign</span> it:</p>
+<p>Nothing happened to <code>penguins</code>! To keep the result, assign
+it:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>gentoo <span class="ot">&lt;-</span> <span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(gentoo)</span></code></pre></div>
 <pre class="r-output"><code>[1] 124</code></pre>
@@ -1521,7 +1518,7 @@ frame</span></li>
 </section>
 <section id="select-helpers" class="slide level2 smaller">
 <h2 class="smaller"><code>select()</code> helpers</h2>
-<p>Select by <span class="hl">name pattern</span> or <span class="hl">type</span> instead of typing every name:</p>
+<p>Select by name pattern or type instead of typing every name:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, species<span class="sc">:</span>bill_depth_mm)   <span class="co"># a range of columns</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">starts_with</span>(<span class="st">&quot;bill&quot;</span>))     <span class="co"># names starting with &quot;bill&quot;</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">ends_with</span>(<span class="st">&quot;_mm&quot;</span>))        <span class="co"># names ending with &quot;_mm&quot;</span></span>
@@ -1541,14 +1538,13 @@ frame</span></li>
 </section>
 <section id="select-by-position" class="slide level2">
 <h2><code>select()</code> by position</h2>
-<p>Also possible, but <span class="hl">fragile</span>:</p>
+<p>Also possible, but fragile:</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>))</span></code></pre></div>
 <div class="fragment">
 <p>If the column order changes (new data export, a colleague’s file),
-your code silently selects the <span class="hl">wrong</span> columns.
-Prefer <span class="hl">names</span>.</p>
+your code silently selects the wrong columns. Prefer names.</p>
 </div>
 </section>
 <section id="rename" class="slide level2 smaller">
@@ -1579,7 +1575,7 @@ name:</p>
 <section id="mutate" class="slide level2 smaller">
 <h2 class="smaller"><code>mutate()</code></h2>
 <div class="fragment fade-up">
-<p>Create <span class="hl">new</span> columns, or <span class="hl">overwrite</span> existing ones</p>
+<p>Create new columns, or overwrite existing ones</p>
 </div>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(penguins,</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">body_mass_kg =</span> body_mass_g <span class="sc">/</span> <span class="dv">1000</span>,</span>
@@ -1593,8 +1589,8 @@ name:</p>
 3 Adelie          3.25       2.24
 # ℹ 341 more rows</code></pre>
 <div class="fragment">
-<p>New columns are added at the <span class="hl">end</span>. You can use
-a column you just created in the same <code>mutate()</code>.</p>
+<p>New columns are added at the end. You can use a column you just
+created in the same <code>mutate()</code>.</p>
 </div>
 </section>
 <section id="mutate-with-conditions" class="slide level2 smaller">
@@ -1620,8 +1616,8 @@ a column you just created in the same <code>mutate()</code>.</p>
 # ℹ 1 more row</code></pre>
 </div>
 <div class="fragment">
-<p>Conditions are checked <span class="hl">in order</span>. Rows
-matching none of them get <code>NA</code>.</p>
+<p>Conditions are checked in order. Rows matching none of them get
+<code>NA</code>.</p>
 </div>
 </section>
 <section id="mutate-on-many-columns-across" class="slide level2 smaller">
@@ -1652,8 +1648,7 @@ these columns</em></p>
 <section id="filter" class="slide level2">
 <h2><code>filter()</code></h2>
 <div class="fragment fade-up">
-<p>Keep the rows where a <span class="hl">condition</span> is
-<code>TRUE</code></p>
+<p>Keep the rows where a condition is <code>TRUE</code></p>
 </div>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 124 × 8
@@ -1743,23 +1738,23 @@ Levels: Adelie Chinstrap Gentoo</code></pre>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">filter</span>(penguins, sex <span class="sc">!=</span> <span class="st">&quot;female&quot;</span>))</span></code></pre></div>
 <pre class="r-output"><code>[1] 168</code></pre>
 <div class="fragment">
-<p><code>165 + 168 = 333</code>, not <span class="hl">344</span>! The 11
-penguins with unknown <code>sex</code> are dropped by <span class="hl">both</span>.</p>
+<p><code>165 + 168 = 333</code>, not 344! The 11 penguins with unknown
+<code>sex</code> are dropped by both.</p>
 </div>
 </section>
 <section id="filter_out-new-in-dplyr-1.2.0" class="slide level2 smaller">
 <h2 class="smaller"><code>filter_out()</code> (new in
 <code>{dplyr}</code> 1.2.0)</h2>
-<p>Say which rows to <span class="hl">drop</span>. Rows with
-<code>NA</code> are <span class="hl">kept</span>.</p>
+<p>Say which rows to drop. Rows with <code>NA</code> are kept.</p>
 <div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">filter_out</span>(penguins, sex <span class="sc">==</span> <span class="st">&quot;female&quot;</span>))</span></code></pre></div>
 <pre class="r-output"><code>[1] 179</code></pre>
 <div class="fragment">
 <p>Rule of thumb:</p>
 <ul>
-<li class="fragment"><code>filter()</code> when you know what to <span class="hl">keep</span></li>
+<li class="fragment"><code>filter()</code> when you know what to
+keep</li>
 <li class="fragment"><code>filter_out()</code> when you know what to
-<span class="hl">drop</span></li>
+drop</li>
 </ul>
 </div>
 <div class="fragment">
@@ -1797,7 +1792,7 @@ each, which add up to about 11 hours of sleep.</p>
 </section>
 <section id="summarise" class="slide level2 smaller">
 <h2 class="smaller"><code>summarise()</code></h2>
-<p>Collapse many rows into <span class="hl">one</span></p>
+<p>Collapse many rows into one</p>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(penguins,</span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">mean_mass =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">sd_mass   =</span> <span class="fu">sd</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
@@ -1814,7 +1809,7 @@ each, which add up to about 11 hours of sleep.</p>
 <section id="group_by-summarise" class="slide level2 smaller">
 <h2 class="smaller"><code>group_by()</code> +
 <code>summarise()</code></h2>
-<p>One row <span class="hl">per group</span></p>
+<p>One row per group</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>penguins_grouped <span class="ot">&lt;-</span> <span class="fu">group_by</span>(penguins, species)</span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(penguins_grouped,</span>
 <span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">mean_mass =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
@@ -1827,7 +1822,7 @@ each, which add up to about 11 hours of sleep.</p>
 3 Gentoo        5076.   124</code></pre>
 <div class="fragment">
 <p><code>group_by()</code> changes nothing you can see. It tells the
-<span class="hl">next</span> verb to work group by group.</p>
+next verb to work group by group.</p>
 </div>
 </section>
 <section id="by-grouping-for-one-step" class="slide level2 smaller">
@@ -1885,7 +1880,7 @@ record.</p>
 <span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>penguins_3 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(penguins_2, <span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>)</span>
 <span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>penguins_4 <span class="ot">&lt;-</span> <span class="fu">select</span>(penguins_3, species, bill_length_cm)</span></code></pre></div>
 <div class="fragment">
-<p>Or nested, read from the <span class="hl">inside out</span>:</p>
+<p>Or nested, read from the inside out:</p>
 <div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>penguins_4 <span class="ot">&lt;-</span> <span class="fu">select</span>(</span>
 <span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>),</span>
@@ -1899,11 +1894,10 @@ record.</p>
 <p><code>x |&gt; f(y)</code> is the same as <code>f(x, y)</code></p>
 </div>
 <ul>
-<li class="fragment">Takes the result on the <span class="hl">left</span>, passes it as the <span class="hl">first
-argument</span> of the function on the <span class="hl">right</span></li>
-<li class="fragment">Read it aloud as <span class="hl">then</span></li>
-<li class="fragment">No need to <span class="hl">repeat the
-object</span> at every step</li>
+<li class="fragment">Takes the result on the left, passes it as the
+first argument of the function on the right</li>
+<li class="fragment">Read it aloud as <span class="hl">then</span>.
+There is no need to repeat the object at every step</li>
 </ul>
 <div class="fragment">
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
@@ -1926,11 +1920,11 @@ object</span> at every step</li>
 <span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>) <span class="sc">|&gt;</span></span>
 <span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
 <span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, bill_length_cm)</span></code></pre></div>
-<p>Take <code>penguins</code>, <span class="hl">then</span>
-<code>filter</code> only the <code>species</code> Gentoo <span class="hl">or</span> Chinstrap, <span class="hl">then</span>
-<code>mutate</code> to add a column <code>bill_length_cm</code> which
-divides <code>bill_length_mm</code> by <span class="hl">10</span>, <span class="hl">then</span> <code>select</code> only <code>species</code> and
-<code>bill_length_cm</code>. Save the result as
+<p>Take <code>penguins</code>, then <code>filter</code> only the
+<code>species</code> Gentoo or Chinstrap, then <code>mutate</code> to
+add a column <code>bill_length_cm</code> which divides
+<code>bill_length_mm</code> by 10, then <code>select</code> only
+<code>species</code> and <code>bill_length_cm</code>. Save the result as
 <code>penguins_2</code>.</p>
 </section>
 <section id="pro-tip-save-to-the-right" class="slide level2">
@@ -1952,8 +1946,8 @@ loaded with the tidyverse (since 2014)</li>
 4.1.0)</li>
 </ul>
 <div class="fragment">
-<p>For everything in this course they are <span class="hl">interchangeable</span>. We use <code>|&gt;</code>: it works
-without loading any package.</p>
+<p>For everything in this course they are interchangeable. We use
+<code>|&gt;</code>: it works without loading any package.</p>
 </div>
 <div class="fragment">
 <p>Keyboard shortcut: <code>Ctrl/Cmd + Shift + M</code></p>
@@ -2011,8 +2005,7 @@ not <code>|&gt;</code>. More next class.</p>
 </tr>
 <tr class="even">
 <td><code>filter(df, ...)</code> and nothing changes</td>
-<td>result not <span class="hl">assigned</span> with
-<code>&lt;-</code></td>
+<td>result not assigned with <code>&lt;-</code></td>
 </tr>
 <tr class="odd">
 <td><code>mean(body_mass_g)</code> gives <code>NA</code></td>
@@ -2042,8 +2035,8 @@ not <code>|&gt;</code>. More next class.</p>
 <li class="fragment">Groups: <code>summarise()</code>,
 <code>count()</code>, <code>group_by()</code> or <code>.by</code></li>
 <li class="fragment">Chain with <code>|&gt;</code>, read as <span class="hl">then</span></li>
-<li class="fragment">Always <span class="hl">assign</span> the result if
-you want to keep it</li>
+<li class="fragment">Always assign the result if you want to keep
+it</li>
 </ul>
 </div>
 </section>
