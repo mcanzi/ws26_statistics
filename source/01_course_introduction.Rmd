@@ -42,39 +42,39 @@ options(width = 70)
 </style>
 
 ::: {.fact}
-`Did you know:` the aye-aye, a lemur from [Madagascar]{.hl}, finds insect larvae by [tapping]{.hl} on wood with its long, thin middle finger and listening for hollow tunnels. Then it gnaws a hole and hooks the larvae out with the same finger.
+`Did you know:` the aye-aye, a lemur from [Madagascar]{.hl}, finds insect larvae by tapping on wood with its long, thin middle finger and listening for hollow tunnels. Then it gnaws a hole and hooks the larvae out with the same finger.
 
 _Source: Duke Lemur Center_
 :::
 
 ## Who I am
 
-I am Dr Massimiliano Canzi, [Max]{.hl} for short.
+I am Dr Massimiliano Canzi, Max for short.
 
 . . .
 
-I studied linguistics in [Milan]{.hl} (BA), [Manchester]{.hl} (MA) and [York]{.hl} (MSc), and returned to [Manchester]{.hl} for my PhD.
+I studied linguistics in Milan (BA), Manchester (MA) and York (MSc), and returned to Manchester for my PhD.
 
 . . .
 
-I work on how listeners [perceive]{.hl} speech and how speakers [produce]{.hl} it, mostly with experiments and quantitative methods. Other interests: forensic speech science, and `R`.
+I work on how listeners perceive speech and how speakers produce it, mostly with experiments and quantitative methods. Other interests: forensic speech science, and `R`.
 
 ## My research
 
 Some of the questions I have worked on:
 
-- [What PMN?]{.hl} Processing phonological mismatch in semantics-free speech perception
-- Do the [somatic features]{.hl} of a speaker mediate how we perceive their voice?
-- A quantitative analysis of the acoustic differences between [neutral]{.hl} and [loud]{.hl} speech
+- What PMN? Processing phonological mismatch in semantics-free speech perception
+- Do the somatic features of a speaker mediate how we perceive their voice?
+- A quantitative analysis of the acoustic differences between neutral and loud speech
 
 ## Who are you?
 
 Tell us briefly:
 
-- Your [name]{.hl} and your [programme]{.hl}
-- The [data]{.hl} you work with, or would like to work with
+- Your name and your programme
+- The data you work with, or would like to work with
 - Your experience with `R`: none, some, lots
-- One thing you would like to [take away]{.hl} from this course
+- One thing you would like to take away from this course
 
 # The course
 
@@ -86,17 +86,17 @@ _Source: Duke Lemur Center_
 
 ## How the course works
 
-- [Lecture]{.hl}, Fridays at 11:45: new concepts, and the code that goes with them
-- [Tutorial]{.hl}, Wednesdays at 13:30: you practise, with help at hand
-- [Office hours]{.hl}, Fridays 10:00 to 11:30, by appointment
-- [Ilias]{.hl}: announcements, homework and submissions
+- Lecture, Fridays at 11:45: new concepts, and the code that goes with them
+- Tutorial, Wednesdays at 13:30: you practise, with help at hand
+- Office hours, Fridays 10:00 to 11:30, by appointment
+- Ilias: announcements, homework and submissions
 
 ## Assessment
 
 | Component | Weight |
 |---|---|
-| [Final assignment]{.hl} | 90% |
-| [Homework]{.hl}: four of the five exercises count | 10% |
+| Final assignment | 90% |
+| Homework: four of the five exercises count | 10% |
 
 . . .
 
@@ -104,17 +104,16 @@ The homework exercises are short, a few questions each, and practise what we cov
 
 ## The final assignment
 
-You analyse a set of [linguistic data]{.hl} and write it up as a scientific report of about [3000 words]{.hl}, in the style of an experimental paper.
+You analyse a set of linguistic data and write it up as a scientific report of about 3000 words, in the style of an experimental paper.
 
 . . .
 
-You hand in [one file]{.hl} that contains the text of your paper alongside the code of your analysis. Anyone who opens it can rerun your analysis and get the same numbers.
+You hand in one file that contains the text of your paper alongside the code of your analysis. Anyone who opens it can rerun your analysis and get the same numbers.
 
 ## Your own work
 
-- The [text]{.hl} and the [code]{.hl} you submit must be your own
-- [Cite]{.hl} every source you build on: papers, books, tutorials, code you adapt
-- If in doubt, [ask]{.hl} before you submit
+- The text and the code you submit must be your own
+- Cite every source you build on (papers, books, tutorials, code you adapt), and if in doubt, ask before you submit
 
 . . .
 
@@ -122,19 +121,19 @@ As The Smiths warn in _Cemetry Gates_ (1986): plagiarism tends to get noticed.
 
 ## Dissertations
 
-I can supervise up to [two dissertations]{.hl} per semester as first supervisor, and up to [two]{.hl} as second supervisor.
+I can supervise up to two dissertations per semester as first supervisor, and up to two as second supervisor.
 
 . . .
 
-If you would like to write a quantitative dissertation, get in touch [early]{.hl}.
+If you would like to write a quantitative dissertation, get in touch early.
 
 ## Slides and materials
 
-The slides are written in [R Markdown]{.hl} and shown with `reveal.js`. Each week you get:
+The slides are written in R Markdown and shown with `reveal.js`. Each week you get:
 
-- the [slides]{.hl} (.html)
-- the [code]{.hl} behind them (.Rmd)
-- the [homework]{.hl} exercises
+- the slides (.html)
+- the code behind them (.Rmd)
+- the homework exercises
 
 . . .
 
@@ -146,8 +145,7 @@ Winter, B. (2019). _Statistics for linguists: An introduction using R_. Routledg
 
 . . .
 
-- Written [for linguists]{.hl}, with linguistic data throughout
-- Uses `R` and the `tidyverse`, like this course
+- Written for linguists, with linguistic data throughout, and uses `R` and the `tidyverse`, like this course
 - Builds everything around the [linear model]{.hl}
 
 ## Syllabus
@@ -199,7 +197,7 @@ You need two free programs:
 
 . . .
 
-RStudio needs R to work, so install [R first]{.hl}.
+RStudio needs R to work, so install R first.
 
 ## RStudio at a glance
 
@@ -283,7 +281,7 @@ x + 1
 
 - The object now appears in your `Environment`
 - Names are [case sensitive]{.hl}: `x` and `X` are two different objects
-- Names cannot start with a number or contain spaces: `word_freq` works, [word freq]{.hl} does not
+- Names cannot start with a number or contain spaces: `word_freq` works, word freq does not
 
 ## Vectors
 
@@ -306,7 +304,7 @@ seq(0, 100, by = 25)
 
 ## Indexing
 
-Square brackets pick out [elements]{.hl} by position:
+Square brackets pick out elements by position:
 
 ```{r}
 x <- c(4, 8, 15, 16, 23, 42)
@@ -317,7 +315,7 @@ x[-1]          # everything except the first
 
 . . .
 
-Or by a [condition]{.hl}:
+Or by a condition:
 
 ```{r}
 x[x > 15]
@@ -364,7 +362,7 @@ levels(animal)
 
 . . .
 
-Levels are sorted [alphabetically]{.hl} by default: this matters later.
+Levels are sorted alphabetically by default: this matters later.
 
 ## Data frames
 
@@ -402,9 +400,8 @@ mean(c(4, NA, 8), na.rm = TRUE)
 
 ## Getting help
 
-- `?mean` opens the help page for `mean()`: read the [Arguments]{.hl}, and run the [Examples]{.hl} at the bottom
-- Copy an [error message]{.hl} into a search engine: someone has almost always seen it before
-- Ask in the [tutorial]{.hl}, or in office hours
+- `?mean` opens the help page for `mean()`: read the Arguments, and run the Examples at the bottom
+- Copy an error message into a search engine, where someone has almost always seen it before, or ask in the tutorial or in office hours
 
 . . .
 
@@ -440,7 +437,7 @@ The `tidyverse` is a collection of R packages, created by [Hadley Wickham](https
 
 . . .
 
-It replaces many base R functions with alternatives that are easier to [write]{.hl}, [read]{.hl} and [reproduce]{.hl}. Think of it as a [dialect]{.hl} of R, with base R as the standard variety.
+It replaces many base R functions with alternatives that are easier to read and write. Think of it as a dialect of R, with base R as the standard variety.
 
 . . .
 
@@ -452,29 +449,29 @@ We start using it next week. It builds on everything you saw today: vectors, dat
 
 Discuss:
 
-- Two researchers analyse the [same data]{.hl}. Do they reach the [same conclusion]{.hl}?
-- Which decisions in an analysis are [yours]{.hl} to make?
+- Two researchers analyse the same data. Do they reach the same conclusion?
+- Which decisions in an analysis are yours to make?
 
 ## Objective or subjective?
 
-Coretta et al. (2023) gave [one speech production data set]{.hl} and [one research question]{.hl} to [46 teams]{.hl} of analysts.
+Coretta et al. (2023) gave one speech production data set and one research question to 46 teams of analysts.
 
 . . .
 
-- The teams reported [substantially different]{.hl} effect sizes and interpretations
+- The teams reported substantially different effect sizes and interpretations
 - Neither prior beliefs nor expertise explained the differences
 
 . . .
 
-Statistics does not remove [choices]{.hl}. It makes them [explicit]{.hl}, so others can check them.
+Every analysis involves choices like these. Statistics makes them explicit, so others can check them.
 
 ## What you will learn
 
 By the end of the course you will be able to:
 
-- [describe]{.hl} and [plot]{.hl} linguistic data in R
-- build, interpret and check [regression models]{.hl}, from simple linear models to mixed effects and logistic regression
-- [report]{.hl} an analysis so that others can follow it and reproduce it
+- describe and plot linguistic data in R
+- build, interpret and check regression models, from simple linear models to mixed effects and logistic regression
+- report an analysis so that others can follow it and reproduce it
 
 ## And now
 

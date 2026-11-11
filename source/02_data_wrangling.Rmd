@@ -57,7 +57,7 @@ rt_data <- tibble(
 
 By the end of this class you will be able to
 
-- explain what the `tidyverse` is and what [tidy data]{.hl} looks like
+- explain what the `tidyverse` is and what tidy data looks like
 - read and write `.csv` files with `{readr}`
 - use the core `{dplyr}` verbs: `select()`, `filter()`, `arrange()`, `rename()`, `mutate()`
 - summarise data by group with `summarise()` and `count()`
@@ -67,17 +67,17 @@ By the end of this class you will be able to
 
 _"R is not a language driven by the purity of its philosophy; R is a language designed to get shit done."_
 
-[Hadley Wickham]{.hl} (Chief Scientist at Posit, formerly RStudio)
+Hadley Wickham (Chief Scientist at Posit, formerly RStudio)
 
 ## Tidyverse {.smaller}
 
-A collection of R packages that share the same [design]{.hl}, [grammar]{.hl} and [data structures]{.hl}.
+A collection of R packages that share the same design, grammar and data structures.
 
-- A [dialect]{.hl} of R: everything you know from base R still works
-- Functions are [verbs]{.hl} named after what they do
-- The [data]{.hl} always comes first, so functions can be chained
+- A dialect of R: everything you know from base R still works
+- Functions are verbs named after what they do
+- The data always comes first, so functions can be chained
 - Output is (almost) always a [data frame]{.hl}, so the next step knows what to expect
-- Together with [Quarto]{.hl} / [R Markdown]{.hl}: reproducible analyses
+- Together with Quarto / R Markdown: reproducible analyses
 
 ## Base R vs tidyverse {.smaller}
 
@@ -86,7 +86,7 @@ Same question: _mean body mass of Gentoo penguins, in kg_
 :::: {.columns}
 
 ::: {.column width="50%"}
-[Base R]{.hl}
+Base R
 
 ```{r, eval=FALSE}
 gentoo <- penguins[penguins$species == "Gentoo", ]
@@ -108,7 +108,7 @@ penguins |>
 
 . . .
 
-Neither is "wrong". The tidyverse version reads like a sentence.
+Both give the same answer; the tidyverse version reads more like a sentence.
 
 ## The core tidyverse {.smaller}
 
@@ -137,7 +137,7 @@ Neither is "wrong". The tidyverse version reads like a sentence.
 - [transform]{.hl}: `{dplyr}` (today)
 - [visualise]{.hl}: `{ggplot2}` (next class)
 - [model]{.hl}: the rest of this course
-- [communicate]{.hl}: [Quarto]{.hl}
+- [communicate]{.hl}: Quarto
 
 ## Tidy data {.smaller}
 
@@ -184,7 +184,7 @@ penguins
 ```
 
 - Prints only the first rows and the columns that fit
-- Shows the [type]{.hl} of each column: `<fct>`, `<dbl>`, `<int>`, `<chr>`
+- Shows the type of each column: `<fct>`, `<dbl>`, `<int>`, `<chr>`
 
 ## `glimpse()`
 
@@ -213,7 +213,7 @@ library(palmerpenguins)
 
 ## `penguins` in base R {.smaller}
 
-`Heads up!` Since R 4.5.0, base R also ships a `penguins` data set, but with [shorter column names]{.hl}:
+`Heads up!` Since R 4.5.0, base R also ships a `penguins` data set, but with shorter column names:
 
 | `{palmerpenguins}` | base R ≥ 4.5.0 |
 |---|---|
@@ -264,8 +264,8 @@ rt <- read_csv(example_file)
 
 . . .
 
-- [Rows]{.hl} and [columns]{.hl} read
-- The [type]{.hl} it guessed for each column
+- Rows and columns read
+- The type it guessed for each column
 - If a guess is wrong, set it yourself:
 
 . . .
@@ -301,8 +301,8 @@ _Source: Australian Antarctic Division_
 Every `{dplyr}` verb works the same way:
 
 1. The first argument is a [data frame]{.hl}
-2. The other arguments say [what to do]{.hl}, using column names [without quotes]{.hl}
-3. The output is a [new data frame]{.hl}
+2. The other arguments say what to do, using column names without quotes
+3. The output is a new data frame
 
 ## Six verbs
 
@@ -324,7 +324,7 @@ nrow(penguins)
 
 . . .
 
-Nothing happened to `penguins`! To keep the result, [assign]{.hl} it:
+Nothing happened to `penguins`! To keep the result, assign it:
 
 ```{r}
 gentoo <- filter(penguins, species == "Gentoo")
@@ -353,7 +353,7 @@ select(penguins, -year)
 
 ## `select()` helpers {.smaller}
 
-Select by [name pattern]{.hl} or [type]{.hl} instead of typing every name:
+Select by name pattern or type instead of typing every name:
 
 ```{r, eval=FALSE}
 select(penguins, species:bill_depth_mm)   # a range of columns
@@ -372,7 +372,7 @@ select(penguins, ends_with("_mm"))
 
 ## `select()` by position
 
-Also possible, but [fragile]{.hl}:
+Also possible, but fragile:
 
 ```{r, eval=FALSE}
 select(penguins, 1, 3, 5)
@@ -382,7 +382,7 @@ select(penguins, -(1:5))
 
 . . .
 
-If the column order changes (new data export, a colleague's file), your code silently selects the [wrong]{.hl} columns. Prefer [names]{.hl}.
+If the column order changes (new data export, a colleague's file), your code silently selects the wrong columns. Prefer names.
 
 ## `rename()` {.smaller}
 
@@ -403,7 +403,7 @@ select(penguins, Type = species, bill_length_mm)
 ## `mutate()` {.smaller}
 
 ::: {.fragment .fade-up}
-Create [new]{.hl} columns, or [overwrite]{.hl} existing ones
+Create new columns, or overwrite existing ones
 :::
 
 ```{r}
@@ -415,7 +415,7 @@ select(penguins_2, species, body_mass_kg, bill_ratio)
 
 . . .
 
-New columns are added at the [end]{.hl}. You can use a column you just created in the same `mutate()`.
+New columns are added at the end. You can use a column you just created in the same `mutate()`.
 
 ## `mutate()` with conditions {.smaller}
 
@@ -442,7 +442,7 @@ count(penguins_2, size)
 
 . . .
 
-Conditions are checked [in order]{.hl}. Rows matching none of them get `NA`.
+Conditions are checked in order. Rows matching none of them get `NA`.
 
 ## `mutate()` on many columns: `across()` {.smaller}
 
@@ -473,7 +473,7 @@ mutate(penguins, across(ends_with("_mm"), \(x) x / 10))  # mm to cm
 ## `filter()`
 
 ::: {.fragment .fade-up}
-Keep the rows where a [condition]{.hl} is `TRUE`
+Keep the rows where a condition is `TRUE`
 :::
 
 ```{r}
@@ -533,11 +533,11 @@ nrow(filter(penguins, sex != "female"))
 
 . . .
 
-`165 + 168 = 333`, not [344]{.hl}! The 11 penguins with unknown `sex` are dropped by [both]{.hl}.
+`165 + 168 = 333`, not 344! The 11 penguins with unknown `sex` are dropped by both.
 
 ## `filter_out()` (new in `{dplyr}` 1.2.0) {.smaller}
 
-Say which rows to [drop]{.hl}. Rows with `NA` are [kept]{.hl}.
+Say which rows to drop. Rows with `NA` are kept.
 
 ```{r}
 nrow(filter_out(penguins, sex == "female"))
@@ -547,8 +547,8 @@ nrow(filter_out(penguins, sex == "female"))
 
 Rule of thumb:
 
-- `filter()` when you know what to [keep]{.hl}
-- `filter_out()` when you know what to [drop]{.hl}
+- `filter()` when you know what to keep
+- `filter_out()` when you know what to drop
 
 . . .
 
@@ -581,7 +581,7 @@ _Source: Libourel et al. (2023), Science_
 
 ## `summarise()` {.smaller}
 
-Collapse many rows into [one]{.hl}
+Collapse many rows into one
 
 ```{r}
 summarise(penguins,
@@ -596,7 +596,7 @@ summarise(penguins,
 
 ## `group_by()` + `summarise()` {.smaller}
 
-One row [per group]{.hl}
+One row per group
 
 ```{r}
 penguins_grouped <- group_by(penguins, species)
@@ -607,7 +607,7 @@ summarise(penguins_grouped,
 
 . . .
 
-`group_by()` changes nothing you can see. It tells the [next]{.hl} verb to work group by group.
+`group_by()` changes nothing you can see. It tells the next verb to work group by group.
 
 ## `.by`: grouping for one step {.smaller}
 
@@ -656,7 +656,7 @@ penguins_4 <- select(penguins_3, species, bill_length_cm)
 
 . . .
 
-Or nested, read from the [inside out]{.hl}:
+Or nested, read from the inside out:
 
 ```{r, eval=FALSE}
 penguins_4 <- select(
@@ -672,9 +672,8 @@ penguins_4 <- select(
 `x |> f(y)` is the same as `f(x, y)`
 :::
 
-- Takes the result on the [left]{.hl}, passes it as the [first argument]{.hl} of the function on the [right]{.hl}
-- Read it aloud as [then]{.hl}
-- No need to [repeat the object]{.hl} at every step
+- Takes the result on the left, passes it as the first argument of the function on the right
+- Read it aloud as [then]{.hl}. There is no need to repeat the object at every step
 
 . . .
 
@@ -695,7 +694,7 @@ penguins_2 <- penguins |>
   select(species, bill_length_cm)
 ```
 
-Take `penguins`, [then]{.hl} `filter` only the `species` Gentoo [or]{.hl} Chinstrap, [then]{.hl} `mutate` to add a column `bill_length_cm` which divides `bill_length_mm` by [10]{.hl}, [then]{.hl} `select` only `species` and `bill_length_cm`. Save the result as `penguins_2`.
+Take `penguins`, then `filter` only the `species` Gentoo or Chinstrap, then `mutate` to add a column `bill_length_cm` which divides `bill_length_mm` by 10, then `select` only `species` and `bill_length_cm`. Save the result as `penguins_2`.
 
 ## `PRO TIP!` Save to the right
 
@@ -717,7 +716,7 @@ You will see two pipes in the wild:
 
 . . .
 
-For everything in this course they are [interchangeable]{.hl}. We use `|>`: it works without loading any package.
+For everything in this course they are interchangeable. We use `|>`: it works without loading any package.
 
 . . .
 
@@ -755,7 +754,7 @@ Note: `{ggplot2}` layers are added with `+`, not `|>`. More next class.
 | `filter(df, species = "Gentoo")` | `=` instead of `==` |
 | `filter(df, species == Gentoo)` | text values need `"quotes"` |
 | `select(df, Species)` | names are [case sensitive]{.hl} |
-| `filter(df, ...)` and nothing changes | result not [assigned]{.hl} with `<-` |
+| `filter(df, ...)` and nothing changes | result not assigned with `<-` |
 | `mean(body_mass_g)` gives `NA` | missing values: add `na.rm = TRUE` |
 | `object 'bill_length_mm' not found` | forgot `library(palmerpenguins)` |
 | `could not find function "filter_out"` | `{dplyr}` older than 1.2.0 |
@@ -768,7 +767,7 @@ Note: `{ggplot2}` layers are added with `+`, not `|>`. More next class.
 - Rows: `filter()`, `filter_out()`, `arrange()`
 - Groups: `summarise()`, `count()`, `group_by()` or `.by`
 - Chain with `|>`, read as [then]{.hl}
-- Always [assign]{.hl} the result if you want to keep it
+- Always assign the result if you want to keep it
 :::
 
 ## Slides and code

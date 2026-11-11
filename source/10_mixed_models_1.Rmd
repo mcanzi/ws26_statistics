@@ -56,12 +56,12 @@ _Source: Smithsonian's National Zoo_
 
 ## Today
 
-- [Repeated measures]{.hl} and the independence assumption
-- Old solutions: [averaging]{.hl} over participants or items
-- Mixed models: varying [intercepts]{.hl} and varying [slopes]{.hl}
-- [Partial pooling]{.hl}: borrowing strength across groups
+- Repeated measures and the independence assumption
+- Old solutions: averaging over participants or items
+- Mixed models: varying intercepts and varying slopes
+- Partial pooling: borrowing strength across groups
 - Interpreting random effects, and the `lme4` syntax
-- Why varying slopes [matter]{.hl}
+- Why varying slopes matter
 - What is a random effect, anyway?
 
 ## So far
@@ -70,29 +70,28 @@ Lectures 4 to 9: `lm()`, with one or several predictors, and how to test them.
 
 . . .
 
-Every one of those models assumed that the data points are __independent__: each one brings [new]{.hl} information.
+Every one of those models assumed that the data points are __independent__: each one brings new information.
 
 . . .
 
-In linguistics, that is almost [never]{.hl} true.
+In linguistics, that is almost never true.
 
 ## Repeated measures
 
-**Repeated measures** data is collected when measurements are taken on the [same units]{.hl} (participants, speakers, words, schools...) multiple times.
+**Repeated measures** data is collected when measurements are taken on the same units (participants, speakers, words, schools...) multiple times.
 
 . . .
 
-- A participant responds to [many]{.hl} words
-- A word is read by [many]{.hl} participants
-- A speaker produces [many]{.hl} tokens of the same vowel
+- A participant responds to many words, and each word is read by many participants
+- A speaker produces many tokens of the same vowel
 
 . . .
 
-Measures from the same unit are likely to be more [similar]{.hl} to each other than measures from different units. This violates the independence assumption of linear regression.
+Measures from the same unit are likely to be more similar to each other than measures from different units. This violates the independence assumption of linear regression.
 
 ## The data {.smaller}
 
-A simulated lexical decision experiment: [20]{.hl} participants each respond to the same [40]{.hl} words.
+A simulated lexical decision experiment: 20 participants each respond to the same 40 words.
 
 ```{r}
 set.seed(21)
@@ -116,7 +115,7 @@ lexdec <- crossing(participants, words) |>
 
 . . .
 
-The true frequency effect is [−30 ms]{.hl} per log unit. But participants differ in [speed]{.hl} and in the [size]{.hl} of their frequency effect, and words differ in [difficulty]{.hl}.
+The true frequency effect is −30 ms per log unit. But participants differ in speed and in the size of their frequency effect, and words differ in difficulty.
 
 ## 800 rows, but not 800 independent observations
 
@@ -147,7 +146,7 @@ ggplot(lexdec, aes(x = freq_c, y = rt)) +
   theme(strip.text = element_text(size = 11), axis.text = element_text(size = 9))
 ```
 
-Every participant has their own [level]{.hl} (fast or slow) and their own [slope]{.hl} (a strong or weak frequency effect).
+Every participant has their own level (fast or slow) and their own slope (a strong or weak frequency effect).
 
 # The independence assumption
 
@@ -165,11 +164,11 @@ tidy(lm(rt ~ freq_c, data = lexdec))
 
 . . .
 
-The estimate is fine. The [standard error]{.hl} is computed as if we had 800 independent observations.
+The estimate is fine. The standard error is computed as if we had 800 independent observations.
 
 . . .
 
-But we only have [20]{.hl} participants. If we ran the experiment again with 20 [new]{.hl} participants, the slope could easily change by more than this SE suggests.
+But we only have 20 participants. If we ran the experiment again with 20 new participants, the slope could easily change by more than this SE suggests.
 
 ## The residuals give it away
 
@@ -183,7 +182,7 @@ augment(lm(rt ~ freq_c, data = lexdec)) |>
   theme(axis.text.x = element_text(size = 10, angle = 90, vjust = 0.5))
 ```
 
-The residuals of one participant are mostly [positive]{.hl} or mostly [negative]{.hl}. Knowing who produced a data point tells us something about its residual: they are [not independent]{.hl}.
+The residuals of one participant are mostly positive or mostly negative. Knowing who produced a data point tells us something about its residual: they are [not independent]{.hl}.
 
 ## Two sources of non-independence
 
@@ -192,13 +191,13 @@ The residuals of one participant are mostly [positive]{.hl} or mostly [negative]
 
 . . .
 
-Clark (1973) called ignoring item variation the __language-as-fixed-effect fallacy__: if our conclusions should hold for words [in general]{.hl}, not just the 40 we tested, the words are a [sample]{.hl} too.
+Clark (1973) called ignoring item variation the __language-as-fixed-effect fallacy__: if our conclusions should hold for words in general, not just the 40 we tested, the words are a sample too.
 
 # Design and averaging
 
 ## The traditional fix: averaging
 
-Collapse the data so that each unit contributes [one]{.hl} number. A __by-participant__ (F1) analysis: one frequency slope per participant, then test the 20 slopes.
+Collapse the data so that each unit contributes one number. A __by-participant__ (F1) analysis: one frequency slope per participant, then test the 20 slopes.
 
 ```{r}
 by_participant <- lexdec |>
@@ -218,14 +217,14 @@ tidy(lm(rt ~ freq_c, data = by_word))[2, ]
 
 ## Problems with averaging
 
-- [Two]{.hl} separate analyses, which can disagree: which one do we report?
-- Averaging [throws away]{.hl} information: variation within participants is lost
+- Two separate analyses, which can disagree: which one do we report?
+- Averaging throws away information: variation within participants is lost
 - With missing data or unbalanced designs, averages are based on different numbers of observations
-- It is hard to include predictors that vary [within]{.hl} a unit, such as trial number
+- It is hard to include predictors that vary within a unit, such as trial number
 
 . . .
 
-Mixed models handle participants [and]{.hl} items, in [one]{.hl} model, on the raw data.
+Mixed models handle participants and items, in one model, on the raw data.
 
 # Varying intercepts and slopes
 
@@ -240,7 +239,7 @@ _Sources: Barker et al. (2021), Science; Science News_
 A __linear mixed effects model__ is an extension of linear regression for repeated measures and other non-independent data. It has two kinds of terms:
 
 - __Fixed effects__: the effects of the predictors we are interested in, here `freq_c`. They are interpreted like the coefficients of `lm()`.
-- __Random effects__: by-participant and by-word [adjustments]{.hl} to those coefficients, which capture how the grouping units vary.
+- __Random effects__: by-participant and by-word adjustments to those coefficients, which capture how the grouping units vary.
 
 . . .
 
@@ -276,7 +275,7 @@ ggplot(lines, aes(x = freq_c, y = fit, group = participant)) +
 
 - __Complete pooling__: ignore participants. Overconfident.
 - __No pooling__: treat each participant as unrelated to the others. Noisy.
-- __Partial pooling__: participants are [different]{.hl}, but [similar]{.hl}, drawn from one population.
+- __Partial pooling__: participants are different, but similar, drawn from one population.
 
 ## Varying intercepts
 
@@ -285,7 +284,7 @@ Each participant gets their own intercept: the overall intercept plus an adjustm
 <div class="formula">rt = (b₀ + u₀ⱼ) + b₁ · freq + e</div>
 
 - `b₀`, `b₁`: the fixed effects, shared by everyone
-- `u₀ⱼ`: participant j's adjustment, drawn from a normal distribution with mean 0 and an estimated [SD]{.hl}
+- `u₀ⱼ`: participant j's adjustment, drawn from a normal distribution with mean 0 and an estimated SD
 
 ## Varying intercepts, visually
 
@@ -298,11 +297,11 @@ grid |>
   labs(x = "log frequency (centred)", y = "RT (ms)")
 ```
 
-Parallel lines: participants differ in [speed]{.hl}, not in the frequency effect.
+Parallel lines: participants differ in speed but share the same frequency effect.
 
 ## Varying slopes
 
-Each participant also gets their own [slope]{.hl}:
+Each participant also gets their own slope:
 
 <div class="formula">rt = (b₀ + u₀ⱼ) + (b₁ + u₁ⱼ) · freq + e</div>
 
@@ -314,16 +313,16 @@ grid |>
   labs(x = "log frequency (centred)", y = "RT (ms)")
 ```
 
-Now the lines [fan out]{.hl}: some participants are much more sensitive to frequency than others.
+Now the lines fan out: some participants are much more sensitive to frequency than others.
 
 ## What the model estimates
 
-The model does [not]{.hl} estimate 20 separate intercepts and 20 separate slopes as free parameters. It estimates:
+The model does not estimate 20 separate intercepts and 20 separate slopes as free parameters. It estimates:
 
-- the fixed effects: the [average]{.hl} intercept and slope
-- the [SD]{.hl} of the intercepts across participants
-- the [SD]{.hl} of the slopes across participants
-- the [correlation]{.hl} between intercepts and slopes
+- the fixed effects: the average intercept and slope
+- the SD of the intercepts across participants
+- the SD of the slopes across participants
+- the correlation between intercepts and slopes
 - the residual SD
 
 . . .
@@ -379,7 +378,7 @@ fixef(m_full)["freq_c"] + c(-2, 2) * attr(VarCorr(m_full)$participant, "stddev")
 
 . . .
 
-A large random-effect SD means that participants differ [a lot]{.hl}, even after accounting for frequency. A small one means they behave much alike.
+A large random-effect SD means that participants differ a lot, even after accounting for frequency. A small one means they behave much alike.
 
 ## Random effect correlations
 
@@ -391,7 +390,7 @@ coef(m_full)$participant |>
   labs(x = "Participant intercept (ms, average RT)", y = "Participant frequency slope")
 ```
 
-The model estimates a correlation of about `r round(attr(VarCorr(m_full)$participant, "correlation")[1, 2], 2)`: [slower]{.hl} participants show [stronger]{.hl} (more negative) frequency effects. Correlations like this can be theoretically interesting in their own right.
+The model estimates a correlation of about `r round(attr(VarCorr(m_full)$participant, "correlation")[1, 2], 2)`: slower participants show stronger (more negative) frequency effects. Correlations like this can be theoretically interesting in their own right.
 
 # The lme4 syntax
 
@@ -407,7 +406,7 @@ The `{lme4}` package: `lmer()` works like `lm()`, plus random effects in bracket
 
 - `(1 | participant)`: varying intercepts by participant
 - `(1 + freq_c | participant)`: varying intercepts and slopes, and their correlation
-- `(1 + freq_c || participant)`: varying intercepts and slopes, [no]{.hl} correlation
+- `(1 + freq_c || participant)`: varying intercepts and slopes, no correlation
 - `(0 + freq_c | participant)`: varying slopes only
 - `(1 | participant) + (1 | word)`: [crossed]{.hl} random effects, every participant sees every word
 - `(1 | school / class)`: [nested]{.hl} random effects, each class belongs to one school
@@ -425,7 +424,7 @@ lmer(rt ~ freq_c + (1 + freq_c | participant) + (1 | word), data = lexdec)
 
 . . .
 
-Why no `(1 + freq_c | word)`? Each word has [one]{.hl} frequency. A slope needs variation in the predictor [within]{.hl} the group: frequency varies within participants, but not within words.
+Why no `(1 + freq_c | word)`? Each word has one frequency. A slope needs variation in the predictor within the group: frequency varies within participants, but not within words.
 
 ## A first look at the output
 
@@ -464,19 +463,19 @@ tibble(model = names(models),
 
 . . .
 
-The estimate is the [same]{.hl} in every model. The standard error is not: random intercepts alone make it [smaller]{.hl} than `lm()`, and varying slopes make it about [three times larger]{.hl} than with random intercepts alone.
+The estimate is the same in every model. The standard error is not: random intercepts alone make it smaller than `lm()`, and varying slopes make it about three times larger than with random intercepts alone.
 
 ## Why?
 
-With random intercepts only, the model assumes every participant has the [same]{.hl} frequency effect. All 800 trials then count as evidence about one slope.
+With random intercepts only, the model assumes every participant has the same frequency effect. All 800 trials then count as evidence about one slope.
 
 . . .
 
-But participants [differ]{.hl} in their slopes. To generalise to [new]{.hl} participants, the model must know how much slopes vary, and that uncertainty belongs in the SE.
+But participants differ in their slopes. To generalise to new participants, the model must know how much slopes vary, and that uncertainty belongs in the SE.
 
 . . .
 
-Barr et al. (2013) showed that random-intercept-only models can have Type I error rates [well above]{.hl} 5%, and recommend the __maximal random effects structure justified by the design__ for confirmatory tests.
+Barr et al. (2013) showed that random-intercept-only models can have Type I error rates well above 5%, and recommend the __maximal random effects structure justified by the design__ for confirmatory tests.
 
 ## Compare with averaging
 
@@ -493,16 +492,16 @@ tibble(
 
 . . .
 
-With varying slopes, the mixed model is about as cautious as the by-participant analysis, while keeping [all]{.hl} the data, and adding [words]{.hl} in the same model.
+With varying slopes, the mixed model is about as cautious as the by-participant analysis, while keeping all the data, and adding words in the same model.
 
 # Different interpretations
 
 ## What is a random effect?
 
-There is no single answer. Gelman (2005) lists [five]{.hl} definitions in use, summarised by Coretta (2021):
+There is no single answer. Gelman (2005) lists five definitions in use, summarised by Coretta (2021):
 
 1. __Constant vs varying__: fixed coefficients are constant across individuals; random coefficients vary (Kreft & de Leeuw, 1998)
-2. __Researcher's interest__: effects are fixed if the research question is about them; random if the interest lies in the underlying [population]{.hl} (Searle, Casella & McCulloch)
+2. __Researcher's interest__: effects are fixed if the research question is about them; random if the interest lies in the underlying population (Searle, Casella & McCulloch)
 3. __Sampling__: "When a sample exhausts the population, the corresponding variable is fixed"; when the sample is a negligible part of it, the variable is random (Green & Tukey, 1960)
 
 ## What is a random effect?
@@ -512,17 +511,17 @@ There is no single answer. Gelman (2005) lists [five]{.hl} definitions in use, s
 
 . . .
 
-The definitions often [disagree]{.hl}. Is "word" random because the words are a sample (3), because they vary (1), or because their estimates are shrunk (5)?
+The definitions often disagree. Is "word" random because the words are a sample (3), because they vary (1), or because their estimates are shrunk (5)?
 
 ## So which is it?
 
 - Gelman recommends avoiding "fixed" and "random" altogether: effects are [constant]{.hl} or [varying]{.hl} across groups
 - In Bayesian work, [population-level]{.hl} and [group-level]{.hl} effects are increasingly common terms
-- In practice: a grouping factor gets random effects when its levels are a [sample]{.hl} from a larger population (participants, words, speakers), and you want to [generalise]{.hl} beyond them
+- In practice: a grouping factor gets random effects when its levels are a sample from a larger population (participants, words, speakers), and you want to generalise beyond them
 
 . . .
 
-Whatever the label, ask: which units are [repeated]{.hl} in my data, and which effects can [vary]{.hl} across them?
+Whatever the label, ask: which units are repeated in my data, and which effects can vary across them?
 
 # Your turn
 
@@ -530,9 +529,9 @@ Whatever the label, ask: which units are [repeated]{.hl} in my data, and which e
 
 For each design, name the grouping factors, and the varying slopes the design allows:
 
-1. 30 speakers each read 50 sentences, half of them [questions]{.hl} and half [statements]{.hl}. Outcome: final pitch rise.
-2. 24 children are recorded at ages [2, 3 and 4]{.hl}. Outcome: vocabulary size.
-3. 40 participants rate 60 words for [emotional valence]{.hl}. Each word has one [frequency]{.hl} and one [length]{.hl}.
+1. 30 speakers each read 50 sentences, half of them questions and half statements. Outcome: final pitch rise.
+2. 24 children are recorded at ages 2, 3 and 4. Outcome: vocabulary size.
+3. 40 participants rate 60 words for emotional valence. Each word has one frequency and one length.
 
 ## Possible answers
 
@@ -544,10 +543,10 @@ For each design, name the grouping factors, and the varying slopes the design al
 
 ::: {.takeaway}
 - Repeated measures violate [independence]{.hl}: data points from the same unit are alike
-- Ignoring this makes SEs [too small]{.hl}; averaging throws information away
+- Ignoring this makes SEs too small; averaging throws information away
 - Mixed models add [varying intercepts]{.hl} and [varying slopes]{.hl} for each grouping factor
-- They estimate the [SD]{.hl} of these adjustments, and [shrink]{.hl} individual estimates towards the average
-- `(1 + x | participant) + (1 | item)`: slopes only for predictors that vary [within]{.hl} the group
+- They estimate the SD of these adjustments, and [shrink]{.hl} individual estimates towards the average
+- `(1 + x | participant) + (1 | item)`: slopes only for predictors that vary within the group
 - "Random effect" has several meanings: think [constant]{.hl} vs [varying]{.hl}
 :::
 

@@ -63,36 +63,36 @@ _Source: Discover Magazine_
 
 ## Today
 
-- [Samples]{.hl} and [populations]{.hl}
-- How big is an effect? [Cohen's d]{.hl}
-- How precise is an estimate? [Standard errors]{.hl} and [confidence intervals]{.hl}
-- [Null hypotheses]{.hl} and the `t` statistic
-- What a [p-value]{.hl} is, and what it is not
+- Samples and populations
+- How big is an effect? Cohen's d
+- How precise is an estimate? Standard errors and confidence intervals
+- Null hypotheses and the `t` statistic
+- What a p-value is, and what it is not
 
 ## So far
 
-Lectures 3 to 8: [describing]{.hl} the data we have.
+Lectures 3 to 8: describing the data we have.
 
 - Means, SDs, slopes, differences between groups
 
 . . .
 
-But we never care about [these]{.hl} 120 vowels. We care about vowels before voiced consonants [in general]{.hl}.
+But we never care about these 120 vowels. We care about vowels before voiced consonants in general.
 
 . . .
 
-Today: how far can we [trust]{.hl} a number computed from a sample?
+Today: how far can we trust a number computed from a sample?
 
 ## Samples and populations
 
 - __Population__: everything we want to draw conclusions about: all speakers of a language, all tokens of a vowel
 - __Sample__: the part of it we actually measured
-- __Parameter__: a number describing the population, e.g. its mean `μ`. Usually [unknown]{.hl}.
-- __Statistic__: the same number computed from the sample, e.g. <span style="text-decoration: overline;">x</span>. Our [estimate]{.hl} of the parameter.
+- __Parameter__: a number describing the population, e.g. its mean `μ`. Usually unknown.
+- __Statistic__: the same number computed from the sample, e.g. <span style="text-decoration: overline;">x</span>. Our estimate of the parameter.
 
 ## A population we know
 
-To see how samples behave, simulate a population whose truth we [know]{.hl}:
+To see how samples behave, simulate a population whose truth we know:
 
 ```{r}
 set.seed(1)
@@ -111,7 +111,7 @@ mean(sample(pop, 10))
 mean(sample(pop, 10))
 ```
 
-Every sample gives a [different]{.hl} estimate.
+Every sample gives a different estimate.
 
 ## Sampling variation
 
@@ -129,7 +129,7 @@ ggplot(means, aes(x = mean, fill = n)) +
   theme(legend.position = "none")
 ```
 
-2000 samples each. Dashed: the true mean, 140 ms. Larger samples give [less variable]{.hl} estimates.
+2000 samples each. Dashed: the true mean, 140 ms. Larger samples give less variable estimates.
 
 # Effect size
 
@@ -149,15 +149,15 @@ vowels |> summarise(mean = mean(duration), sd = sd(duration), n = n(), .by = voi
 
 . . .
 
-A difference of about [38 ms]{.hl}. Big or small?
+A difference of about 38 ms. Big or small?
 
 . . .
 
-It depends on how much durations [vary]{.hl} anyway. 38 ms is huge if tokens vary by 5 ms, and tiny if they vary by 200 ms.
+It depends on how much durations vary anyway. 38 ms is huge if tokens vary by 5 ms, and tiny if they vary by 200 ms.
 
 ## Cohen's d
 
-The difference between two means, in units of their [standard deviation]{.hl}:
+The difference between two means, in units of their standard deviation:
 
 <div class="formula">d = (mean₂ − mean₁) / pooled SD</div>
 
@@ -174,7 +174,7 @@ pooled_sd <- sqrt(((s$n[1] - 1) * s$sd[1]^2 + (s$n[2] - 1) * s$sd[2]^2) / (sum(s
 
 . . .
 
-The voiced mean is almost [2 SDs]{.hl} above the voiceless mean.
+The voiced mean is almost 2 SDs above the voiceless mean.
 
 ## Cohen's d in R
 
@@ -187,7 +187,7 @@ cohen.d(duration ~ voicing, data = vowels)
 
 . . .
 
-`cohen.d()` subtracts the [second]{.hl} level from the first, so d is negative here. The [size]{.hl} is what matters: `r round(abs(cohen.d(duration ~ voicing, data = vowels)$estimate), 2)`.
+`cohen.d()` subtracts the second level from the first, so d is negative here. The size is what matters: `r round(abs(cohen.d(duration ~ voicing, data = vowels)$estimate), 2)`.
 
 ## Interpreting d
 
@@ -204,7 +204,7 @@ tibble(d = c(0.2, 0.5, 0.8, 2)) |>
   theme(legend.position = "none", axis.text = element_blank())
 ```
 
-Cohen's benchmarks: [0.2]{.hl} small, [0.5]{.hl} medium, [0.8]{.hl} large. They are rough conventions, not laws: what counts as large depends on the [field]{.hl} and the [measure]{.hl}.
+Cohen's benchmarks: 0.2 small, 0.5 medium, 0.8 large. They are rough conventions: what counts as large depends on the field and the measure.
 
 # Standard errors and confidence intervals
 
@@ -236,7 +236,7 @@ c(simulated_n10 = sd(means$mean[means$n == "n = 10"]), formula_n10 = 25 / sqrt(1
 
 . . .
 
-The SD describes the [data]{.hl}. The SE describes the [estimate]{.hl}.
+The SD describes the [data]{.hl}, and the SE describes the [estimate]{.hl}.
 
 ## The SE shrinks with n
 
@@ -248,11 +248,11 @@ tibble(n = 2:200) |>
   labs(x = "Sample size (n)", y = "Standard error (ms)")
 ```
 
-To [halve]{.hl} the SE, you need [four times]{.hl} as many observations.
+To halve the SE, you need four times as many observations.
 
 ## Confidence intervals
 
-A __95% confidence interval__: the estimate, plus and minus about [two]{.hl} standard errors.
+A __95% confidence interval__: the estimate, plus and minus about two standard errors.
 
 ```{r}
 set.seed(3)
@@ -283,17 +283,16 @@ ggplot(cis, aes(x = i, y = mean, ymin = lower, ymax = upper, colour = hit)) +
   theme(legend.position = "none")
 ```
 
-100 samples of 20. Pink: the `r sum(!cis$hit)` intervals that miss the true mean. In the long run, [95%]{.hl} of intervals contain it.
+100 samples of 20. Pink: the `r sum(!cis$hit)` intervals that miss the true mean. In the long run, 95% of intervals contain it.
 
 ## What a confidence interval means
 
-- The [procedure]{.hl} captures the true value in 95% of samples
-- It is a range of values [compatible]{.hl} with the data
-- Narrow interval: a [precise]{.hl} estimate. Wide interval: an imprecise one
+- The procedure captures the true value in 95% of samples, and the interval is a range of values compatible with the data
+- Narrow interval: a precise estimate. Wide interval: an imprecise one
 
 . . .
 
-It does [not]{.hl} mean "there is a 95% probability that the true value lies in this particular interval". The true value is fixed; it is the [interval]{.hl} that varies.
+It does not mean "there is a 95% probability that the true value lies in this particular interval". The true value is fixed, while the interval changes from sample to sample.
 
 # Null hypotheses
 
@@ -305,16 +304,16 @@ _Source: Australian Museum_
 
 ## Null and alternative hypotheses
 
-- __Null hypothesis__, H₀: there is [no]{.hl} difference: μ_voiced = μ_voiceless
-- __Alternative hypothesis__, H₁: there [is]{.hl} a difference: μ_voiced ≠ μ_voiceless
+- __Null hypothesis__, H₀: there is no difference: μ_voiced = μ_voiceless
+- __Alternative hypothesis__, H₁: there is a difference: μ_voiced ≠ μ_voiceless
 
 . . .
 
-Significance testing asks: how [compatible]{.hl} are our data with H₀?
+Significance testing asks: how compatible are our data with H₀?
 
 . . .
 
-If the data would be very [surprising]{.hl} in a world where H₀ is true, we treat that as evidence against H₀.
+If the data would be very surprising in a world where H₀ is true, we treat that as evidence against H₀.
 
 ## A small study
 
@@ -334,11 +333,11 @@ obs_diff
 
 . . .
 
-Voiced vowels are about `r round(obs_diff)` ms longer. Could a difference this big appear [by chance]{.hl}, if voicing had no effect at all?
+Voiced vowels are about `r round(obs_diff)` ms longer. Could a difference this big appear by chance, if voicing had no effect at all?
 
 ## Simulating the null
 
-If H₀ is true, the labels "voiced" and "voiceless" are [arbitrary]{.hl}. Shuffle them, and see which differences chance alone produces:
+If H₀ is true, the labels "voiced" and "voiceless" are arbitrary. Shuffle them, and see which differences chance alone produces:
 
 ```{r}
 set.seed(5)
@@ -366,11 +365,11 @@ tibble(d = null_diffs) |>
   theme(legend.position = "none")
 ```
 
-Pink: differences at least as extreme as the observed one (dashed). Our result is [not]{.hl} surprising under H₀.
+Pink: differences at least as extreme as the observed one (dashed). Our result is not surprising under H₀.
 
 ## The t statistic
 
-Instead of simulating, we can measure the difference in units of its [standard error]{.hl}:
+Instead of simulating, we can measure the difference in units of its standard error:
 
 <div class="formula">t = difference / SE of the difference</div>
 
@@ -433,8 +432,8 @@ t.test(duration ~ voicing, data = small)
 
 ## Two tails
 
-- Two-tailed test: H₁ is "a difference in [either]{.hl} direction"; both tails count
-- One-tailed tests only count one direction. Use them only if the direction was fixed [before]{.hl} seeing the data
+- Two-tailed test: H₁ is "a difference in either direction"; both tails count
+- One-tailed tests only count one direction. Use them only if the direction was fixed before seeing the data
 
 . . .
 
@@ -442,15 +441,15 @@ t.test(duration ~ voicing, data = small)
 
 ## What a p-value is
 
-The probability of obtaining data [at least as extreme]{.hl} as ours, assuming H₀ is true.
+The probability of obtaining data at least as extreme as ours, assuming H₀ is true.
 
 . . .
 
-It is [not]{.hl}:
+It is not:
 
 - the probability that H₀ is true
 - the probability that the result is due to chance
-- a measure of how [big]{.hl} or [important]{.hl} the effect is
+- a measure of how big or important the effect is
 
 . . .
 
@@ -458,13 +457,12 @@ Chapter 10 of Winter is about these misinterpretations: we come back to it in le
 
 ## Significance
 
-By convention, if `p < α`, with α usually [0.05]{.hl}, the result is called __statistically significant__ and H₀ is rejected.
+By convention, if `p < α`, with α usually 0.05, the result is called __statistically significant__ and H₀ is rejected.
 
 . . .
 
-- α = 0.05 is a [convention]{.hl}, not a law of nature
-- "Significant" means only "surprising under H₀", not "important"
-- p = 0.049 and p = 0.051 are practically the [same]{.hl} evidence
+- α = 0.05 is a convention, and "significant" means only "surprising under H₀", and says nothing about importance
+- p = 0.049 and p = 0.051 are practically the same evidence
 
 ## Back to the 120 vowels
 
@@ -497,11 +495,11 @@ tibble(
 
 . . .
 
-A [medium]{.hl} effect that is not significant, and a [tiny]{.hl} effect that is. The p-value mixes effect size [and]{.hl} sample size.
+A medium effect that is not significant, and a tiny effect that is. The p-value mixes effect size and sample size.
 
 . . .
 
-Always report the [effect size]{.hl} and its [confidence interval]{.hl}, not only p.
+Always report the [effect size]{.hl} and its [confidence interval]{.hl} alongside p.
 
 ## t-tests are linear models
 
@@ -528,7 +526,7 @@ With inline R (lecture 3), every number comes from the analysis:
 
 . . .
 
-- The [effect]{.hl} and its [CI]{.hl}, in the units of the data
+- The effect and its [CI]{.hl}, in the units of the data
 - The test statistic, its [degrees of freedom]{.hl}, and p
 - A standardised [effect size]{.hl}
 
@@ -541,7 +539,7 @@ With `palmerpenguins::penguins`, keep only Adelie and Chinstrap penguins (use `f
 1. Compare their `body_mass_g`: compute Cohen's d and run a t-test
 2. Do the same for `flipper_length_mm`
 3. Which difference is significant? Report each with its 95% CI
-4. Does the first result show that the two species [weigh the same]{.hl}?
+4. Does the first result show that the two species weigh the same?
 
 ## Solutions {.smaller}
 
@@ -564,7 +562,7 @@ t.test(flipper_length_mm ~ species, data = two)[c("statistic", "p.value", "conf.
 
 . . .
 
-Flipper length differs clearly; body mass does not reach significance. But a non-significant result is [not]{.hl} evidence of no difference: the CI for body mass still includes differences of over 100 g.
+Flipper length differs clearly; body mass does not reach significance. But a non-significant result is not evidence of no difference: the CI for body mass still includes differences of over 100 g.
 
 ## Summary
 

@@ -55,19 +55,19 @@ _Source: Merriam-Webster_
 
 ## Today
 
-- Simulating a data set where we [know]{.hl} the truth
-- Fitting and [reading]{.hl} an `lmer()` model
-- [Extracting]{.hl} estimates, random effects, confidence intervals and predictions
-- [Significance testing]{.hl}: likelihood ratio tests
-- [Common mistakes]{.hl}, made on purpose
+- Simulating a data set where we know the truth
+- Fitting and reading an `lmer()` model
+- Extracting estimates, random effects, confidence intervals and predictions
+- Significance testing: likelihood ratio tests
+- Common mistakes, made on purpose
 - `R²`, convergence problems and singular fits
 
 ## Last week
 
-- Repeated measures are [not independent]{.hl}: data from the same speaker or word are alike
-- Mixed models add [varying intercepts]{.hl} and [varying slopes]{.hl} for each grouping factor
+- Repeated measures are not independent: data from the same speaker or word are alike
+- Mixed models add varying intercepts and varying slopes for each grouping factor
 - `(1 + x | speaker)` for predictors that vary within speakers; `(1 | word)` when x does not vary within words
-- Without varying slopes, standard errors are [too small]{.hl}
+- Without varying slopes, standard errors are too small
 
 . . .
 
@@ -77,15 +77,14 @@ Today: doing it properly, from simulation to write-up.
 
 ## Why simulate?
 
-With real data, we never know the [true]{.hl} effects. With simulated data, we do, so we can check whether the model [recovers]{.hl} them.
+With real data, we never know the true effects. With simulated data, we do, so we can check whether the model recovers them.
 
 . . .
 
 Like Winter (2019, section 15.2), we simulate vowel durations. Our design:
 
-- [16]{.hl} speakers each read the same [24]{.hl} words
-- Half the words end in a [voiced]{.hl} consonant, half in a [voiceless]{.hl} one
-- True voicing effect: vowels [20 ms]{.hl} longer before voiced consonants
+- 16 speakers each read the same 24 words. Half the words end in a [voiced]{.hl} consonant, half in a [voiceless]{.hl} one
+- True voicing effect: vowels 20 ms longer before voiced consonants
 
 ## The simulation {.smaller}
 
@@ -111,7 +110,7 @@ vowels <- crossing(speakers, words) |>
 
 . . .
 
-`(voicing == "voiced")` is `TRUE` or `FALSE`, which R treats as [1]{.hl} or [0]{.hl}: a dummy variable, as in lecture 7.
+`(voicing == "voiced")` is `TRUE` or `FALSE`, which R treats as 1 or 0: a dummy variable, as in lecture 7.
 
 ## The data
 
@@ -125,7 +124,7 @@ vowels |>
   labs(x = "Following consonant", y = "Mean vowel duration (ms)")
 ```
 
-One line per speaker (blue), and the overall means (orange). Speakers differ in [speed]{.hl} and in the [size]{.hl} of their voicing effect.
+One line per speaker (blue), and the overall means (orange). Speakers differ in speed and in the size of their voicing effect.
 
 # Fitting the model
 
@@ -137,8 +136,8 @@ _Source: Smithsonian Magazine_
 
 ## Which random effects?
 
-- `speaker`: every speaker produces voiced [and]{.hl} voiceless words, so voicing varies [within]{.hl} speakers: `(1 + voicing | speaker)`
-- `word`: each word is either voiced or voiceless, so voicing does [not]{.hl} vary within words: `(1 | word)`
+- `speaker`: every speaker produces voiced and voiceless words, so voicing varies within speakers: `(1 + voicing | speaker)`
+- `word`: each word is either voiced or voiceless, so voicing does not vary within words: `(1 | word)`
 
 . . .
 
@@ -149,7 +148,7 @@ m <- lmer(duration ~ voicing + (1 + voicing | speaker) + (1 | word),
 
 . . .
 
-The maximal random effects structure [justified by the design]{.hl} (Barr et al., 2013, lecture 10).
+The maximal random effects structure justified by the design (Barr et al., 2013, lecture 10).
 
 ## `summary()` {.smaller}
 
@@ -160,7 +159,7 @@ summary(m)
 ## Reading the output
 
 - __REML criterion__: the fit statistic for REML estimation (more on REML below)
-- __Random effects__: the [variances]{.hl} and [SDs]{.hl} of the varying effects, and their correlation
+- __Random effects__: the variances and SDs of the varying effects, and their correlation
 - __Fixed effects__: estimates, SEs and t values, read exactly as in `lm()`
 - __Correlation of fixed effects__: how the estimates of the fixed effects covary. Rarely of interest
 
@@ -208,7 +207,7 @@ sigma(m)              # the residual SD
 
 ## Each speaker's estimates {.smaller}
 
-`ranef()`: each speaker's [adjustment]{.hl} to the fixed effects. `coef()`: fixed effects [plus]{.hl} adjustments, that is each speaker's own estimates.
+`ranef()`: each speaker's adjustment to the fixed effects. `coef()`: fixed effects plus adjustments, that is each speaker's own estimates.
 
 ```{r}
 head(ranef(m)$speaker, 3)
@@ -250,7 +249,7 @@ Without `re.form = NA`, the prediction includes the random effects: here, speake
 predict(m, newdata = tibble(speaker = "S01", word = "w01", voicing = new$voicing[1]))
 ```
 
-For a [new]{.hl} speaker, not in the data, only the population-level prediction makes sense.
+For a new speaker, not in the data, only the population-level prediction makes sense.
 
 # Significance testing
 
@@ -262,7 +261,7 @@ _Source: Smithsonian Magazine_
 
 ## Likelihood ratio tests
 
-Compare two [nested]{.hl} models: one with the predictor, one without it, and the [same]{.hl} random effects.
+Compare two [nested]{.hl} models: one with the predictor, one without it, and the same random effects.
 
 ```{r}
 m_null <- lmer(duration ~ 1 + (1 + voicing | speaker) + (1 | word),
@@ -293,12 +292,12 @@ The full model fits much better: χ²(`r anova(m_null, m_full)$Df[2]`) = `r roun
 
 . . .
 
-Here the models differ by [one]{.hl} parameter, the voicing effect, so the test has [1]{.hl} df.
+Here the models differ by one parameter, the voicing effect, so the test has 1 df.
 
 ## REML or ML?
 
-- `lmer()` uses __REML__ (restricted maximum likelihood) by default: better estimates of the [variances]{.hl}
-- To compare models that differ in their [fixed effects]{.hl}, the likelihoods must come from __ML__: `REML = FALSE`
+- `lmer()` uses __REML__ (restricted maximum likelihood) by default: better estimates of the variances
+- To compare models that differ in their fixed effects, the likelihoods must come from __ML__: `REML = FALSE`
 
 . . .
 
@@ -345,7 +344,7 @@ Also report the [random effects structure]{.hl}: "The model included by-speaker 
 
 ## A slope that cannot exist
 
-What if we add a random slope for voicing [by word]{.hl}?
+What if we add a random slope for voicing by word?
 
 ```{r, warning = TRUE, message = TRUE}
 m_bad <- lmer(duration ~ voicing + (1 + voicing | speaker) + (1 + voicing | word),
@@ -354,7 +353,7 @@ m_bad <- lmer(duration ~ voicing + (1 + voicing | speaker) + (1 + voicing | word
 
 . . .
 
-Each word is [either]{.hl} voiced or voiceless, so a by-word voicing slope is impossible to estimate. The model cannot converge to a sensible answer: always check [which]{.hl} slopes your design supports.
+Each word is either voiced or voiceless, so a by-word voicing slope is impossible to estimate. The model cannot converge to a sensible answer: always check which slopes your design supports.
 
 ## Forgetting the random slopes
 
@@ -367,7 +366,7 @@ c(with_slopes    = coef(summary(m))["voicingvoiced", "Std. Error"],
 
 . . .
 
-Here the difference is [small]{.hl}: speakers' voicing effects vary little (SD ≈ `r round(attr(VarCorr(m)$speaker, "stddev")[2], 1)` ms). The more slopes vary across speakers, the bigger the gap: in lecture 10, the SE went from 1.5 to 4.2 ms.
+Here the difference is small: speakers' voicing effects vary little (SD ≈ `r round(attr(VarCorr(m)$speaker, "stddev")[2], 1)` ms). The more slopes vary across speakers, the bigger the gap: in lecture 10, the SE went from 1.5 to 4.2 ms.
 
 # Remaining issues
 
@@ -381,8 +380,8 @@ _Source: RNZ_
 
 There is no single R². Nakagawa and Schielzeth (2013) distinguish:
 
-- __Marginal R²__: variance explained by the [fixed effects]{.hl} alone
-- __Conditional R²__: variance explained by fixed [and]{.hl} random effects
+- __Marginal R²__: variance explained by the fixed effects alone
+- __Conditional R²__: variance explained by fixed and random effects
 
 . . .
 
@@ -401,7 +400,7 @@ c(marginal    = var_fixed / (var_fixed + var_random + var_resid),
 ## Reading R² for mixed models
 
 - Voicing alone accounts for only about `r round(100 * var_fixed / (var_fixed + var_random + var_resid))`% of the variation
-- With speakers and words, about `r round(100 * (var_fixed + var_random) / (var_fixed + var_random + var_resid))`%: most variation is [between speakers and words]{.hl}
+- With speakers and words, about `r round(100 * (var_fixed + var_random) / (var_fixed + var_random + var_resid))`%: most variation is between speakers and words
 
 . . .
 
@@ -417,19 +416,19 @@ Model failed to converge with max|grad| = 0.0066 (tol = 0.002)
 
 . . .
 
-A warning, not an error: R still returns a model. But do not report it without checking.
+This is a warning rather than an error, so R still returns a model, but check it before you report anything.
 
 ## What to do {.smaller}
 
-1. Check the [data]{.hl} and the [design]{.hl}: is every random slope possible? (see above)
-2. [Centre]{.hl} or [scale]{.hl} continuous predictors (lecture 5)
+1. Check the data and the design: is every random slope possible? (see above)
+2. Centre or scale continuous predictors (lecture 5)
 3. Try a different [optimiser]{.hl}: `lmer(..., control = lmerControl(optimizer = "bobyqa"))`
-4. Compare [all]{.hl} optimisers with `allFit(model)`: if they agree, the warning is usually harmless
-5. [Simplify]{.hl} the random effects: first remove the correlations with `||`, then slopes with the least variance. `||` only works for `numeric` predictors: code a factor like voicing as 0/1 first
+4. Compare all optimisers with `allFit(model)`: if they agree, the warning is usually harmless
+5. Simplify the random effects: first remove the correlations with `||`, then slopes with the least variance. `||` only works for `numeric` predictors: code a factor like voicing as 0/1 first
 
 . . .
 
-Barr et al. (2013) recommend starting maximal; Matuschek et al. (2017) show that maximal models can [lose power]{.hl}, and recommend keeping only the random effects the data support.
+Barr et al. (2013) recommend starting maximal; Matuschek et al. (2017) show that maximal models can lose power, and recommend keeping only the random effects the data support.
 
 ## Singular fits
 
@@ -439,7 +438,7 @@ boundary (singular) fit: see help('isSingular')
 
 . . .
 
-The model estimated a random-effect [variance]{.hl} of zero, or a [correlation]{.hl} of exactly ±1: the data cannot support that part of the random effects structure.
+The model estimated a random-effect variance of zero, or a correlation of exactly ±1: the data cannot support that part of the random effects structure.
 
 ```{r}
 isSingular(m)
@@ -517,15 +516,15 @@ lex_null <- update(lex_full, . ~ . - NativeLanguage)
 anova(lex_null, lex_full)
 ```
 
-With random intercepts only, the same test gives p ≈ .01. The by-word slope for NativeLanguage makes the test more [cautious]{.hl}.
+With random intercepts only, the same test gives p ≈ .01. The by-word slope for NativeLanguage makes the test more cautious.
 
 ## Summary
 
 ::: {.takeaway}
-- Simulate first: you can only check a model against a [known]{.hl} truth
+- Simulate first: you can only check a model against a known truth
 - `summary()`, `fixef()`, `ranef()`, `coef()`, `VarCorr()`, `confint()`, `predict(re.form = NA)`
 - `lme4` gives no p-values: use [likelihood ratio tests]{.hl} (with ML), or `{lmerTest}`
-- Random slopes only where the predictor varies [within]{.hl} the group
+- Random slopes only where the predictor varies within the group
 - Convergence warnings and singular fits: check, change optimiser, then simplify
 - Marginal vs conditional `R²`
 :::

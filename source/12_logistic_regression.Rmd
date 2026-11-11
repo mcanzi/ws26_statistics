@@ -55,31 +55,31 @@ _Source: National Geographic_
 
 ## Today
 
-- [Binary]{.hl} outcomes, and why `lm()` is the wrong tool for them
-- The [generalised linear model]{.hl}: distribution, linear predictor, link function
-- Probabilities, [odds]{.hl} and [log odds]{.hl}
+- Binary outcomes, and why `lm()` is the wrong tool for them
+- The generalised linear model: distribution, linear predictor, link function
+- Probabilities, odds and log odds
 - Fitting a mixed logistic regression with `glmer()`
-- [Interpreting]{.hl} coefficients: log odds, odds ratios and probabilities
+- Interpreting coefficients: log odds, odds ratios and probabilities
 - Testing, convergence and reporting
 
 ## So far
 
-Lectures 4 to 11: a [continuous]{.hl} outcome, normally distributed residuals.
+Lectures 4 to 11: a continuous outcome, normally distributed residuals.
 
 - Reaction times, vowel durations, body mass
 
 . . .
 
-Many linguistic outcomes are [binary]{.hl}: one of two things happens.
+Many linguistic outcomes are binary: one of two things happens.
 
-- A response is [correct]{.hl} or [incorrect]{.hl}
-- A speaker chooses [one variant]{.hl} or the other: _give her the book_ vs _give the book to her_
-- A listener says [yes]{.hl} or [no]{.hl}: is this sentence acceptable?
-- A final /t/ is [pronounced]{.hl} or [deleted]{.hl}
+- A response is correct or incorrect
+- A speaker chooses one variant or the other: _give her the book_ vs _give the book to her_
+- A listener says yes or no: is this sentence acceptable?
+- A final /t/ is pronounced or deleted
 
 ## The data {.smaller}
 
-A simulated lexical decision task: is the response [correct]{.hl} (1) or not (0)?
+A simulated lexical decision task: is the response correct (1) or not (0)?
 
 ```{r}
 set.seed(1)
@@ -128,7 +128,7 @@ acc |>
   labs(x = "log frequency (centred)", y = "Proportion correct")
 ```
 
-Grey: every response, 0 or 1. Orange: the [proportion]{.hl} correct in 8 frequency bins. Frequent words are recognised more accurately.
+Grey: every response, 0 or 1. Orange: the proportion correct in 8 frequency bins. Frequent words are recognised more accurately.
 
 ## Why not `lm()`?
 
@@ -148,25 +148,25 @@ bind_rows(
   labs(x = "log frequency (centred)", y = "Predicted probability", colour = NULL)
 ```
 
-- A straight line predicts probabilities [above 1]{.hl} and [below 0]{.hl} (pink zones)
-- The residuals can only take two values: they cannot be [normal]{.hl}
+- A straight line predicts probabilities above 1 and below 0 (pink zones)
+- The residuals can only take two values: they cannot be normal
 - The variance depends on the mean: it is largest at p = 0.5
 
 # The generalised linear model
 
 ::: {.fact}
-`Did you know:` axolotls keep juvenile features such as feathery external gills all their lives ([neoteny]{.hl}). Turning into a land salamander is a yes-or-no outcome that in the wild almost always comes out [no]{.hl}.
+`Did you know:` axolotls keep juvenile features such as feathery external gills all their lives ([neoteny]{.hl}). Turning into a land salamander is a yes-or-no outcome that in the wild almost always comes out no.
 
 _Source: National Geographic_
 :::
 
 ## Data-generating processes
 
-Winter (2019, section 12.2): think about the process that [generates]{.hl} each data point.
+Winter (2019, section 12.2): think about the process that generates each data point.
 
 . . .
 
-- Normal: each value is a [mean]{.hl} plus normally distributed noise, with some [SD]{.hl}
+- Normal: each value is a mean plus normally distributed noise, with some SD
 - __Bernoulli__: each response is a [weighted coin]{.hl}. It comes up 1 with probability `p`, and 0 otherwise
 
 . . .
@@ -189,7 +189,7 @@ A __generalised linear model__ (GLM) has:
 
 . . .
 
-Why a link function? The linear predictor can take [any]{.hl} value, from −∞ to +∞. A probability must stay between [0]{.hl} and [1]{.hl}.
+Why a link function? The linear predictor can take any value, from −∞ to +∞. A probability must stay between 0 and 1.
 
 ## Probabilities, odds and log odds
 
@@ -202,8 +202,8 @@ tibble(p = c(0.1, 0.25, 0.5, 0.75, 0.9)) |>
 
 . . .
 
-- __Odds__: how much more likely it happens than not. p = 0.75 gives odds of 3: [3 to 1]{.hl}
-- __Log odds__ (__logits__): the log of the odds. They range from −∞ to +∞, and are [0]{.hl} when p = 0.5
+- __Odds__: how much more likely it happens than not. p = 0.75 gives odds of 3: 3 to 1
+- __Log odds__ (__logits__): the log of the odds. They range from −∞ to +∞, and are 0 when p = 0.5
 
 ## The logistic function
 
@@ -245,8 +245,8 @@ _Source: National Geographic_
 
 The same reasoning as for `lmer()` (lectures 10 and 11):
 
-- Frequency varies [within]{.hl} participants: `(1 + freq_c | participant)`
-- Frequency does [not]{.hl} vary within words: `(1 | word)`
+- Frequency varies within participants: `(1 + freq_c | participant)`
+- Frequency does not vary within words: `(1 | word)`
 
 . . .
 
@@ -268,7 +268,7 @@ print(summary(m), correlation = FALSE, signif.stars = FALSE)
 ## Reading the output
 
 - [Laplace Approximation]{.hl}: how the model was fitted. GLMMs use maximum likelihood: there is no REML
-- __Random effects__: SDs on the [log odds]{.hl} scale. There is [no residual]{.hl} variance: for 0/1 data, it is fixed by the distribution
+- __Random effects__: SDs on the [log odds]{.hl} scale. There is no residual variance: for 0/1 data, it is fixed by the distribution
 - __Fixed effects__: estimates on the [log odds]{.hl} scale, with __z values__ and __p-values__
 
 . . .
@@ -291,7 +291,7 @@ fixef(m)
 
 . . .
 
-The intercept, `r round(fixef(m)[1], 2)`, is the log odds of a correct response for a word of [average]{.hl} frequency, by an [average]{.hl} participant (truth: 1.5).
+The intercept, `r round(fixef(m)[1], 2)`, is the log odds of a correct response for a word of average frequency, by an average participant (truth: 1.5).
 
 . . .
 
@@ -320,7 +320,7 @@ exp(fixef(m)[2])
 
 . . .
 
-Each extra unit of log frequency [multiplies]{.hl} the odds of a correct response by about `r round(exp(fixef(m)[2]), 2)`.
+Each extra unit of log frequency multiplies the odds of a correct response by about `r round(exp(fixef(m)[2]), 2)`.
 
 . . .
 
@@ -346,11 +346,11 @@ pp <- round(100 * predict(m, newdata = new, re.form = NA, type = "response"))
 
 . . .
 
-The same slope, [different]{.hl} changes in probability: +`r pp[2] - pp[1]` points from −2 to −1, only +`r pp[5] - pp[4]` from 1 to 2.
+The same slope, different changes in probability: +`r pp[2] - pp[1]` points from −2 to −1, only +`r pp[5] - pp[4]` from 1 to 2.
 
 ## The divide-by-4 rule
 
-The logistic curve is steepest at p = 0.5, where its slope is exactly [1/4]{.hl} of the log odds slope.
+The logistic curve is steepest at p = 0.5, where its slope is exactly 1/4 of the log odds slope.
 
 ```{r}
 fixef(m)[2] / 4
@@ -358,7 +358,7 @@ fixef(m)[2] / 4
 
 . . .
 
-So one unit of log frequency changes the probability of a correct response by [at most]{.hl} about `r round(100 * fixef(m)[2] / 4)` percentage points. Elsewhere on the curve, the change is smaller.
+So one unit of log frequency changes the probability of a correct response by at most about `r round(100 * fixef(m)[2] / 4)` percentage points. Elsewhere on the curve, the change is smaller.
 
 ## Predicted curves
 
@@ -401,17 +401,17 @@ No `REML = FALSE` needed: `glmer()` always uses maximum likelihood.
 
 ## Convergence {.smaller}
 
-Mixed logistic models are [harder]{.hl} to fit than `lmer()` models, and convergence warnings are common. The checklist from lecture 11 still applies:
+Mixed logistic models are harder to fit than `lmer()` models, and convergence warnings are common. The checklist from lecture 11 still applies:
 
-1. Is every random slope [possible]{.hl} in the design?
-2. [Centre]{.hl} or scale continuous predictors
+1. Is every random slope possible in the design?
+2. Centre or scale continuous predictors
 3. Try other optimisers, or more iterations: `glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))`
 4. Compare optimisers with `allFit()`
-5. [Simplify]{.hl} the random effects, and report what you did
+5. Simplify the random effects, and report what you did
 
 . . .
 
-Binary data carry [less information]{.hl} per observation than continuous data: complex random effects need a lot of data.
+Binary data carry less information per observation than continuous data: complex random effects need a lot of data.
 
 ## Reporting
 
@@ -423,11 +423,11 @@ lrt <- anova(m_null, m)
 
 . . .
 
-Report estimates on the log odds scale, and help your reader with odds ratios or predicted [probabilities]{.hl}.
+Report estimates on the log odds scale, and help your reader with odds ratios or predicted probabilities.
 
 ## Counts and proportions
 
-Sometimes data come as [counts]{.hl}: 17 correct out of 20 trials. The binomial family handles this too, with successes and failures:
+Sometimes data come as counts: 17 correct out of 20 trials. The binomial family handles this too, with successes and failures:
 
 ```{r, eval = FALSE}
 glmer(cbind(n_correct, n_incorrect) ~ predictor + (1 | participant),
@@ -436,7 +436,7 @@ glmer(cbind(n_correct, n_incorrect) ~ predictor + (1 | participant),
 
 . . .
 
-When you have the individual trials, model them [directly]{.hl}, as we did today: you keep the information about words.
+When you have the individual trials, model them directly, as we did today: you keep the information about words.
 
 # Your turn
 
@@ -453,12 +453,12 @@ lexdec |> count(Correct)
 
 ## Exercises
 
-1. Create a column `correct`, coded [1]{.hl} for correct responses and [0]{.hl} otherwise
+1. Create a column `correct`, coded 1 for correct responses and 0 otherwise
 2. Fit `correct ~ Frequency + NativeLanguage` with `glmer()`, by-subject and by-word random intercepts
 3. Interpret the `Frequency` effect as an odds ratio. What is the predicted probability of a correct response for a native and a non-native speaker, at the mean frequency?
 4. Test `NativeLanguage` with a likelihood ratio test
 
-*Careful*: if you give `glmer()` the factor `Correct` directly, it models the probability of the [second]{.hl} level, `"incorrect"`.
+*Careful*: if you give `glmer()` the factor `Correct` directly, it models the probability of the second level, `"incorrect"`.
 
 ## Solutions {.smaller}
 
@@ -493,12 +493,12 @@ Both groups are very accurate, and native language does not reliably improve the
 ## Summary
 
 ::: {.takeaway}
-- Binary outcomes: `glmer(..., family = binomial)`, not `lmer()`
+- Binary outcomes need `glmer(..., family = binomial)` instead of `lmer()`
 - A GLM: a [distribution]{.hl}, a [linear predictor]{.hl}, a [link function]{.hl}
 - Coefficients are on the [log odds]{.hl} scale: `exp()` gives odds ratios, `plogis()` probabilities
-- The same slope means different changes in probability along the S-curve; divide by 4 for the [maximum]{.hl}
+- The same slope means different changes in probability along the S-curve; divide by 4 for the maximum
 - Test with [likelihood ratio tests]{.hl}; expect more convergence issues
-- The random effects logic is the [same]{.hl} as for `lmer()`
+- The random effects logic is the same as for `lmer()`
 :::
 
 ## Slides and code

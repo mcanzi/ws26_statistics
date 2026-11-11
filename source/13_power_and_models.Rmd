@@ -57,43 +57,42 @@ _Source: San Diego Zoo Wildlife Alliance_
 
 Three chapters of Winter (2019), the most important points of each:
 
-- [Chapter 10]{.hl}: what p-values are not, power, Type I, II, M and S errors, multiple testing, stopping rules
-- [Chapter 11]{.hl}: uncertainty in regression: confidence intervals, testing predictors with several levels, plotting uncertainty
-- [Chapter 16]{.hl}: strategies for model building, and reproducible research
+- Chapter 10: what p-values are not, power, Type I, II, M and S errors, multiple testing, stopping rules
+- Chapter 11: uncertainty in regression: confidence intervals, testing predictors with several levels, plotting uncertainty
+- Chapter 16: strategies for model building, and reproducible research
 
 . . .
 
-Most of today is [simulation]{.hl}: we make up a world where we know the truth, and see how our methods behave in it.
+Most of today is simulation: we make up a world where we know the truth, and see how our methods behave in it.
 
 ## So far
 
-- Lecture 9: p-values, standard errors, confidence intervals; [significance is not size]{.hl}
+- Lecture 9: p-values, standard errors, confidence intervals; significance is not size
 - Lectures 10 to 12: mixed models with `lmer()` and `glmer()`, likelihood ratio tests
 
 . . .
 
-Today: how p-values [mislead]{.hl} us, and how to plan, build and report models that don't.
+Today: how p-values can mislead, and how to plan and report models more carefully.
 
 ## Common misreadings
 
 A p-value of .03 does __not__ mean:
 
-- that there is a 3% chance that the null hypothesis is [true]{.hl}
-- that there is a 97% chance that the effect is [real]{.hl}
-- that the effect is [large]{.hl} or important
+- that there is a 3% chance that the null hypothesis is true
+- that there is a 97% chance that the effect is real
+- that the effect is large or important
 
 . . .
 
-It means: [if]{.hl} the null hypothesis were true, data at least this extreme would turn up 3% of the time.
+It means: if the null hypothesis were true, data at least this extreme would turn up 3% of the time.
 
 ## Absence of evidence
 
-p > .05 does __not__ mean that there is [no effect]{.hl}.
+p > .05 does __not__ mean that there is no effect.
 
 . . .
 
-- It means the data are [compatible]{.hl} with no effect
-- They may be compatible with a large effect, too: look at the [confidence interval]{.hl}
+- It means the data are compatible with no effect, but they may be compatible with a large effect too: look at the confidence interval
 - A small study can miss a real effect: more on this in a minute ([power]{.hl})
 
 ## Significant vs not significant
@@ -105,7 +104,7 @@ Two studies of the same effect (Gelman & Stern, 2006):
 
 . . .
 
-Do the two studies disagree? Test the [difference]{.hl} between them:
+Do the two studies disagree? Test the difference between them:
 
 ```{r}
 diff    <- 25 - 10
@@ -115,7 +114,7 @@ se_diff <- sqrt(10^2 + 10^2)
 
 . . .
 
-The difference between "significant" and "not significant" is [not itself]{.hl} significant. Compare effects [directly]{.hl}, never by their p-values.
+The difference between "significant" and "not significant" is not itself significant. Compare the effects directly instead of comparing their p-values.
 
 # Power and errors
 
@@ -129,18 +128,17 @@ _Source: San Diego Zoo Wildlife Alliance_
 
 |                      | No effect in reality       | Effect in reality         |
 |----------------------|----------------------------|---------------------------|
-| __Significant__      | [Type I]{.hl} error (false alarm) | correct                 |
-| __Not significant__  | correct                    | [Type II]{.hl} error (miss)    |
+| __Significant__      | Type I error (false alarm) | correct                 |
+| __Not significant__  | correct                    | Type II error (miss)    |
 
 . . .
 
 - The Type I error rate is `α`, usually .05: we choose it
-- __Power__: the probability of finding an effect when it [is]{.hl} there (1 − the Type II error rate)
-- Power depends on the [effect size]{.hl}, the [noise]{.hl} and the [sample size]{.hl}
+- __Power__: the probability of finding an effect when it is there (1 − the Type II error rate). It depends on the effect size, the noise and the sample size
 
 ## Simulating a study {.smaller}
 
-A world we control: group b's vowels are [10 ms]{.hl} longer than group a's, SD = 40 ms.
+A world we control: group b's vowels are 10 ms longer than group a's, SD = 40 ms.
 
 ```{r}
 sim_study <- function(n, diff = 10, sd = 40) {
@@ -157,7 +155,7 @@ one
 
 . . .
 
-The true difference is +10 ms. This study, with 20 speakers per group, estimates `r round(one$estimate, 1)` ms (p = `r round(one$p, 2)`): one study can be [far]{.hl} off.
+The true difference is +10 ms. This study, with 20 speakers per group, estimates `r round(one$estimate, 1)` ms (p = `r round(one$p, 2)`): one study can be far off.
 
 ## Run it 1,000 times
 
@@ -169,7 +167,7 @@ mean(sims20$p < .05)
 
 . . .
 
-The power is about `r round(100 * mean(sims20$p < .05))`%: the effect is real, yet almost 9 studies in 10 [miss]{.hl} it.
+The power is about `r round(100 * mean(sims20$p < .05))`%: the effect is real, yet almost 9 studies in 10 miss it.
 
 . . .
 
@@ -193,11 +191,11 @@ ggplot(pw, aes(n, power)) +
   labs(x = "Speakers per group", y = "Power")
 ```
 
-For 80% power, this 10 ms effect needs about `r ceiling(power.t.test(power = 0.8, delta = 10, sd = 40)$n)` speakers [per group]{.hl}. Plan the sample size [before]{.hl} collecting data.
+For 80% power, this 10 ms effect needs about `r ceiling(power.t.test(power = 0.8, delta = 10, sd = 40)$n)` speakers per group. Plan the sample size before collecting data.
 
 ## Type M and Type S errors
 
-Gelman & Carlin (2014): with low power, the [significant]{.hl} results are the misleading ones.
+Gelman & Carlin (2014): with low power, the significant results are the misleading ones.
 
 ```{r, echo = FALSE, fig.height = 3.4}
 sims20 |>
@@ -210,7 +208,7 @@ sims20 |>
   labs(x = "Estimated difference (ms)", y = "Studies", fill = NULL)
 ```
 
-- Only [large]{.hl} estimates reach significance
+- Only large estimates reach significance
 
 ## Type M and Type S errors
 
@@ -223,19 +221,19 @@ mean(sig$estimate < 0)       # wrong sign
 . . .
 
 - __Type M__ (magnitude): significant estimates are on average `r round(mean(abs(sig$estimate)) / 10, 1)` times too large
-- __Type S__ (sign): `r round(100 * mean(sig$estimate < 0), 1)`% of them even point in the [wrong direction]{.hl}
+- __Type S__ (sign): `r round(100 * mean(sig$estimate < 0), 1)`% of them even point in the wrong direction
 
 . . .
 
-A significant result from a small study is [not]{.hl} a safe result: it probably exaggerates.
+A significant result from a small study probably exaggerates the effect.
 
 ## Power for mixed models
 
 For mixed models, there is no simple formula. Do what we just did:
 
-1. Simulate data with your design: participants, items, [plausible]{.hl} effect sizes and random effects (lectures 10 to 12)
+1. Simulate data with your design: participants, items, plausible effect sizes and random effects (lectures 10 to 12)
 2. Fit the model to each simulated data set
-3. Count how often the effect is [significant]{.hl}
+3. Count how often the effect is significant
 
 . . .
 
@@ -260,11 +258,11 @@ tibble(k = c(1, 5, 10, 20)) |>
 
 . . .
 
-Test 20 things that don't exist, and you will probably find [at least one]{.hl}.
+If you test 20 effects that do not exist, you will probably find at least one "significant" result.
 
 ## A simulation
 
-1,000 studies, each running 10 t-tests on [pure noise]{.hl}:
+1,000 studies, each running 10 t-tests on pure noise:
 
 ```{r}
 set.seed(3)
@@ -277,7 +275,7 @@ mean(any_sig)
 
 . . .
 
-About `r round(100 * mean(any_sig))`% of the studies find "something". The more you test, the more you find.
+About `r round(100 * mean(any_sig))`% of the studies find "something".
 
 ## Correcting for multiple tests
 
@@ -289,11 +287,11 @@ p.adjust(p, method = "holm")          # less conservative
 
 . . .
 
-Better still: test [fewer]{.hl} things. Decide which comparisons answer your question [before]{.hl} you look at the data.
+Better still: test fewer things. Decide which comparisons answer your question before you look at the data.
 
 ## Stopping rules
 
-A tempting plan: test after every 10 participants, and [stop]{.hl} as soon as p < .05.
+A tempting plan: test after every 10 participants, and stop as soon as p < .05.
 
 ```{r, echo = FALSE, fig.height = 3.2}
 set.seed(8)
@@ -312,7 +310,7 @@ ggplot(paths, aes(n, p, group = study, colour = ever)) +
   labs(x = "Participants per group so far", y = "p-value", colour = NULL)
 ```
 
-20 studies of [no effect]{.hl}: p-values wander, and some dip below .05 by chance.
+20 studies of no effect: p-values wander, and some dip below .05 by chance.
 
 ## Peeking inflates false alarms
 
@@ -329,7 +327,7 @@ false_alarm
 
 . . .
 
-With 10 peeks, the false alarm rate is about `r round(100 * false_alarm)`%, not 5%. Fix the sample size in [advance]{.hl}, and report how you chose it.
+With 10 peeks, the false alarm rate is about `r round(100 * false_alarm)`%, not 5%. Fix the sample size in advance, and report how you chose it.
 
 # Uncertainty in regression
 
@@ -350,7 +348,7 @@ confint(m)
 
 . . .
 
-Each mm of flipper goes with about 50 g of body mass, and the 95% CI runs from `r round(confint(m)[2, 1], 1)` to `r round(confint(m)[2, 2], 1)` g: roughly the estimate ± [2 SE]{.hl}.
+Each mm of flipper goes with about 50 g of body mass, and the 95% CI runs from `r round(confint(m)[2, 1], 1)` to `r round(confint(m)[2, 2], 1)` g: roughly the estimate ± 2 SE.
 
 ## Predictors with several levels
 
@@ -374,7 +372,7 @@ anova(m_0, m_sp)
 
 . . .
 
-For `lm()`, the comparison is an [F-test]{.hl}; for `lmer()` and `glmer()`, a likelihood ratio test. Same idea: does the predictor [improve]{.hl} the model?
+For `lm()`, the comparison is an [F-test]{.hl}; for `lmer()` and `glmer()`, a likelihood ratio test. Same idea: does the predictor improve the model?
 
 ## Showing uncertainty: categories
 
@@ -420,7 +418,7 @@ ggplot(grid, aes(flipper_length_mm, fit)) +
   labs(x = "Flipper length (mm)", y = "Body mass (g)")
 ```
 
-The band: the [uncertainty]{.hl} in the line, wider at the edges. `geom_smooth(method = "lm")` draws the same.
+The band: the uncertainty in the line, wider at the edges. `geom_smooth(method = "lm")` draws the same.
 
 # Building models
 
@@ -442,7 +440,7 @@ tibble(
 
 . . .
 
-We fitted `glmer()` in lecture 12; `glm()` is the same model without random effects. One framework: an outcome, a [linear predictor]{.hl} (continuous and categorical predictors, interactions), a distribution, and random effects where the data are [grouped]{.hl}. Counts would use Poisson regression (Winter, Ch 13).
+We fitted `glmer()` in lecture 12; `glm()` is the same model without random effects. One framework: an outcome, a [linear predictor]{.hl} (continuous and categorical predictors, interactions), a distribution, and random effects where the data are grouped. Counts would use Poisson regression (Winter, Ch 13).
 
 ## The cookbook approach
 
@@ -451,8 +449,8 @@ The cookbook: "two groups → t-test; three groups → ANOVA; two numbers → co
 . . .
 
 - Each test is a special case of the [linear model]{.hl} (lecture 9: t-tests are linear models)
-- The cookbook hides the model's [assumptions]{.hl}, and breaks as soon as data get more complex (repeated measures, several predictors)
-- Winter's advice: think in terms of [models]{.hl}, not tests
+- The cookbook hides the model's assumptions, and breaks as soon as data get more complex (repeated measures, several predictors)
+- Winter's advice: think in terms of models
 
 ## Stepwise regression
 
@@ -482,35 +480,34 @@ mean(n_sig >= 1)
 
 . . .
 
-- In `r round(100 * mean(n_sig >= 1))`% of the data sets, the final model has at least one "significant" predictor, though [nothing]{.hl} is real
-- The p-values of the final model ignore all the tests that went into choosing it: a hidden case of [multiple testing]{.hl}
-- Choose predictors from your [research question]{.hl} and theory instead
+- In `r round(100 * mean(n_sig >= 1))`% of the data sets, the final model has at least one "significant" predictor, though nothing is real. The p-values of the final model ignore all the tests that went into choosing it: a hidden case of multiple testing
+- Choose predictors from your research question and theory instead
 
 ## Theory-driven modelling
 
-Winter (Ch 16): modelling is [subjective]{.hl}, and that is fine, as long as it is principled and transparent.
+Winter (Ch 16): modelling is subjective, and that is fine, as long as it is principled and transparent.
 
-- Decide the model [before]{.hl} seeing the data: outcome, predictors, interactions, random effects
+- Decide the model before seeing the data: outcome, predictors, interactions, random effects
 - Keep [confirmatory]{.hl} (planned) and [exploratory]{.hl} (after the fact) analyses apart, and label them
 - Consider [preregistering]{.hl} the analysis
-- Report the choices you made, and [why]{.hl}
+- Report the choices you made, and why
 
 ## Reproducible research
 
-Someone else, or you in a year, should get the [same]{.hl} results from your data.
+Someone else, or you in a year, should get the same results from your data.
 
-- Write the analysis as code: R Markdown, [not]{.hl} clicking and copying
+- Write the analysis as code, for example in R Markdown, instead of clicking and copying
 - `set.seed()` before anything random: simulations, `sample()`
-- Use [relative]{.hl} paths and R projects, not `C:/Users/me/Desktop/...`
+- Use relative paths and R projects instead of paths like `C:/Users/me/Desktop/...`
 - Record package versions with `sessionInfo()`
-- Share [data and code]{.hl} alongside the paper, e.g. on the OSF
+- Share data and code alongside the paper, e.g. on the OSF
 
 # Your turn
 
 ## Exercises
 
-1. Use `sim_study()` to estimate the power to detect a [20 ms]{.hl} difference (SD = 40) with 20 and with 50 speakers per group. Check your answers with `power.t.test()`
-2. A study reports these p-values for 6 tests: [0.001, 0.008, 0.02, 0.04, 0.045, 0.3]{.hl}. Which remain below .05 after a Holm correction?
+1. Use `sim_study()` to estimate the power to detect a 20 ms difference (SD = 40) with 20 and with 50 speakers per group. Check your answers with `power.t.test()`
+2. A study reports these p-values for 6 tests: 0.001, 0.008, 0.02, 0.04, 0.045, 0.3. Which remain below .05 after a Holm correction?
 3. Fit `flipper_length_mm ~ species` on `pengs`. Test `species` with a model comparison, and plot the predicted means with their 95% CIs
 
 ## Solutions {.smaller}
@@ -553,12 +550,12 @@ ggplot(preds_fl, aes(species, fit)) +
 ## Summary
 
 ::: {.takeaway}
-- A p-value is not the probability that the null is true; p > .05 is not "no effect"; compare effects [directly]{.hl}
+- A p-value is not the probability that the null is true; p > .05 is not "no effect"; compare effects directly
 - Low [power]{.hl} misses real effects, and exaggerates the ones it finds (Type M and S errors)
-- [Simulate]{.hl} to find out the power of a design, including mixed models
-- Many tests and peeking at the data [inflate]{.hl} false alarms: plan in advance
+- Simulate to find out the power of a design, including mixed models
+- Many tests and peeking at the data inflate false alarms: plan in advance
 - Report [confidence intervals]{.hl}, and plot uncertainty
-- Build models from [theory]{.hl}, not stepwise; keep your analysis [reproducible]{.hl}
+- Build models from theory instead of stepwise selection; keep your analysis [reproducible]{.hl}
 :::
 
 ## References {.smaller}

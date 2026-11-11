@@ -55,16 +55,16 @@ _Sources: Spottiswoode et al. (2016), Science; National Geographic_
 
 ## Today
 
-- What an [interaction]{.hl} is, and why lines stop being parallel
-- Categorical × [continuous]{.hl} interactions
-- Categorical × [categorical]{.hl} interactions
-- Continuous × continuous interactions and [curved]{.hl} regression planes
-- Why [centering]{.hl} and [sum coding]{.hl} matter so much here
-- A word on [higher-order]{.hl} interactions
+- What an interaction is, and why lines stop being parallel
+- Categorical × continuous interactions
+- Categorical × categorical interactions
+- Continuous × continuous interactions and curved regression planes
+- Why centering and sum coding matter so much here
+- A word on higher-order interactions
 
 ## So far
 
-Lectures 6 and 7: several predictors, each with [one]{.hl} effect.
+Lectures 6 and 7: several predictors, each with one effect.
 
 . . .
 
@@ -84,11 +84,11 @@ tibble(x = rep(0:10, 2), group = rep(c("A", "B"), each = 11)) |>
 
 . . .
 
-An __interaction__: the effect of one predictor [depends on]{.hl} the value of another. The lines are no longer parallel.
+An __interaction__: the effect of one predictor depends on the value of another. The lines are no longer parallel.
 
 ## Interactions in R
 
-`*` adds both predictors [and]{.hl} their interaction:
+`*` adds both predictors and their interaction:
 
 ```{r, eval = FALSE}
 lm(y ~ x * group)            # is the same as
@@ -122,7 +122,7 @@ lex <- tibble(group    = rep(c("L1", "L2"), each = 200),
 
 . . .
 
-In this simulation, frequency matters [more]{.hl} for L2 speakers: −55 ms per log unit, against −25 ms for L1 speakers.
+In this simulation, frequency matters more for L2 speakers: −55 ms per log unit, against −25 ms for L1 speakers.
 
 ## The data
 
@@ -133,7 +133,7 @@ ggplot(lex, aes(x = log_freq, y = rt, colour = group)) +
   labs(x = "log10 frequency", y = "Reaction time (ms)", colour = NULL)
 ```
 
-Two [different]{.hl} slopes. Can last week's model capture that?
+Two different slopes. Can last week's model capture that?
 
 ## Without an interaction
 
@@ -150,7 +150,7 @@ augment(m_add) |>
   labs(x = "log10 frequency", y = "RT (ms)", colour = NULL)
 ```
 
-One slope for [both]{.hl} groups: too shallow for L2, too steep for L1.
+One slope for both groups: too shallow for L2, too steep for L1.
 
 ## With an interaction
 
@@ -161,9 +161,9 @@ coef(m_int)
 
 . . .
 
-- `log_freq`: the frequency slope for the [reference]{.hl} group, L1
+- `log_freq`: the frequency slope for the reference group, L1
 - `groupL2`: the difference between L2 and L1 `when log_freq = 0`
-- `log_freq:groupL2`: how much [steeper]{.hl} the slope is for L2
+- `log_freq:groupL2`: how much steeper the slope is for L2
 
 . . .
 
@@ -179,11 +179,11 @@ Only at `log_freq = 0`, a frequency that does not exist in our data (1 to 6).
 
 . . .
 
-With an interaction, each lower-order coefficient is a __simple effect__: the effect of one predictor when the other is [0]{.hl} (or at its reference level).
+With an interaction, each lower-order coefficient is a __simple effect__: the effect of one predictor when the other is 0 (or at its reference level).
 
 ## Centering rescues the coefficients
 
-From lecture 5: centre the continuous predictor, so that [0]{.hl} means "average frequency".
+From lecture 5: centre the continuous predictor, so that 0 means "average frequency".
 
 ```{r}
 lex <- lex |> mutate(log_freq_c = log_freq - mean(log_freq))
@@ -192,8 +192,8 @@ coef(lm(rt ~ log_freq_c * group, data = lex))
 
 . . .
 
-- `groupL2`: now the L1–L2 difference for a word of [average]{.hl} frequency
-- The slope and the interaction do [not]{.hl} change
+- `groupL2`: now the L1–L2 difference for a word of average frequency
+- The slope and the interaction do not change
 
 ## Did the interaction help?
 
@@ -204,12 +204,12 @@ c(additive    = glance(m_add)$adj.r.squared,
 
 . . .
 
-Adjusted R² goes [up]{.hl}: separate slopes describe these data better. Whether the interaction is [reliable]{.hl} beyond this sample is a question for inference, later in the course.
+Adjusted R² goes up: separate slopes describe these data better. Whether the interaction is reliable beyond this sample is a question for inference, later in the course.
 
 # Categorical × categorical
 
 ::: {.fact}
-`Did you know:` Hadza hunters in Tanzania [whistle]{.hl} instead. Honeyguides in Tanzania were over three times more likely to cooperate with the Hadza whistle than with the Yao call, and in Mozambique almost twice as likely with the Yao call: the effect of the call [depends on the place]{.hl}.
+`Did you know:` Hadza hunters in Tanzania [whistle]{.hl} instead. Honeyguides in Tanzania were over three times more likely to cooperate with the Hadza whistle than with the Yao call, and in Mozambique almost twice as likely with the Yao call: the effect of the call depends on the place.
 
 _Source: Spottiswoode & Wood (2023), Science_
 :::
@@ -251,7 +251,7 @@ vs |>
   labs(x = "Speaking style", y = "Mean duration (ms)", colour = NULL)
 ```
 
-Clear speech lengthens vowels, [more so]{.hl} before voiced consonants: the lines are not parallel.
+Clear speech lengthens vowels, more so before voiced consonants: the lines are not parallel.
 
 ## Treatment-coded interaction {.smaller}
 
@@ -264,10 +264,10 @@ coef(m_vs)
 
 | Coefficient | Meaning |
 |---|---|
-| `(Intercept)` | mean of [voiceless, casual]{.hl} (both reference levels) |
-| `voicingvoiced` | voicing effect in [casual]{.hl} speech only |
+| `(Intercept)` | mean of voiceless, casual (both reference levels) |
+| `voicingvoiced` | voicing effect in casual speech only |
 | `styleclear` | style effect for `voiceless` only |
-| `voicingvoiced:styleclear` | how much [bigger]{.hl} the voicing effect is in clear speech |
+| `voicingvoiced:styleclear` | how much bigger the voicing effect is in clear speech |
 
 ## Rebuilding the cell means
 
@@ -281,7 +281,7 @@ c(voiceless_casual = b[[1]],
 
 . . .
 
-The interaction coefficient is added [only]{.hl} in the cell where both non-reference levels meet.
+The interaction coefficient is added only in the cell where both non-reference levels meet.
 
 ## Sum coding, as promised
 
@@ -295,17 +295,17 @@ coef(lm(duration ~ voicing * style, data = vs_sum))
 . . .
 
 - Intercept: the [grand mean]{.hl} of the four cells
-- `voicing1`, `style1`: effects [averaged]{.hl} over the other predictor, the classic main effects
-- Same fit, same predictions: only the [meaning]{.hl} of the coefficients changed
+- `voicing1`, `style1`: effects averaged over the other predictor, the classic main effects
+- The fit and the predictions are unchanged; only the coefficients mean something different
 
 ## Which coding?
 
-- __Treatment__ coding: each effect is [relative to the reference]{.hl} level of the other predictor
-- __Sum__ coding: each effect is the [average]{.hl} across the levels of the other predictor
+- __Treatment__ coding: each effect is relative to the reference level of the other predictor
+- __Sum__ coding: each effect is the average across the levels of the other predictor
 
 . . .
 
-With interactions, always check which coding you used [before]{.hl} interpreting a "main effect".
+With interactions, always check which coding you used before interpreting a "main effect".
 
 # Continuous × continuous
 
@@ -317,7 +317,7 @@ _Source: University of Cape Town, FitzPatrick Institute_
 
 ## The data
 
-Back to word frequency and length, simulated, now [with]{.hl} an interaction:
+Back to word frequency and length, simulated, now with an interaction:
 
 ```{r}
 set.seed(12)
@@ -330,7 +330,7 @@ w <- tibble(log_freq = runif(400, 1, 6),
 
 . . .
 
-The interaction term multiplies the two predictors: here, length matters [less]{.hl} for frequent words.
+The interaction term multiplies the two predictors: here, length matters less for frequent words.
 
 ## Uncentred: a surprise
 
@@ -340,7 +340,7 @@ coef(lm(rt ~ log_freq * length, data = w))
 
 . . .
 
-The frequency slope is [positive]{.hl}? It is the effect of frequency for a word of length [0]{.hl}.
+The frequency slope is positive? It is the effect of frequency for a word of length 0.
 
 . . .
 
@@ -348,7 +348,7 @@ The frequency slope is [positive]{.hl}? It is the effect of frequency for a word
 coef(lm(rt ~ lf_c * len_c, data = w))
 ```
 
-Centred, the simple effects describe a word of [average]{.hl} frequency and length. The interaction is the [same]{.hl} in both models.
+Centred, the simple effects describe a word of average frequency and length. The interaction is the same in both models.
 
 ## Simple slopes
 
@@ -365,7 +365,7 @@ ggplot(w, aes(x = length, y = rt)) +
   labs(x = "Length (letters)", y = "Reaction time (ms)", colour = "log10 frequency")
 ```
 
-The effect of length at three frequencies. Compare lecture 6: the lines now [fan out]{.hl}.
+The effect of length at three frequencies. Compare lecture 6: the lines now fan out.
 
 ## A twisted plane
 
@@ -383,7 +383,7 @@ ggplot(plane, aes(x = log_freq, y = length)) +
   theme(legend.key.width = unit(2, "cm"))
 ```
 
-Without an interaction, the contour lines were straight and parallel (lecture 6). With one, they [bend]{.hl}: the plane is twisted.
+Without an interaction, the contour lines were straight and parallel (lecture 6). With one, they bend: the plane is twisted.
 
 # Higher-order interactions
 
@@ -403,15 +403,15 @@ expands to 7 coefficients beyond the intercept:
 
 . . .
 
-Three-way interactions are hard to interpret and need a lot of data. Include them only when your [research question]{.hl} asks for one.
+Three-way interactions are hard to interpret and need a lot of data. Include them only when your research question asks for one.
 
 ## Reading interactions: a checklist
 
-1. [Plot]{.hl} the data: do the lines or groups look non-parallel?
-2. [Centre]{.hl} continuous predictors and choose your [coding]{.hl} before fitting
+1. Plot the data: do the lines or groups look non-parallel?
+2. Centre continuous predictors and choose your coding before fitting
 3. Read the interaction term as a [change in an effect]{.hl}
 4. Read lower-order terms as [simple effects]{.hl}, at 0 or the reference level
-5. Plot the [model predictions]{.hl}, not just the coefficients
+5. Plot the model predictions as well as the coefficients
 
 # Your turn
 
@@ -451,7 +451,7 @@ coef(lm(body_mass_g ~ species * sex, data = pengs_sum))
 
 . . .
 
-Treatment: the intercept is the mean of [female Adelie]{.hl} penguins. Sum: the [grand mean]{.hl} of the six species × sex cells.
+Treatment: the intercept is the mean of female Adelie penguins. Sum: the [grand mean]{.hl} of the six species × sex cells.
 
 ## Summary
 
@@ -460,7 +460,7 @@ Treatment: the intercept is the mean of [female Adelie]{.hl} penguins. Sum: the 
 - `y ~ x * z` = `x + z + x:z`
 - The interaction term is a [change in an effect]{.hl}
 - Lower-order terms become [simple effects]{.hl}: centre continuous predictors, choose your coding
-- Continuous × continuous interactions [twist]{.hl} the regression plane
+- Continuous × continuous interactions twist the regression plane
 - Higher-order interactions: only when the research question needs them
 :::
 

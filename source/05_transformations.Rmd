@@ -62,11 +62,11 @@ _Sources: Encyclopaedia Britannica; WWF_
 
 ## Today
 
-- [Why]{.hl} we transform variables
-- [Linear]{.hl} transformations: units, centering, standardising
-- [Correlation]{.hl}: Pearson's r, and what it hides
-- [Logarithms]{.hl}: for predictors and for outcomes
-- A note on the word ["normalising"]{.hl}
+- Why we transform variables
+- Linear transformations: units, centering, standardising
+- Correlation: Pearson's r, and what it hides
+- Logarithms: for predictors and for outcomes
+- A note on the word "normalising"
 
 ## Last week
 
@@ -77,26 +77,26 @@ tidy(m)[, 1:3]
 . . .
 
 - __Slope__: each extra gram of body mass goes with `r round(b1, 4)` mm more flipper
-- __Intercept__: a penguin of [0 g]{.hl} would have flippers of `r round(b0, 1)` mm
+- __Intercept__: a penguin of 0 g would have flippers of `r round(b0, 1)` mm
 
 . . .
 
-The model is fine. The [numbers]{.hl} are awkward: tiny slopes, and an intercept that describes an impossible penguin.
+The model is fine, but the numbers are awkward: tiny slopes, and an intercept that describes an impossible penguin.
 
 ## Why transform?
 
-- __Interpretation__: make [0]{.hl} mean something, and slopes use sensible units
-- __Comparison__: put variables measured in different units on a [common scale]{.hl}
-- __Shape__: make skewed, multiplicative data behave more like the [linear model]{.hl} expects
+- __Interpretation__: make 0 mean something, and slopes use sensible units
+- __Comparison__: put variables measured in different units on a common scale
+- __Shape__: make skewed, multiplicative data behave more like the linear model expects
 
 . . .
 
-Transforming a variable does not change the [data]{.hl}. It changes the [scale]{.hl} we describe it on.
+Transforming a variable changes only the scale on which we describe the data.
 
 ## Linear vs non-linear
 
-- __Linear__: add, subtract, multiply or divide by a constant. The [shape]{.hl} of the distribution stays the same.
-- __Non-linear__: e.g. the logarithm or the square root. The [shape]{.hl} changes.
+- __Linear__: add, subtract, multiply or divide by a constant. The shape of the distribution stays the same.
+- __Non-linear__: e.g. the logarithm or the square root. The shape changes.
 
 ## Linear vs non-linear {.smaller}
 
@@ -119,12 +119,12 @@ bind_rows(
   labs(x = NULL, y = "Count", fill = NULL)
 ```
 
-Simulated reaction times on four scales. The three linear ones are the [same]{.hl} histogram with different numbers on the axis. Only the log changes the [shape]{.hl}.
+Simulated reaction times on four scales. The three linear ones are the same histogram with different numbers on the axis. Only the log changes the shape.
 
 # Linear transformations
 
 ::: {.fact}
-`Did you know:` a nursing blue whale calf gains up to [90 kg]{.hl} a day: that is [3.75]{.hl} kg an hour, or [0.09]{.hl} tonnes a day. Same calf, different units.
+`Did you know:` a nursing blue whale calf gains up to [90 kg]{.hl} a day: that is 3.75 kg an hour, or 0.09 tonnes a day. Same calf, different units.
 
 _Source: Encyclopaedia Britannica_
 :::
@@ -144,7 +144,7 @@ Divide the predictor by 1000, and the slope is multiplied by 1000: `r round(b1 *
 
 . . .
 
-Same line, same fit, same `R²` (`r round(r2, 2)`). Only the numbers are easier to read.
+The line and its `R²` (`r round(r2, 2)`) stay the same; the numbers are just easier to read.
 
 ## Where is the intercept?
 
@@ -160,11 +160,11 @@ ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
   labs(x = "Body mass (g)", y = "Flipper length (mm)")
 ```
 
-The intercept is where the line crosses `x = 0`: far [outside]{.hl} the data.
+The intercept is where the line crosses `x = 0`: far outside the data.
 
 ## Centering
 
-Subtract the mean, so that [0]{.hl} means "a penguin of average body mass":
+Subtract the mean, so that 0 means "a penguin of average body mass":
 
 ```{r}
 pengs <- pengs |>
@@ -176,7 +176,7 @@ mean(pengs$flipper_length_mm)
 
 . . .
 
-The slope does [not]{.hl} change. The intercept is now the mean flipper length: the predicted value for an [average]{.hl} penguin.
+The slope does not change. The intercept is now the mean flipper length: the predicted value for an average penguin.
 
 ## Centering
 
@@ -189,11 +189,11 @@ ggplot(pengs, aes(x = body_mass_c, y = flipper_length_mm)) +
   labs(x = "Body mass (g), centred: 0 = average", y = "Flipper length (mm)")
 ```
 
-Same data, same line: only the `x` axis has moved. The intercept (white) sits in the middle of the data.
+The data and the line are unchanged, and only the `x` axis has moved. The intercept (white) sits in the middle of the data.
 
 ## Centre on any meaningful value {.smaller}
 
-The mean is not the only choice. Subtract any value that makes [0]{.hl} meaningful:
+The mean is not the only choice. Subtract any value that makes 0 meaningful:
 
 ```{r}
 pengs <- pengs |> mutate(body_mass_4kg = body_mass_g - 4000)
@@ -202,7 +202,7 @@ coef(lm(flipper_length_mm ~ body_mass_4kg, data = pengs))
 
 . . .
 
-The intercept is now the predicted flipper length of a [4 kg]{.hl} penguin.
+The intercept is now the predicted flipper length of a 4 kg penguin.
 
 . . .
 
@@ -227,7 +227,7 @@ coef(lm(flipper_length_mm ~ body_mass_z, data = pengs))
 
 . . .
 
-The slope is now the change in flipper length for [one standard deviation]{.hl} more body mass.
+The slope is now the change in flipper length for one standard deviation more body mass.
 
 ## What a z-score says
 
@@ -237,7 +237,7 @@ The slope is now the change in flipper length for [one standard deviation]{.hl} 
 
 . . .
 
-From lecture 3: in a normal distribution about 95% of values lie within [2 SD]{.hl}. A value with `z = 3` is unusual.
+From lecture 3: in a normal distribution about 95% of values lie within 2 SD. A value with `z = 3` is unusual.
 
 . . .
 
@@ -254,7 +254,7 @@ coef(lm(flipper_length_mm ~ bill_length_mm, data = pengs))[2]
 
 . . .
 
-Grams and millimetres cannot be compared. Standardise [both]{.hl}:
+Grams and millimetres cannot be compared. Standardise both:
 
 ```{r}
 pengs <- pengs |> mutate(bill_length_z = as.numeric(scale(bill_length_mm)))
@@ -265,15 +265,15 @@ coef(lm(flipper_length_mm ~ bill_length_z, data = pengs))[2]
 
 . . .
 
-Per standard deviation, body mass goes with a [larger]{.hl} change in flipper length.
+Per standard deviation, body mass goes with a larger change in flipper length.
 
 ## Speaker normalisation
 
-A classic linguistic use of z-scores: [vowel formants]{.hl}.
+A classic linguistic use of z-scores: vowel formants.
 
 . . .
 
-Speakers with longer vocal tracts have [lower]{.hl} formants overall. Raw F1 and F2 mix up [which vowel]{.hl} and [which speaker]{.hl}.
+Speakers with longer vocal tracts have lower formants overall. Raw F1 and F2 mix up which vowel and which speaker.
 
 ```{r}
 set.seed(8)
@@ -299,11 +299,11 @@ ggplot(formants, aes(x = F2, y = F1, colour = speaker, shape = vowel)) +
   guides(shape = guide_legend(override.aes = list(colour = mist)))
 ```
 
-The [same]{.hl} vowels from two speakers land in different places.
+The same vowels from two speakers land in different places.
 
 ## Lobanov normalisation
 
-z-score each formant [within each speaker]{.hl} (Lobanov, 1971). With `.by` from lecture 2:
+z-score each formant within each speaker (Lobanov, 1971). With `.by` from lecture 2:
 
 ```{r}
 formants_z <- formants |>
@@ -313,7 +313,7 @@ formants_z <- formants |>
 
 . . .
 
-`.by = speaker`: each speaker's F1 and F2 are z-scored using [that speaker's]{.hl} own mean and SD.
+`.by = speaker`: each speaker's F1 and F2 are z-scored using that speaker's own mean and SD.
 
 ## After normalisation
 
@@ -326,7 +326,7 @@ ggplot(formants_z, aes(x = F2, y = F1, colour = speaker, shape = vowel)) +
   guides(shape = guide_legend(override.aes = list(colour = mist)))
 ```
 
-After normalisation, the vowels [overlap]{.hl} across speakers.
+After normalisation, the vowels overlap across speakers.
 
 ## Linear transformations: summary {.smaller}
 
@@ -350,7 +350,7 @@ tibble(
 
 . . .
 
-The [fit]{.hl} never changes. Linear transformations change what the [numbers mean]{.hl}.
+Linear transformations change what the numbers mean, while the fit stays the same.
 
 # Correlation
 
@@ -362,7 +362,7 @@ _Source: Royal Ontario Museum_
 
 ## Pearson's r {.smaller}
 
-The __correlation coefficient__ r measures how closely two variables follow a [straight line]{.hl}.
+The __correlation coefficient__ r measures how closely two variables follow a straight line.
 
 ```{r, echo = FALSE, fig.height = 3.6}
 set.seed(2)
@@ -379,8 +379,8 @@ bind_rows(make_r(-0.8), make_r(0), make_r(0.4), make_r(0.9)) |>
   theme(axis.text = element_blank())
 ```
 
-- From [-1]{.hl} (perfect negative) through [0]{.hl} (no linear relation) to [+1]{.hl} (perfect positive)
-- It has [no units]{.hl}: it is the same whether you measure in g, kg or tonnes
+- From -1 (perfect negative) through 0 (no linear relation) to +1 (perfect positive)
+- It has no units: it is the same whether you measure in g, kg or tonnes
 
 ## `cor()` in R {.smaller}
 
@@ -406,7 +406,7 @@ pengs |> summarise(r = cor(flipper_length_mm, body_mass_g), .by = species)
 
 ## Correlation and regression {.smaller}
 
-Standardise [both]{.hl} variables, and the regression slope [is]{.hl} the correlation:
+Standardise both variables, and the regression slope is the correlation:
 
 ```{r}
 pengs <- pengs |> mutate(flipper_z = as.numeric(scale(flipper_length_mm)))
@@ -446,7 +446,7 @@ ggplot(quartet, aes(x, y)) +
   labs(x = NULL, y = NULL)
 ```
 
-Four data sets with the same means, the same regression line and the same correlation, __r = 0.82__. Only one of them looks like a straight-line relationship. [Always plot first]{.hl}.
+Four data sets with the same means, the same regression line and the same correlation, __r = 0.82__. Only one of them looks like a straight-line relationship. Always plot first.
 
 ## Correlation by group
 
@@ -460,31 +460,31 @@ bills |> summarise(r = cor(bill_length_mm, bill_depth_mm), .by = species)
 
 . . .
 
-Negative overall, [positive]{.hl} within every species: Simpson's paradox again. A correlation describes the data you give it, [not]{.hl} the process behind it.
+Negative overall, positive within every species: Simpson's paradox again. A correlation describes only the data you give it, and says nothing about the process behind them.
 
 ## Correlation is not causation
 
-In children, [shoe size]{.hl} and [vocabulary size]{.hl} are correlated: children with bigger feet tend to know more words.
+In children, shoe size and vocabulary size are correlated: children with bigger feet tend to know more words.
 
 . . .
 
-Bigger feet do not teach words. Both grow with a third variable: [age]{.hl}.
+Bigger feet do not teach words. Both grow with a third variable: age.
 
 . . .
 
-A correlation, or a regression slope, tells us that two variables [go together]{.hl}. Whether one [causes]{.hl} the other depends on the design of the study, not on the statistics.
+A correlation, or a regression slope, tells us that two variables go together. Whether one causes the other is a question for the design of the study.
 
 # Logarithms
 
 ::: {.fact}
-`Did you know:` blue whale calls can reach [188 decibels]{.hl}. Decibels are a [logarithmic]{.hl} scale: every 10 dB more means ten times the sound intensity.
+`Did you know:` blue whale calls can reach [188 decibels]{.hl}. Decibels are a logarithmic scale: every 10 dB more means ten times the sound intensity.
 
 _Source: WWF_
 :::
 
 ## Magnitudes
 
-Some linguistic variables span many [orders of magnitude]{.hl}. Word frequency is the classic example:
+Some linguistic variables span many orders of magnitude. Word frequency is the classic example:
 
 ```{r}
 set.seed(5)
@@ -497,7 +497,7 @@ range(words$freq)
 
 . . .
 
-The most frequent word is [2000]{.hl} times more frequent than the least frequent one. `rt`: a simulated lexical decision time for each word, in ms.
+The most frequent word is 2000 times more frequent than the least frequent one. `rt`: a simulated lexical decision time for each word, in ms.
 
 ## What is a logarithm?
 
@@ -520,13 +520,13 @@ exp(log(50))       # exp() undoes log()
 
 | Function | Base | One unit means |
 |---|---|---|
-| `log10()` | 10 | a [tenfold]{.hl} increase |
-| `log2()` | 2 | a [doubling]{.hl} |
+| `log10()` | 10 | a tenfold increase |
+| `log2()` | 2 | a doubling |
 | `log()` | e ≈ 2.718 | the default in R and in most models |
 
 . . .
 
-The base changes the [numbers]{.hl}, not the shape: `log10(x)` is just `log(x) / log(10)`. Choose the base that is easiest to [explain]{.hl}.
+The base changes only the numbers on the axis, and the shape stays the same: `log10(x)` is just `log(x) / log(10)`. Choose the base that is easiest to explain.
 
 ## Zeros and negatives
 
@@ -537,7 +537,7 @@ log(-5)
 
 . . .
 
-The log is only defined for [positive]{.hl} numbers.
+The log is only defined for positive numbers.
 
 . . .
 
@@ -562,7 +562,7 @@ bind_rows(
   labs(x = NULL, y = "Reaction time (ms)")
 ```
 
-On the raw scale, most words are squeezed against zero and a straight line fits badly. On the [log]{.hl} scale, the relationship is close to [linear]{.hl}.
+On the raw scale, most words are squeezed against zero and a straight line fits badly. On the log scale, the relationship is close to linear.
 
 ## Logging a predictor
 
@@ -573,7 +573,7 @@ coef(m_freq)
 
 . . .
 
-Each [tenfold]{.hl} increase in frequency (10 → 100 → 1000) goes with responses about `r round(-coef(m_freq)[2])` ms faster.
+Each tenfold increase in frequency (10 → 100 → 1000) goes with responses about `r round(-coef(m_freq)[2])` ms faster.
 
 . . .
 
@@ -599,7 +599,7 @@ bind_rows(
   theme(legend.position = "none")
 ```
 
-After the log, the residuals are much more [symmetric]{.hl}: closer to what the linear model assumes (lecture 4).
+After the log, the residuals are much more symmetric: closer to what the linear model assumes (lecture 4).
 
 ## Reading a log outcome {.smaller}
 
@@ -611,7 +611,7 @@ exp(coef(m_log)[2])
 
 . . .
 
-On the log scale, effects [multiply]{.hl}. Each tenfold increase in frequency multiplies the RT by `r round(exp(coef(m_log)[2]), 3)`: responses about `r round((1 - exp(coef(m_log)[2])) * 100, 1)`% faster.
+On the log scale, effects multiply. Each tenfold increase in frequency multiplies the RT by `r round(exp(coef(m_log)[2]), 3)`: responses about `r round((1 - exp(coef(m_log)[2])) * 100, 1)`% faster.
 
 . . .
 
@@ -623,23 +623,23 @@ exp(predict(m_log, newdata = tibble(freq = c(10, 1000, 100000))))
 
 ## When to log
 
-- The variable is [positive]{.hl} and [right-skewed]{.hl}: RTs, durations, frequencies, counts
+- The variable is positive and [right-skewed]{.hl}: RTs, durations, frequencies, counts
 - Effects are plausibly [multiplicative]{.hl}: "x% faster" rather than "x ms faster"
-- The residuals of the raw model are skewed or [funnel-shaped]{.hl}
+- The residuals of the raw model are skewed or funnel-shaped
 
 . . .
 
-The log is not a cure-all. Report [which]{.hl} variables you transformed and [why]{.hl}, and interpret the coefficients on the transformed scale.
+The log is not a cure-all. Report which variables you transformed and why, and interpret the coefficients on the transformed scale.
 
 # The word "normalising"
 
 ## A slippery word {.smaller}
 
-"Normalising" is used for several [different]{.hl} operations:
+"Normalising" is used for several different operations:
 
 - [z-scoring]{.hl}: subtract the mean, divide by the SD
 - [min-max scaling]{.hl}: squeeze values into the range 0 to 1
-- transforming a variable so its distribution looks more [normal]{.hl}, e.g. with a log
+- transforming a variable so its distribution looks more normal, e.g. with a log
 - [speaker normalisation]{.hl} in phonetics, e.g. Lobanov
 
 . . .
@@ -651,17 +651,17 @@ x <- c(4, 8, 15, 16, 23, 42)
 
 . . .
 
-In your write-up, avoid the word on its own. Say exactly what you did: "F1 and F2 were [z-scored within speaker]{.hl} (Lobanov, 1971)". See also Winter (2019), section 5.7.
+In your write-up, avoid the word on its own. Say exactly what you did: "F1 and F2 were z-scored within speaker (Lobanov, 1971)". See also Winter (2019), section 5.7.
 
 ## Summary
 
 ::: {.takeaway}
-- __Units__ and __centering__ change what the intercept and slope [mean]{.hl}, never the fit
-- __Standardising__ puts variables on a common scale: slopes per [SD]{.hl}
+- __Units__ and __centering__ change what the intercept and slope mean; the fit stays the same
+- __Standardising__ puts variables on a common scale: slopes per SD
 - __Correlation__ is the slope between two z-scored variables: unitless, from −1 to 1
-- Same r, [very different]{.hl} data: always plot
+- The same r can come from very different data, so always plot
 - __Logarithms__ turn multiplicative effects into additive ones, and tame skew
-- Name your transformation precisely: ["normalised"]{.hl} is not enough
+- Name your transformation precisely, instead of just writing "normalised"
 :::
 
 ## Slides and code

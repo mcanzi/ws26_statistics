@@ -53,19 +53,19 @@ bill_mad  <- mad(bill, na.rm = TRUE)
   }
 </style>
 
-A model is like a [map]{.hl} of a city: it is useful [because]{.hl} it leaves most of the detail out.
+A model is like a map of a city: it is useful because it leaves most of the detail out.
 
 . . .
 
-Descriptive statistics are the simplest maps: [one number]{.hl} that stands for a whole distribution.
+Descriptive statistics are the simplest maps: one number that stands for a whole distribution.
 
 ## Today
 
-- What a [distribution]{.hl} is: empirical and theoretical
-- Measures of [central tendency]{.hl}: mean, median, mode
-- Measures of [spread]{.hl}: standard deviation, MAD, range, quantiles
-- When each map [misleads]{.hl}: skew, outliers, more than one peak
-- [Grouped]{.hl} summaries and plots, building on `{dplyr}`
+- What a distribution is: empirical and theoretical
+- Measures of central tendency: mean, median, mode
+- Measures of spread: standard deviation, MAD, range, quantiles
+- When each map misleads: skew, outliers, more than one peak
+- Grouped summaries and plots, building on `{dplyr}`
 
 ## Distributions
 
@@ -76,7 +76,7 @@ A (frequency) distribution displays the frequency of occurrence of each possible
 
 ## Plotting with `{ggplot2}` {.smaller}
 
-Last week's promise: `{ggplot2}` builds a plot in [layers]{.hl}, added with `+`.
+Last week's promise: `{ggplot2}` builds a plot in layers, added with `+`.
 
 ```{r, eval = FALSE}
 ggplot(data, aes(x = column)) +   # the data, and which column goes where
@@ -100,7 +100,7 @@ ggplot(penguins, aes(x = flipper_length_mm)) +
   labs(x = "Flipper length (mm)", y = "Count")
 ```
 
-Each bar counts the penguins whose flipper length falls in a [3 mm]{.hl} bin.
+Each bar counts the penguins whose flipper length falls in a 3 mm bin.
 
 ## Histogram or density? {.smaller}
 
@@ -112,7 +112,7 @@ ggplot(penguins, aes(x = flipper_length_mm)) +
   labs(x = "Flipper length (mm)", y = "Density")
 ```
 
-The [density]{.hl} curve is a smoothed histogram. The area under it is [1]{.hl}.
+The [density]{.hl} curve is a smoothed histogram. The area under it is 1.
 
 ## The normal distribution
 
@@ -141,7 +141,7 @@ tibble(value = normal) |>
   labs(x = "Value", y = "Density")
 ```
 
-Bars: our [500]{.hl} random values. Line: the [theoretical]{.hl} normal curve.
+Bars: our 500 random values. Line: the [theoretical]{.hl} normal curve.
 
 ## The 68–95–99.7 rule
 
@@ -163,7 +163,7 @@ ggplot(curve_df, aes(x, y)) +
   labs(x = NULL, y = "Density")
 ```
 
-In a normal distribution, about 68% of values lie within [1 SD]{.hl} of the mean, 95% within [2 SD]{.hl}, 99.7% within [3 SD]{.hl}.
+In a normal distribution, about 68% of values lie within 1 SD of the mean, 95% within 2 SD, 99.7% within 3 SD.
 
 ## Other distributions {.smaller}
 
@@ -213,7 +213,7 @@ Two types of descriptive measures are used to map our data:
 
 . . .
 
-Always report one of each: a [centre]{.hl} without a [spread]{.hl} hides half the map.
+Always report one of each: a measure of [centre]{.hl} and a measure of [spread]{.hl}.
 
 ## First: missing values {.smaller}
 
@@ -294,7 +294,7 @@ median(c(3, 1, 5, 7))     # sorted: 1 3 5 7 -> mean of 3 and 5
 
 . . .
 
-With an [even]{.hl} number of values, the median is the mean of the two middle values.
+With an even number of values, the median is the mean of the two middle values.
 
 ## `median()` {.smaller}
 
@@ -326,7 +326,7 @@ ggplot(drop_na(penguins, bill_length_mm), aes(x = bill_length_mm)) +
   labs(x = "Bill length (mm)", y = "Density", fill = NULL, colour = NULL)
 ```
 
-The overall mean (`r round(bill_mean, 1)` mm) sits in a [dip]{.hl}: few penguins actually have a bill that long. The distribution has [three]{.hl} species in it.
+The overall mean (`r round(bill_mean, 1)` mm) sits in a dip: few penguins actually have a bill that long. The distribution has three species in it.
 
 ## Skewed data: reaction times
 
@@ -348,7 +348,7 @@ ggplot(rt, aes(x = rt)) +
   labs(x = "Reaction time (ms)", y = "Count")
 ```
 
-A long right [tail]{.hl} pulls the mean (dashed) away from the median (dotted).
+A long right tail pulls the mean (dashed) away from the median (dotted).
 
 ## Outliers
 
@@ -366,11 +366,11 @@ tibble(data   = c("40 trials", "40 trials + one 5000 ms"),
 
 . . .
 
-The mean moves by more than [100 ms]{.hl}. The median barely moves: it is [robust]{.hl}.
+The mean moves by more than 100 ms. The median barely moves: it is [robust]{.hl}.
 
 ## Mode {.smaller}
 
-The mode is the [most frequent]{.hl} value. It is used in __categorical__ distributions.
+The mode is the most frequent value. It is used in __categorical__ distributions.
 
 . . .
 
@@ -389,7 +389,7 @@ words |> count(word, sort = TRUE) |> head(3)
 
 ## Mode: a trap {.smaller}
 
-R has a function called `mode()`, but it does [not]{.hl} compute the mode:
+R has a function called `mode()`, but it does not compute the mode:
 
 ```{r}
 mode(c("Hello", "Hello", "Goodbye"))
@@ -397,7 +397,7 @@ mode(c("Hello", "Hello", "Goodbye"))
 
 . . .
 
-It returns the [storage type]{.hl}. If you need a function, write your own:
+It returns the storage type. If you need a function, write your own:
 
 ```{r}
 find_mode <- function(x) {
@@ -430,11 +430,11 @@ ggplot(two_groups, aes(x = duration, fill = group, colour = group)) +
   labs(x = "Vowel duration (ms)", y = "Density", fill = NULL, colour = NULL)
 ```
 
-Both speakers have a mean of [150 ms]{.hl}. Speaker B is far less [consistent]{.hl}.
+Both speakers have a mean of 150 ms. Speaker B is far less consistent.
 
 ## `sd()`
 
-A standard deviation is a measure of how dispersed the data is in relation to the mean: roughly, the [typical distance]{.hl} of a value from the mean.
+A standard deviation is a measure of how dispersed the data is in relation to the mean: roughly, the typical distance of a value from the mean.
 
 <div class="formula">s = √( Σ (xᵢ − <span style="text-decoration: overline;">x</span>)² / (n − 1) )</div>
 
@@ -468,7 +468,7 @@ ggplot(penguins, aes(x = bill_length_mm)) +
 
 ## `mad()`
 
-The median absolute deviation (MAD) is a robust measure of the variability of a univariate sample of quantitative data: the [median]{.hl} distance from the [median]{.hl}.
+The median absolute deviation (MAD) is a robust measure of the variability of a univariate sample of quantitative data: the median distance from the median.
 
 . . .
 
@@ -492,7 +492,7 @@ mad(x)
 
 . . .
 
-By default, `mad()` multiplies the result by [1.4826]{.hl}. With normal data, this makes the MAD estimate the [SD]{.hl}, so the two are comparable.
+By default, `mad()` multiplies the result by 1.4826. With normal data, this makes the MAD estimate the SD, so the two are comparable.
 
 . . .
 
@@ -533,7 +533,7 @@ diff(range(penguins$bill_length_mm, na.rm = TRUE))
 
 . . .
 
-The range depends on [two]{.hl} values only, the most extreme ones. One outlier changes it completely.
+The range depends on two values only, the most extreme ones. One outlier changes it completely.
 
 ## Quantiles / Quartiles
 
@@ -541,7 +541,7 @@ Quantiles are cut points dividing the range of a probability distribution into c
 
 . . .
 
-__Quartiles__ are __quantiles__ that divide the data into four [quarters]{.hl}:
+__Quartiles__ are __quantiles__ that divide the data into four quarters:
 
 ```{r}
 quantile(penguins$bill_length_mm, na.rm = TRUE)
@@ -575,7 +575,7 @@ ggplot(drop_na(penguins, bill_length_mm),
   theme(legend.position = "none")
 ```
 
-Box: [25%]{.hl} to [75%]{.hl} (the IQR). Line: the [median]{.hl}. Whiskers: to the furthest point within 1.5 × IQR of the box. Dots: every penguin.
+Box: 25% to 75% (the IQR). Line: the median. Whiskers: to the furthest point within 1.5 × IQR of the box. Dots: every penguin.
 
 # `group_by` and `summarise`
 
@@ -587,11 +587,11 @@ _Sources: Jönsson et al. (2008), Current Biology; ScienceDaily_
 
 ## Summaries per group
 
-Until now, we have summarised [one distribution]{.hl} at a time.
+Until now, we have summarised one distribution at a time.
 
 . . .
 
-Usually we want the same summary for [each group]{.hl}: `bill_length_mm` for each species separately.
+Usually we want the same summary for each group: `bill_length_mm` for each species separately.
 
 . . .
 
@@ -623,7 +623,7 @@ penguins |>
 
 . . .
 
-One row per species, one column per summary, [no]{.hl} copies of the data.
+One row per species, one column per summary, no copies of the data.
 
 ## Grouping by two variables {.smaller}
 
@@ -637,12 +637,12 @@ penguins |>
 
 . . .
 
-The message: the result is [still grouped]{.hl} by species. Either add `.groups = "drop"`, `ungroup()` it, or use `.by = c(species, sex)`, which never leaves groups behind.
+The message: the result is still grouped by species. Either add `.groups = "drop"`, `ungroup()` it, or use `.by = c(species, sex)`, which never leaves groups behind.
 
 ## `group_by()` or `.by`?
 
-- Use `group_by()` when several steps in a row should work [per group]{.hl}
-- Use `.by` when only [one step]{.hl} needs the groups
+- Use `group_by()` when several steps in a row should work per group
+- Use `.by` when only one step needs the groups
 - Remember to `ungroup()` when you use `group_by()`, especially if you are doing other things before you save the result into a variable
 
 ## Many columns at once: `across()` {.smaller}
@@ -660,7 +660,7 @@ penguins |>
 
 . . .
 
-`list(mean = ..., sd = ...)` applies [two]{.hl} functions to each column, and adds `_mean` and `_sd` to the names.
+`list(mean = ..., sd = ...)` applies two functions to each column, and adds `_mean` and `_sd` to the names.
 
 ## Plotting group summaries {.smaller}
 
@@ -676,11 +676,11 @@ ggplot(drop_na(penguins, bill_length_mm), aes(x = species, y = bill_length_mm)) 
   labs(x = NULL, y = "Bill length (mm)") + theme(legend.position = "none")
 ```
 
-Points: every penguin. White: [mean ± 1 SD]{.hl} per species.
+Points: every penguin. White: mean ± 1 SD per species.
 
 ## Reporting descriptives {.smaller}
 
-In R Markdown, numbers in your text can come [straight from R]{.hl}:
+In R Markdown, numbers in your text can come straight from R:
 
 ```{r}
 gentoo <- filter(bill_summary, species == "Gentoo")
@@ -699,15 +699,15 @@ becomes
 
 . . .
 
-If the data change, the text [updates itself]{.hl}. No copying numbers by hand.
+If the data change, the text updates itself, so you never copy numbers by hand.
 
 ## Summary
 
 ::: {.takeaway}
-- A distribution is the [map]{.hl}; a summary is a [simplified]{.hl} map
+- A summary is a simplified map of a distribution
 - Centre: `mean()` (sensitive), `median()` (robust), mode with `count()`
 - Spread: `sd()` (sensitive), `mad()` and `IQR()` (robust), `range()`, `quantile()`
-- Always [plot]{.hl} the data: skew, outliers and several peaks hide behind one number
+- Always plot the data: skew, outliers and several peaks hide behind one number
 - Per group: `summarise()` with `.by` or `group_by()`; many columns with `across()`
 :::
 

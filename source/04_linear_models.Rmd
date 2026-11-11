@@ -54,15 +54,15 @@ r2      <- glance(m)$r.squared
   }
 </style>
 
-Last week: [one]{.hl} variable at a time. Today: how one variable [changes with]{.hl} another.
+Last week we looked at one variable at a time. Today we look at how one variable changes with another.
 
 ## Today
 
-- From the [mean]{.hl} to the [conditional mean]{.hl}
-- [Intercepts]{.hl}, [slopes]{.hl} and [residuals]{.hl}
-- Fitting a line: [least squares]{.hl} and `lm()`
-- Reading and [checking]{.hl} a model
-- A warning: when one line [misleads]{.hl}
+- From the mean to the conditional mean
+- Intercepts, slopes and residuals
+- Fitting a line: least squares and `lm()`
+- Reading and checking a model
+- A warning: when one line misleads
 
 ## Univariate > Bivariate
 
@@ -74,7 +74,7 @@ Last week: [one]{.hl} variable at a time. Today: how one variable [changes with]
 > Model changes in `y` by changes in `x`
 
 - __Univariate__: mean flipper length (mm)
-- __Bivariate__: mean flipper length (mm) [for penguins of a given]{.hl} body mass (g)
+- __Bivariate__: mean flipper length (mm) for penguins of a given body mass (g)
 
 ## Conditional means
 
@@ -88,11 +88,11 @@ ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
   labs(x = "Body mass (g)", y = "Flipper length (mm)")
 ```
 
-Orange: the [mean]{.hl} flipper length within each body-mass bin. The means line up along a [straight line]{.hl}.
+Orange: the mean flipper length within each body-mass bin. The means line up along a straight line.
 
 ## Simple linear regression
 
-Winter (2019): simple linear regression models [one continuous outcome]{.hl} as a function of [one predictor]{.hl}.
+Winter (2019): simple linear regression models one continuous outcome as a function of one predictor.
 
 . . .
 
@@ -113,12 +113,12 @@ What you are measuring, your __dependent variable__ or __outcome variable__ (e.g
 
 . . .
 
-The variable you manipulate in an experiment, or measure alongside the outcome, to see whether the outcome [changes with it]{.hl} (e.g. word frequency, speaking rate, age, condition).
+The variable you manipulate in an experiment, or measure alongside the outcome, to see whether the outcome changes with it (e.g. word frequency, speaking rate, age, condition).
 
 # Intercepts & slopes
 
 ::: {.fact}
-`Did you know:` Alpine ibex climb near-vertical [slopes]{.hl}. In the Italian Alps, females scale the concrete walls of dams such as the Cingino dam to lick the [salts]{.hl} that form on them.
+`Did you know:` Alpine ibex climb near-vertical [slopes]{.hl}. In the Italian Alps, females scale the concrete walls of dams such as the Cingino dam to lick the salts that form on them.
 
 _Source: Water Power Magazine_
 :::
@@ -128,7 +128,7 @@ _Source: Water Power Magazine_
 <div class="formula">y = b₀ + b₁ · x + e</div>
 
 - `b₀`, the __intercept__: the value of `y` when `x = 0`
-- `b₁`, the __slope__: how much `y` changes when `x` increases by [1]{.hl}
+- `b₁`, the __slope__: how much `y` changes when `x` increases by 1
 - `e`, the __error__ or __residual__: what the line does not explain
 
 . . .
@@ -174,7 +174,7 @@ ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
   labs(x = "Body mass (g)", y = "Flipper length (mm)")
 ```
 
-Heavier penguins have longer flippers. Which [line]{.hl} describes this best?
+Heavier penguins have longer flippers. Which line describes this best?
 
 ## The regression line
 
@@ -185,7 +185,7 @@ ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
   labs(x = "Body mass (g)", y = "Flipper length (mm)")
 ```
 
-`geom_smooth(method = "lm")` draws it. The band shows the [uncertainty]{.hl} about the line.
+`geom_smooth(method = "lm")` draws it. The band shows the uncertainty about the line.
 
 ## Residuals
 
@@ -207,7 +207,7 @@ One common method to estimate our __regression line__ is: __The least squares me
 
 . . .
 
-It finds the line that minimises the sum of the [squared]{.hl} residuals.
+It finds the line that minimises the sum of the squared residuals.
 
 . . .
 
@@ -220,7 +220,7 @@ sum((pengs$flipper_length_mm - guess)^2)
 
 . . .
 
-Squaring makes all residuals positive, and [penalises]{.hl} large misses more than small ones.
+Squaring makes all residuals positive, and penalises large misses more than small ones.
 
 # Linear models in R
 
@@ -257,12 +257,12 @@ coefficients(m)
 
 . . .
 
-- __Slope__: each extra [gram]{.hl} adds `r round(b1, 4)` mm of flipper. Each extra [kilogram]{.hl} adds `r round(b1 * 1000, 1)` mm.
-- __Intercept__: a penguin weighing [0 g]{.hl} would have flippers of `r round(b0, 1)` mm.
+- __Slope__: each extra gram adds `r round(b1, 4)` mm of flipper. Each extra kilogram adds `r round(b1 * 1000, 1)` mm.
+- __Intercept__: a penguin weighing 0 g would have flippers of `r round(b0, 1)` mm.
 
 . . .
 
-The intercept is correct maths, but [meaningless]{.hl}: there are no weightless penguins. Next week we fix this with [centering]{.hl}.
+The intercept is correct maths, but meaningless: there are no weightless penguins. Next week we fix this with [centering]{.hl}.
 
 ## Residuals average zero
 
@@ -276,7 +276,7 @@ mean(residuals(m))
 
 . . .
 
-The line passes through the [middle]{.hl} of the data: the points above it balance the points below it.
+The line passes through the middle of the data: the points above it balance the points below it.
 
 ## `{broom}`: models as tibbles {.smaller}
 
@@ -302,9 +302,9 @@ glance(m)$r.squared
 
 . . .
 
-- [0]{.hl}: the predictor tells us nothing about the outcome
-- [1]{.hl}: every point lies exactly on the line
-- In linguistics, much [smaller]{.hl} values are normal: people are noisy
+- 0: the predictor tells us nothing about the outcome
+- 1: every point lies exactly on the line
+- In linguistics, much smaller values are normal: people are noisy
 
 ## Predictions
 
@@ -319,7 +319,7 @@ predict(m, newdata = new_penguins)
 
 . . .
 
-Only predict [within]{.hl} the range of your data: `r min(pengs$body_mass_g)` to `r max(pengs$body_mass_g)` g. Outside it, the line is a guess.
+Only predict within the range of your data: `r min(pengs$body_mass_g)` to `r max(pengs$body_mass_g)` g. Outside it, the line is a guess.
 
 # Checking the model
 
@@ -338,7 +338,7 @@ ggplot(augment(m), aes(x = .resid)) +
   labs(x = "Residual (mm)", y = "Count")
 ```
 
-Linear models assume residuals that are roughly [normal]{.hl}: symmetric, centred on zero.
+Linear models assume residuals that are roughly normal: symmetric, centred on zero.
 
 ## Checking the model: constant variance
 
@@ -349,7 +349,7 @@ ggplot(augment(m), aes(x = .fitted, y = .resid)) +
   labs(x = "Fitted flipper length (mm)", y = "Residual (mm)")
 ```
 
-They also assume residuals with roughly the [same spread]{.hl} along the line: no funnel shapes. Chapter 4 covers both checks.
+They also assume residuals with roughly the same spread along the line: no funnel shapes. Chapter 4 covers both checks.
 
 # Grouped data
 
@@ -371,7 +371,7 @@ ggplot(bills, aes(x = bill_depth_mm, y = bill_length_mm)) +
   labs(x = "Bill depth (mm)", y = "Bill length (mm)")
 ```
 
-Deeper bills, [shorter]{.hl} bills? The slope is negative.
+Deeper bills, shorter bills? The slope is negative.
 
 ## A warning: three species again
 
@@ -383,7 +383,7 @@ ggplot(bills, aes(x = bill_depth_mm, y = bill_length_mm)) +
   labs(x = "Bill depth (mm)", y = "Bill length (mm)", colour = NULL, fill = NULL)
 ```
 
-Within [every]{.hl} species, the slope is [positive]{.hl}. Ignoring species reversed the effect: this is [Simpson's paradox]{.hl}. Models with more than one predictor: watch this space.
+Within every species, the slope is positive. Ignoring species reversed the effect: this is [Simpson's paradox]{.hl}. Models with more than one predictor: watch this space.
 
 ## Slides and code
 

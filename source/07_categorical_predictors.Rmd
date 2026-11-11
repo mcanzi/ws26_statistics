@@ -56,21 +56,21 @@ _Source: Thoen et al. (2014), Science_
 
 ## Today
 
-- What a [categorical]{.hl} predictor is, and how R stores it: [factors]{.hl}
-- [Treatment]{.hl} coding: the default in R
-- Dummy coding [by hand]{.hl}, and changing the [reference level]{.hl}
-- [Sum]{.hl} coding
-- Predictors with [more than two]{.hl} levels
-- [Combining]{.hl} categorical and continuous predictors
+- What a categorical predictor is, and how R stores it: factors
+- Treatment coding: the default in R
+- Dummy coding by hand, and changing the reference level
+- Sum coding
+- Predictors with more than two levels
+- Combining categorical and continuous predictors
 
 ## So far
 
-- Lectures 4 to 6: [continuous]{.hl} predictors: frequency, length, body mass
+- Lectures 4 to 6: continuous predictors: frequency, length, body mass
 - `y ~ x1 + x2`: each slope is a change in `y` per unit of `x`
 
 . . .
 
-Many linguistic predictors are [categories]{.hl}, not numbers:
+Many linguistic predictors are categories:
 
 - Voicing: voiced, voiceless
 - Speaking style: casual, clear, loud
@@ -103,12 +103,12 @@ ggplot(vowels, aes(x = voicing, y = duration, colour = voicing)) +
   theme(legend.position = "none")
 ```
 
-White: the [mean]{.hl} of each group. A model with voicing as a predictor should recover these two means.
+White: the mean of each group. A model with voicing as a predictor should recover these two means.
 
 # Treatment coding
 
 ::: {.fact}
-`Did you know:` mantis shrimp come in two kinds: [smashers]{.hl} break open crabs, clams and snails with club-like limbs, and [spearers]{.hl} ambush fish from their burrows and impale them.
+`Did you know:` mantis shrimp come in two kinds: [smashers]{.hl} break open crabs, clams and snails with club-like limbs, and spearers ambush fish from their burrows and impale them.
 
 _Source: UC Berkeley News_
 :::
@@ -131,7 +131,7 @@ vowels |> summarise(mean = mean(duration), .by = voicing)
 . . .
 
 - The __intercept__ is the mean of `voiced`
-- The __slope__ `voicingvoiceless` is the [difference]{.hl}: voiceless minus voiced
+- The __slope__ `voicingvoiceless` is the difference: voiceless minus voiced
 
 ## The reference level
 
@@ -139,7 +139,7 @@ Why is `voiced` the intercept?
 
 . . .
 
-R turns text into a `factor`, and puts its levels in [alphabetical]{.hl} order:
+R turns text into a `factor`, and puts its levels in alphabetical order:
 
 ```{r}
 levels(factor(vowels$voicing))
@@ -147,7 +147,7 @@ levels(factor(vowels$voicing))
 
 . . .
 
-The [first]{.hl} level becomes the __reference level__. Every other level is compared [against]{.hl} it.
+The first level becomes the __reference level__. Every other level is compared against it.
 
 . . .
 
@@ -175,7 +175,7 @@ vowels |>
   theme(legend.position = "none")
 ```
 
-Code the reference level as [0]{.hl} and the other as [1]{.hl}: the regression line goes through the two [means]{.hl}. A one-unit change in x [is]{.hl} the change from one category to the other.
+Code the reference level as 0 and the other as 1: the regression line goes through the two means. A one-unit change in x is the change from one category to the other.
 
 ## Dummy coding by hand
 
@@ -190,11 +190,11 @@ coef(lm(duration ~ voiceless01, data = vowels))
 
 . . .
 
-Same numbers as before. A variable coded [0]{.hl} and [1]{.hl} like this is called a __dummy variable__.
+Same numbers as before. A variable coded 0 and 1 like this is called a __dummy variable__.
 
 ## Changing the reference level
 
-Voiceless is the more natural [baseline]{.hl} here. Set the order of the levels with `fct_relevel()` from `{forcats}`:
+Voiceless is the more natural baseline here. Set the order of the levels with `fct_relevel()` from `{forcats}`:
 
 ```{r}
 vowels <- vowels |>
@@ -206,17 +206,16 @@ coef(lm(duration ~ voicing, data = vowels))
 
 . . .
 
-The intercept is now the `voiceless` mean, and the slope is [+38 ms]{.hl} for voiced. Same model, same fit: only the [comparison]{.hl} has changed.
+The intercept is now the `voiceless` mean, and the slope is +38 ms for voiced. The model and its fit are unchanged; only the comparison is different.
 
 ## Choosing the reference level
 
-- Choose the level that makes the coefficients [easiest to read]{.hl}
-- Often a natural baseline: a [control]{.hl} condition, the [standard]{.hl} variety, the most [frequent]{.hl} category
-- Set it [explicitly]{.hl}, rather than relying on the alphabet
+- Choose the level that makes the coefficients easiest to read, often a natural baseline: a control condition, the standard variety, the most frequent category
+- Set it explicitly, rather than relying on the alphabet
 
 . . .
 
-In R, the reference level of a factor is simply its [first]{.hl} level.
+In R, the reference level of a factor is simply its first level.
 
 # Sum coding
 
@@ -228,7 +227,7 @@ _Sources: Patek, Korff & Caldwell (2004), Nature; UC Berkeley News_
 
 ## Sum coding
 
-Instead of [0]{.hl} and [1]{.hl}, code the two levels as [+1]{.hl} and [−1]{.hl}:
+Instead of 0 and 1, code the two levels as +1 and −1:
 
 ```{r}
 contrasts(vowels$voicing) <- contr.sum(2)
@@ -252,7 +251,7 @@ diff(means$mean) / 2                  # half the difference
 . . .
 
 - The __intercept__ is the [grand mean]{.hl}: the average of the group means
-- The __coefficient__ is how far each group lies [from]{.hl} that grand mean: `+` for the first level, `−` for the second
+- The __coefficient__ is how far each group lies from that grand mean: `+` for the first level, `−` for the second
 
 ## Sum coding, visually
 
@@ -277,13 +276,13 @@ Arrows: the sum-coded coefficient, `±` `r round(abs(diff(means$mean)) / 2, 1)` 
 
 | | Treatment (0 / 1) | Sum (+1 / −1) |
 |---|---|---|
-| Intercept | mean of the [reference]{.hl} level | [grand mean]{.hl} |
+| Intercept | mean of the reference level | [grand mean]{.hl} |
 | Coefficient | difference from the reference | deviation from the grand mean |
 | Default in R | yes | no: `contr.sum()` |
 
 . . .
 
-The [fit]{.hl} is identical. The choice changes what the intercept means, which matters most when you add [interactions]{.hl} (next week).
+The fit is identical. The choice changes what the intercept means, which matters most when you add interactions (next week).
 
 # More than two levels
 
@@ -295,7 +294,7 @@ _Sources: Thoen et al. (2014), Science; Sci.News_
 
 ## Speaking style
 
-A simulated study of vowel duration in three [speaking styles]{.hl}:
+A simulated study of vowel duration in three speaking styles:
 
 ```{r}
 set.seed(9)
@@ -326,8 +325,8 @@ coef(m_style)
 . . .
 
 - __Intercept__: the mean of `casual`, the reference level
-- `styleclear`: clear [minus]{.hl} casual
-- `styleloud`: loud [minus]{.hl} casual
+- `styleclear`: clear minus casual
+- `styleloud`: loud minus casual
 
 . . .
 
@@ -380,7 +379,7 @@ coef(lm(duration ~ style, data = styles))
 
 - Intercept: the [grand mean]{.hl} of the three styles
 - `style1`: casual's deviation from it; `style2`: clear's deviation
-- Loud's deviation is not shown: it is [minus the sum]{.hl} of the other two
+- Loud's deviation is not shown: it is minus the sum of the other two
 
 ## Model fit and assumptions {.smaller}
 
@@ -397,7 +396,7 @@ augment(m_style) |>
   theme(legend.position = "none")
 ```
 
-The same assumptions as before. With categories, check that the residuals have a similar [spread]{.hl} in every group.
+The same assumptions as before. With categories, check that the residuals have a similar spread in every group.
 
 # Mixing predictors
 
@@ -421,7 +420,7 @@ coef(m_bills)
 
 . . .
 
-The bill depth slope turns [positive]{.hl}: Simpson's paradox, solved.
+The bill depth slope turns positive: Simpson's paradox, solved.
 
 ## Three parallel lines
 
@@ -433,7 +432,7 @@ ggplot(bills_fit, aes(x = bill_depth_mm, colour = species)) +
   labs(x = "Bill depth (mm)", y = "Bill length (mm)", colour = NULL)
 ```
 
-One slope for bill depth, and a different [intercept]{.hl} for each species (Adelie is the reference). The lines are parallel: no interaction.
+One slope for bill depth, and a different intercept for each species (Adelie is the reference). The lines are parallel: no interaction.
 
 ## Reading the mixed model
 
@@ -443,20 +442,20 @@ tidy(m_bills)[, 1:2]
 
 . . .
 
-- `bill_depth_mm`: `+` `r round(coef(m_bills)["bill_depth_mm"], 2)` mm of length per mm of depth, [within]{.hl} a species
-- `speciesChinstrap`: Chinstrap bills are `r round(coef(m_bills)["speciesChinstrap"], 1)` mm longer than Adelie bills of the [same depth]{.hl}
+- `bill_depth_mm`: `+` `r round(coef(m_bills)["bill_depth_mm"], 2)` mm of length per mm of depth, within a species
+- `speciesChinstrap`: Chinstrap bills are `r round(coef(m_bills)["speciesChinstrap"], 1)` mm longer than Adelie bills of the same depth
 - `speciesGentoo`: Gentoo, `r round(coef(m_bills)["speciesGentoo"], 1)` mm longer than Adelie
 
 ## Other coding schemes
 
 Treatment and sum coding are the two you will meet most. There are others, for example:
 
-- [Helmert]{.hl} coding: each level against the mean of the [previous]{.hl} levels
-- [Successive differences]{.hl}: each level against the [previous]{.hl} one, for ordered categories
+- [Helmert]{.hl} coding: each level against the mean of the previous levels
+- [Successive differences]{.hl}: each level against the previous one, for ordered categories
 
 . . .
 
-All of them give the [same fit]{.hl}. They differ only in which comparisons the coefficients show: choose the one that matches your [research question]{.hl}.
+All of them give the same fit. They differ only in which comparisons the coefficients show: choose the one that matches your research question.
 
 # Your turn
 
@@ -466,7 +465,7 @@ With `penguins`:
 
 1. Model `body_mass_g` by `species`. Check that the coefficients match the group means.
 2. Make `Gentoo` the reference level and refit. What changed?
-3. Refit with [sum coding]{.hl}. What is the intercept now?
+3. Refit with sum coding. What is the intercept now?
 4. Model `body_mass_g` by `sex` and `flipper_length_mm` together. Interpret both coefficients.
 
 ## Solutions {.smaller}
@@ -495,16 +494,16 @@ coef(lm(body_mass_g ~ sex + flipper_length_mm, data = pengs))
 
 . . .
 
-Males are about `r round(coef(lm(body_mass_g ~ sex + flipper_length_mm, data = pengs))["sexmale"])` g heavier than females with the [same flipper length]{.hl}.
+Males are about `r round(coef(lm(body_mass_g ~ sex + flipper_length_mm, data = pengs))["sexmale"])` g heavier than females with the same flipper length.
 
 ## Summary
 
 ::: {.takeaway}
-- R stores categories as [factors]{.hl}; the [first]{.hl} level is the reference
+- R stores categories as [factors]{.hl}; the first level is the reference
 - [Treatment coding]{.hl}: intercept = reference mean, coefficients = differences from it
 - [Sum coding]{.hl}: intercept = grand mean, coefficients = deviations from it
 - `k` levels → `k − 1` coefficients; change the reference to see other comparisons
-- Categorical and continuous predictors can be [combined]{.hl}: one slope, several intercepts
+- Categorical and continuous predictors can be combined: one slope, several intercepts
 :::
 
 ## Slides and code
