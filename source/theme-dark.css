@@ -1,6 +1,7 @@
 /* theme-dark.css
-   The dark theme of mcanzi.github.io for {revealjs}: charcoal, with indian red
-   for headings, and rafflesias scattered over the background.
+   The dark theme of mcanzi.github.io for {revealjs}: a rainforest at night,
+   green-black, with silver sage for headings, pale moon yellow and leaf green
+   for accents, and dimmed rafflesias scattered over the background.
    The theme of Statistics for Linguists. The website has two more themes
    with the same rules and another palette and background: the light one
    (ggplot2_workshop) and the purple one (forensic speech science). */
@@ -41,26 +42,26 @@
 }
 
 :root {
-  --floor:      #141619;   /* background: charcoal */
-  --understory: #1d2125;   /* code panels, table header, fact cards */
-  --raised:     #23282d;
-  --vine:       #343a42;   /* borders, grid lines */
-  --mist:       #e4e7d8;   /* body text */
-  --muted:      #a3abb3;   /* secondary text */
-  --pandan:     #cb6d67;   /* indian red: headings, functions */
-  --hornbill:   #e8a33d;   /* amber: inline code, keywords */
-  --kingfisher: #45b4c8;   /* links, numbers */
-  --orchid:     #e39ac0;   /* strings */
-  --moss:       #7f9b78;   /* list markers */
-  --comment:    #7f9b78;   /* code comments */
-  --operator:   #b9c0c8;   /* operators in code */
+  --floor:      #0b110e;   /* background: green-black */
+  --understory: #111a16;   /* code panels, table header, fact cards */
+  --raised:     #17221d;
+  --vine:       #24332c;   /* borders, grid lines */
+  --mist:       #e3e8e1;   /* body text: moonlit */
+  --muted:      #8e9e96;   /* secondary text */
+  --pandan:     #c9d8cf;   /* silver sage: headings, functions */
+  --hornbill:   #e8e2b0;   /* pale moon yellow: inline code, keywords */
+  --kingfisher: #88c9a8;   /* leaf green: links, numbers */
+  --orchid:     #c3b6d6;   /* strings */
+  --moss:       #6f8a7a;   /* list markers */
+  --comment:    #6f8a7a;   /* code comments */
+  --operator:   #b3c0b8;   /* operators in code */
   --strong:     #ffffff;
   --shadow:     0 18px 50px rgba(0, 0, 0, 0.35);
-  --glow-1:     rgba(170, 190, 210, 0.09);
-  --glow-2:     rgba(203, 109, 103, 0.06);
-  --on-accent:  #141619;
-  --marker:     rgba(232, 163, 61, 0.30);   /* emphasis highlighter */
-  --output-bg:  #191c20;   /* R output under the code */
+  --glow-1:     rgba(220, 230, 225, 0.08);   /* moonlight */
+  --glow-2:     rgba(136, 201, 168, 0.04);
+  --on-accent:  #0b110e;
+  --marker:     rgba(232, 226, 176, 0.25);   /* emphasis highlighter */
+  --output-bg:  #0f1713;   /* R output under the code */
   --error:      #e0675f;
 
   /* the {revealjs} base theme reads these */
@@ -86,7 +87,7 @@
 body {
   background-color: var(--floor);
   background:
-    url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 xmlns:xlink=%22http://www.w3.org/1999/xlink%22 width=%22640%22 height=%22640%22 viewBox=%220 0 640 640%22%3E%3Cdefs%3E%3Cg id=%22lobe%22%3E%3Cpath fill=%22%23cb6d67%22 stroke=%22%23141619%22 stroke-width=%222.5%22 d=%22M-12 -20C-36 -26 -36 -63 -8 -67C0 -68 0 -68 8 -67C36 -63 36 -26 12 -20Z%22/%3E%3Cg fill=%22%23e4e7d8%22%3E%3Cellipse cx=%220%22 cy=%22-56%22 rx=%224.5%22 ry=%223.3%22/%3E%3Cellipse cx=%22-14%22 cy=%22-50%22 rx=%223.6%22 ry=%222.8%22/%3E%3Cellipse cx=%2214%22 cy=%22-50%22 rx=%223.6%22 ry=%222.8%22/%3E%3Cellipse cx=%22-7%22 cy=%22-40%22 rx=%224%22 ry=%223%22/%3E%3Cellipse cx=%228%22 cy=%22-40%22 rx=%224%22 ry=%223%22/%3E%3Cellipse cx=%22-19%22 cy=%22-36%22 rx=%222.8%22 ry=%222.2%22/%3E%3Cellipse cx=%2219%22 cy=%22-36%22 rx=%222.8%22 ry=%222.2%22/%3E%3Cellipse cx=%220%22 cy=%22-30%22 rx=%223.2%22 ry=%222.4%22/%3E%3C/g%3E%3C/g%3E%3Cg id=%22r%22%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22/%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22 transform=%22rotate%2872%29%22/%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22 transform=%22rotate%28144%29%22/%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22 transform=%22rotate%28216%29%22/%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22 transform=%22rotate%28288%29%22/%3E%3Ccircle r=%2225%22 fill=%22%239c4a45%22/%3E%3Ccircle r=%2225%22 fill=%22none%22 stroke=%22%23e4e7d8%22 stroke-width=%222%22 stroke-dasharray=%223 5%22/%3E%3Ccircle r=%2212%22 fill=%22%23141619%22/%3E%3Cg fill=%22%23cb6d67%22%3E%3Ccircle cx=%22-4%22 cy=%22-3%22 r=%221.6%22/%3E%3Ccircle cx=%224%22 cy=%22-2%22 r=%221.6%22/%3E%3Ccircle cx=%220%22 cy=%224%22 r=%221.6%22/%3E%3C/g%3E%3C/g%3E%3Cg id=%22bud%22%3E%3Ccircle r=%2216%22 fill=%22%239c4a45%22/%3E%3Cpath fill=%22none%22 stroke=%22%23cb6d67%22 stroke-width=%222.4%22 d=%22M-14 -4C-8 -14 8 -14 14 -4M-15 6C-8 -4 8 -4 15 6M-11 14C-5 7 5 7 11 14%22/%3E%3C/g%3E%3C/defs%3E%3Cg opacity=%220.085%22%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28120 130%29 rotate%2812%29 scale%280.95%29%22/%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28470 110%29 rotate%28-20%29 scale%280.6%29%22/%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28330 330%29 rotate%2830%29 scale%281.2%29%22/%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28110 470%29 rotate%28-8%29 scale%280.7%29%22/%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28530 520%29 rotate%2818%29 scale%280.75%29%22/%3E%3Cuse xlink:href=%22%23bud%22 href=%22%23bud%22 transform=%22translate%28300 90%29 rotate%2820%29 scale%280.9%29%22/%3E%3Cuse xlink:href=%22%23bud%22 href=%22%23bud%22 transform=%22translate%28560 300%29 rotate%28-15%29 scale%280.75%29%22/%3E%3Cuse xlink:href=%22%23bud%22 href=%22%23bud%22 transform=%22translate%28240 580%29 rotate%285%29 scale%280.7%29%22/%3E%3Cuse xlink:href=%22%23bud%22 href=%22%23bud%22 transform=%22translate%2840 300%29 rotate%28-30%29 scale%280.6%29%22/%3E%3C/g%3E%3C/svg%3E") 0 0 / 72vmin 72vmin repeat fixed,
+    url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 xmlns:xlink=%22http://www.w3.org/1999/xlink%22 width=%22640%22 height=%22640%22 viewBox=%220 0 640 640%22%3E%3Cdefs%3E%3Cg id=%22lobe%22%3E%3Cpath fill=%22%23936764%22 stroke=%22%230b110e%22 stroke-width=%222.5%22 d=%22M-12 -20C-36 -26 -36 -63 -8 -67C0 -68 0 -68 8 -67C36 -63 36 -26 12 -20Z%22/%3E%3Cg fill=%22%23c2c4b8%22%3E%3Cellipse cx=%220%22 cy=%22-56%22 rx=%224.5%22 ry=%223.3%22/%3E%3Cellipse cx=%22-14%22 cy=%22-50%22 rx=%223.6%22 ry=%222.8%22/%3E%3Cellipse cx=%2214%22 cy=%22-50%22 rx=%223.6%22 ry=%222.8%22/%3E%3Cellipse cx=%22-7%22 cy=%22-40%22 rx=%224%22 ry=%223%22/%3E%3Cellipse cx=%228%22 cy=%22-40%22 rx=%224%22 ry=%223%22/%3E%3Cellipse cx=%22-19%22 cy=%22-36%22 rx=%222.8%22 ry=%222.2%22/%3E%3Cellipse cx=%2219%22 cy=%22-36%22 rx=%222.8%22 ry=%222.2%22/%3E%3Cellipse cx=%220%22 cy=%22-30%22 rx=%223.2%22 ry=%222.4%22/%3E%3C/g%3E%3C/g%3E%3Cg id=%22r%22%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22/%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22 transform=%22rotate%2872%29%22/%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22 transform=%22rotate%28144%29%22/%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22 transform=%22rotate%28216%29%22/%3E%3Cuse xlink:href=%22%23lobe%22 href=%22%23lobe%22 transform=%22rotate%28288%29%22/%3E%3Ccircle r=%2225%22 fill=%22%236e4846%22/%3E%3Ccircle r=%2225%22 fill=%22none%22 stroke=%22%23c2c4b8%22 stroke-width=%222%22 stroke-dasharray=%223 5%22/%3E%3Ccircle r=%2212%22 fill=%22%230b110e%22/%3E%3Cg fill=%22%23936764%22%3E%3Ccircle cx=%22-4%22 cy=%22-3%22 r=%221.6%22/%3E%3Ccircle cx=%224%22 cy=%22-2%22 r=%221.6%22/%3E%3Ccircle cx=%220%22 cy=%224%22 r=%221.6%22/%3E%3C/g%3E%3C/g%3E%3Cg id=%22bud%22%3E%3Ccircle r=%2216%22 fill=%22%236e4846%22/%3E%3Cpath fill=%22none%22 stroke=%22%23936764%22 stroke-width=%222.4%22 d=%22M-14 -4C-8 -14 8 -14 14 -4M-15 6C-8 -4 8 -4 15 6M-11 14C-5 7 5 7 11 14%22/%3E%3C/g%3E%3C/defs%3E%3Cg opacity=%220.15%22%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28120 130%29 rotate%2812%29 scale%280.95%29%22/%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28470 110%29 rotate%28-20%29 scale%280.6%29%22/%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28330 330%29 rotate%2830%29 scale%281.2%29%22/%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28110 470%29 rotate%28-8%29 scale%280.7%29%22/%3E%3Cuse xlink:href=%22%23r%22 href=%22%23r%22 transform=%22translate%28530 520%29 rotate%2818%29 scale%280.75%29%22/%3E%3Cuse xlink:href=%22%23bud%22 href=%22%23bud%22 transform=%22translate%28300 90%29 rotate%2820%29 scale%280.9%29%22/%3E%3Cuse xlink:href=%22%23bud%22 href=%22%23bud%22 transform=%22translate%28560 300%29 rotate%28-15%29 scale%280.75%29%22/%3E%3Cuse xlink:href=%22%23bud%22 href=%22%23bud%22 transform=%22translate%28240 580%29 rotate%285%29 scale%280.7%29%22/%3E%3Cuse xlink:href=%22%23bud%22 href=%22%23bud%22 transform=%22translate%2840 300%29 rotate%28-30%29 scale%280.6%29%22/%3E%3C/g%3E%3C/svg%3E") 0 0 / 72vmin 72vmin repeat fixed,
     radial-gradient(ellipse 75% 60% at 85% -15%, var(--glow-1), transparent 70%) fixed,
     radial-gradient(ellipse 60% 50% at 0% 70%, var(--glow-2), transparent 70%) fixed,
     var(--floor);
