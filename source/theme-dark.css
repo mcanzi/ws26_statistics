@@ -63,6 +63,9 @@
   --output-bg:  #0f1713;   /* R output under the code */
   --error:      #e0675f;
 
+  --title-top:  #ece07e;   /* titles: moonlight above, leaf green below */
+  --title-bottom: #5cc48a;
+
   /* the {revealjs} base theme reads these */
   --r-background-color: var(--floor);
   --r-main-color: var(--mist);
@@ -191,6 +194,17 @@ body {
 .reveal section.title-slide.level1 > h1 {
   font-size: 2.6em;
   max-width: 80%;
+}
+
+/* the title of the title slide and of the section slides: a gradient from
+   --title-top to --title-bottom (set with the palette above), as the name
+   and the page titles on mcanzi.github.io */
+.reveal #title-slide h1.title,
+.reveal section.title-slide.level1 > h1 {
+  background: linear-gradient(180deg, var(--title-top) 8%, var(--title-bottom) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ---- fact cards on the section slides (::: {.fact} in the Rmd) -------
