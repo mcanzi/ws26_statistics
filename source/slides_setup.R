@@ -1,5 +1,5 @@
 slide_palette <- list(
-  pandan = "#88c9a8", hornbill = "#e8e2b0", kingfisher = "#8fb8d0", orchid = "#c3b6d6",
+  pandan = "#5cc48a", hornbill = "#f2d45c", kingfisher = "#5aa0e0", orchid = "#e08ab8",
   mist = "#e3e8e1", moss = "#6f8a7a", muted = "#8e9e96", floor_col = "#0b110e",
   vine = "#24332c", dim_col = "#1d2a24", qr_dark = "#0b110e", qr_light = "#e3e8e1"
 )
