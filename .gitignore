@@ -1,2 +1,7 @@
 .DS_Store
+.Rhistory
+.Rproj.user
 source/render_all.html
+source/*_cache/
+source/*_files/
+docs/*_files/

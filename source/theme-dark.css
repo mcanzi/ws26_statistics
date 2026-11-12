@@ -1,9 +1,10 @@
 /* theme-dark.css
-   The dark theme of mcanzi.github.io for {revealjs}: a rainforest at night,
-   green-black, with leaf green for headings and moon yellow for accents, and dimmed rafflesias scattered over the background.
-   The theme of Statistics for Linguists. The website has two more themes
-   with the same rules and another palette and background: the light one
-   (ggplot2_workshop) and the purple one (forensic speech science). */
+   The forest theme of mcanzi.github.io for {revealjs}: a rainforest at night,
+   green-black, with leaf green for headings, moon yellow for accents, and
+   rafflesias drawn in ink, dimmed, over the background.
+   The theme of Statistics. Advanced Statistics (theme-buttercup.css) and
+   Introduction to Forensic Speech Science (theme-sunset.css) use the same
+   rules with another palette and background. */
 
 /* ---- fonts: the website's own files (fonts/, licences: fonts/OFL-*.txt).
    Pandoc embeds them in the HTML, so the slides need no internet and send
