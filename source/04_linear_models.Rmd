@@ -64,9 +64,10 @@ _Source: ALPECOLE, University of Zurich_
 
 - From the mean to the conditional mean
 - Intercepts, slopes and residuals
-- Fitting a line: least squares and `lm()`
-- Reading and checking a model
-- A warning: when one line misleads
+- Fitting a line with least squares and `lm()`
+- Reading a model and making predictions
+- Measuring how well the line fits with `R²`
+- Checking the model, and a warning about groups
 
 ## Last week: one variable
 
@@ -77,7 +78,7 @@ ggplot(pengs, aes(x = seq_along(flipper_length_mm), y = flipper_length_mm)) +
   labs(x = "Penguin", y = "Flipper length (mm)")
 ```
 
-The mean (`r round(mean(pengs$flipper_length_mm))` mm) is the simplest model of a variable: it predicts the same flipper length for every penguin. Most penguins are some distance away from it.
+The mean (`r round(mean(pengs$flipper_length_mm))` mm) is the [simplest model]{.hl} of a variable: it predicts the same flipper length for every penguin. Most penguins are some distance away from it.
 
 ## Today: two variables
 
@@ -101,8 +102,8 @@ If we know a penguin's body mass, we can do better: the [conditional mean]{.hl} 
 :::: {.columns}
 
 ::: {.column width="52%"}
-- The __outcome__ (dependent or response variable, `y`) is what you measure
-- The __predictor__ (independent variable, `x`) is what you manipulate, or measure alongside, to see whether the outcome changes with it
+- The [outcome]{.hl} (dependent or response variable, `y`) is what you measure
+- The [predictor]{.hl} (independent variable, `x`) is what you manipulate, or measure alongside, to see whether the outcome changes with it
 :::
 
 ::: {.column width="48%"}
@@ -133,7 +134,7 @@ _Source: Water Power Magazine_
 
 - The [intercept]{.hl} `b₀` is where the line crosses the vertical axis, at `x = 0`
 - The [slope]{.hl} `b₁` is how much `y` changes when `x` goes up by 1
-- The error `e` is the part of each observation the line misses
+- The [error]{.hl} `e` is the part of each observation the line misses
 :::
 
 ::: {.column width="50%"}
@@ -235,19 +236,19 @@ ggplot(search, aes(x = slope, y = ss / 1000)) +
   labs(x = "Slope of a line through the middle of the data", y = "Sum of squared residuals (× 1,000)")
 ```
 
-Each point on the curve is one candidate line. The sum of squared residuals is smallest at a slope of `r round(b1, 4)`: the line B from before, and the line `lm()` finds.
+Each point on the curve is one candidate line. The sum of squared residuals is smallest at a slope of `r round(b1, 4)`. That is line B from the previous slide, and it is the line `lm()` finds.
 
 # Linear models in R
 
 ::: {.fact}
-`Did you know:` a male Alpine ibex weighs about 90 kg, and his horns grow to about 92 cm on average. A female weighs 35 to 49 kg, with horns of about 34 cm: one species, two very different [intercepts]{.hl}.
+`Did you know:` a male Alpine ibex weighs about 90 kg, and his horns grow to about 92 cm on average. A female weighs 35 to 49 kg, with horns of about 34 cm. A model of horn length would need very different [intercepts]{.hl} for the two sexes.
 
 _Source: Gran Paradiso National Park_
 :::
 
 ## `lm()` in `R`
 
-`lm()` fits a [linear model]{.hl}. The formula `outcome ~ predictor` reads "flipper length as a function of body mass".
+`lm()` fits a [linear model]{.hl}. The [formula]{.hl} `outcome ~ predictor` reads "flipper length as a function of body mass".
 
 ```{r}
 m <- lm(flipper_length_mm ~ body_mass_g, data = pengs)
@@ -272,7 +273,7 @@ summary(m)
 | `Coefficients`, `Estimate` | The intercept `b₀` and the slope `b₁` |
 | `Std. Error`, `t value`, `Pr(>\|t\|)` | How certain the estimates are: lecture 9 |
 | `Residual standard error` | The typical size of a residual, in mm |
-| `Multiple R-squared` | How much of the variation the model accounts for: in a few slides |
+| `Multiple R-squared` | How much of the variation the model accounts for: later today |
 
 ## Reading the coefficients
 
@@ -283,13 +284,11 @@ coefficients(m)
 . . .
 
 - Each extra kilogram of body mass goes with flippers `r round(b1 * 1000, 1)` mm longer (`r round(b1, 4)` mm per gram)
-- A penguin weighing 0 g would have flippers `r round(b0, 1)` mm long
-
-. . .
-
-The intercept is correct arithmetic, but there are no weightless penguins. Next week, [centering]{.hl} gives it a meaning.
+- A penguin weighing 0 g would have flippers `r round(b0, 1)` mm long. No penguin weighs 0 g, so next week [centering]{.hl} will give the intercept a meaning
 
 ## Residuals average zero
+
+The points above the line balance the points below it, so the residuals average zero:
 
 ```{r}
 mean(residuals(m))
@@ -297,40 +296,43 @@ mean(residuals(m))
 
 . . .
 
-`e-16` means "times 10 to the power of −16", so the mean is zero up to rounding error. The points above the line balance the points below it.
+`e-16` means "times 10 to the power of −16", so this mean is zero up to rounding error.
 
-## `{broom}`: models as tibbles {.smaller}
+## `{broom}`: models as tibbles
+
+`tidy()` gives one row per coefficient and `glance()` one row per model:
 
 ```{r}
 tidy(m)
 glance(m)[, 1:4]
+```
+
+## `augment()`: one row per penguin
+
+```{r}
 augment(m)[, 1:4]
 ```
 
 . . .
 
-`tidy()` gives one row per coefficient, `glance()` one row per model, `augment()` one row per observation. All three return tibbles, ready for `{dplyr}` and `{ggplot2}`.
+`augment()` adds the fitted value and the residual of every penguin to the data. All three `{broom}` functions return tibbles, ready for `{dplyr}` and `{ggplot2}`.
 
-## `R²`: how much does the model explain?
+## Plotting the model
 
-```{r}
-glance(m)$r.squared
+```{r, eval = FALSE}
+ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
+  geom_point() +
+  geom_smooth(method = "lm")
 ```
 
-. . .
+```{r, echo = FALSE, fig.height = 3.1}
+ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
+  geom_point(colour = pandan, alpha = 0.4, size = 2) +
+  geom_smooth(method = "lm", colour = hornbill, fill = hornbill, linewidth = 1.3) +
+  labs(x = "Body mass (g)", y = "Flipper length (mm)")
+```
 
-`R²` is the proportion of the variance in `y` that the model accounts for: `r round(r2 * 100)`% of the variation in flipper length goes with body mass.
-
-. . .
-
-It runs from 0, when the predictor tells us nothing, to 1, when every point lies on the line. In linguistics much lower values are normal, because speakers and listeners vary for many reasons besides any one predictor.
-
-## Discussion
-
-Body mass accounts for `r round(r2 * 100)`% of the variation in flipper length. Suppose a study finds that word frequency accounts for 5% of the variation in reaction times.
-
-- Is that model useless?
-- What might account for the other 95%?
+`geom_smooth(method = "lm")` fits the same model as `lm()` and draws its line. The band around the line shows how uncertain it is: lecture 9.
 
 ## Predictions
 
@@ -359,10 +361,83 @@ ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
 
 The data cover `r min(pengs$body_mass_g)` to `r max(pengs$body_mass_g)` g (shaded). Outside that range the dashed line is a guess: it gives a weightless penguin `r round(b0)` mm flippers.
 
+# Model fit
+
+::: {.fact}
+`Did you know:` an Alpine ibex horn adds one segment a year, so you can count a male's age on it. In males aged 1 to 6, age accounted for 50% of the [variance]{.hl} in yearly horn growth. Warm springs with early plant growth gave longer segments.
+
+_Sources: Giacometti et al. (2002), Journal of Mammalogy; Büntgen et al. (2014), Ecology Letters_
+:::
+
+## The `1` in a formula
+
+The `1` in a formula stands for the intercept, and `R` adds it for you.
+
+```{r}
+coef(lm(flipper_length_mm ~ 1 + body_mass_g, data = pengs))
+m0 <- lm(flipper_length_mm ~ 1, data = pengs)
+coef(m0)
+```
+
+. . .
+
+So `y ~ x` and `y ~ 1 + x` fit the same model. `y ~ 1` fits an [intercept-only model]{.hl}: its one estimate is the mean flipper length, the model from last week.
+
+## The mean as a baseline
+
+```{r, echo = FALSE, fig.height = 3.3}
+bind_rows(`The mean: y ~ 1` = mutate(few, pred = mean(pengs$flipper_length_mm)),
+          `The line: y ~ x` = mutate(few, pred = .fitted), .id = "model") |>
+  mutate(model = fct_inorder(model)) |>
+  ggplot(aes(x = body_mass_g, y = flipper_length_mm)) +
+  geom_line(aes(y = pred), colour = hornbill, linewidth = 1.2) +
+  geom_segment(aes(xend = body_mass_g, yend = pred), colour = orchid, linewidth = 0.8) +
+  geom_point(colour = pandan, size = 2.5) +
+  facet_wrap(~ model) +
+  labs(x = "Body mass (g)", y = "Flipper length (mm)")
+```
+
+The left panel shows each penguin's distance from the mean, the residuals of `y ~ 1`. With our line (right, same 30 penguins) the residuals are much shorter.
+
+## `R²` step by step
+
+<div class="formula">R² = 1 − SS<sub>line</sub> / SS<sub>mean</sub></div>
+
+```{r}
+ss_mean <- sum(residuals(m0)^2)
+ss_line <- sum(residuals(m)^2)
+1 - ss_line / ss_mean
+```
+
+. . .
+
+`SS` is a sum of squared residuals, as in least squares. [R²]{.hl} is the proportion of the squared misses of the mean that the line removes, here `r round(r2 * 100)`%.
+
+## Reading `R²`
+
+```{r}
+glance(m)$r.squared
+```
+
+. . .
+
+This is the `Multiple R-squared` in `summary()`: `r round(r2 * 100)`% of the variation in flipper length goes with body mass.
+
+. . .
+
+It runs from 0, when the line does no better than the mean, to 1, when every point lies on the line. In linguistics much lower values are normal, because speakers and listeners vary for many reasons besides any one predictor.
+
+## Discussion
+
+Body mass accounts for `r round(r2 * 100)`% of the variation in flipper length. Suppose a study finds that word frequency accounts for 5% of the variation in reaction times.
+
+- Is that model useless?
+- What might account for the other 95%?
+
 # Checking the model
 
 ::: {.fact}
-`Did you know:` by the 19th century, Alpine ibex had been hunted out of the Alps except in the Italian king's hunting reserve, today [Gran Paradiso National Park]{.hl}. In the early 1900s, young ibex were smuggled from there into Switzerland, where the first reintroduction followed in 1911.
+`Did you know:` by the 19th century, Alpine ibex had been hunted out of the Alps except in the Italian king's hunting reserve, today Gran Paradiso National Park. In the early 1900s, young ibex were smuggled from there into Switzerland, where the first [reintroduction]{.hl} followed in 1911.
 
 _Sources: Gran Paradiso National Park; Springer Nature Research Communities_
 :::
@@ -376,7 +451,7 @@ ggplot(augment(m), aes(x = .resid)) +
   labs(x = "Residual (mm)", y = "Count")
 ```
 
-Linear models assume that the residuals are roughly normal: symmetric and centred on zero. These are close enough.
+Linear models assume that the residuals are roughly [normal]{.hl}, symmetric and centred on zero, and these residuals are close enough.
 
 ## Is the spread constant?
 
@@ -394,7 +469,7 @@ bind_rows(`Our model` = select(augment(m), .fitted, .resid),
   labs(x = "Fitted flipper length (mm)", y = "Residual (mm)")
 ```
 
-The residuals should also have about the same spread all along the line. On the right, the misses grow with the fitted values. Chapter 4 of Winter (2019) covers both checks.
+The residuals should also have about the [same spread]{.hl} all along the line. On the right, the misses grow with the fitted values. Chapter 4 of Winter (2019) covers both checks.
 
 # Grouped data
 
@@ -430,6 +505,52 @@ ggplot(bills, aes(x = bill_depth_mm, y = bill_length_mm)) +
 ```
 
 Within every species the slope is positive. Leaving species out reversed the relationship: this is [Simpson's paradox]{.hl}. Lectures 6 and 7 show how to add species to the model.
+
+# Your turn
+
+## Exercises
+
+With `penguins`, after `drop_na()` on the columns you use:
+
+1. Fit a model of `bill_length_mm` as a function of `flipper_length_mm`
+2. Report the slope in a sentence. What does the intercept mean here?
+3. What is `R²`? Compute it by hand with an intercept-only model
+4. Predict the bill length of penguins with 190 and 220 mm flippers
+5. Bonus: plot the residuals against the fitted values with `augment()`, coloured by `species`. What do you see?
+
+## Solutions {.smaller}
+
+```{r}
+bill_data <- drop_na(penguins, bill_length_mm, flipper_length_mm)
+
+m_bill <- lm(bill_length_mm ~ flipper_length_mm, data = bill_data)
+coef(m_bill)
+
+m_bill0 <- lm(bill_length_mm ~ 1, data = bill_data)
+1 - sum(residuals(m_bill)^2) / sum(residuals(m_bill0)^2)
+glance(m_bill)$r.squared
+```
+
+## Solutions {.smaller}
+
+```{r, fig.height = 2.8}
+predict(m_bill, newdata = tibble(flipper_length_mm = c(190, 220)))
+
+augment(m_bill, data = bill_data) |>
+  ggplot(aes(x = .fitted, y = .resid, colour = species)) +
+  geom_point()
+```
+
+## Summary
+
+::: {.takeaway}
+- `y = b₀ + b₁ · x + e` predicts the [conditional mean]{.hl} of `y` from `x`
+- The [intercept]{.hl} is the prediction at `x = 0`; the [slope]{.hl} is the change in `y` when `x` goes up by 1
+- [Least squares]{.hl} picks the line with the smallest sum of squared residuals, and `lm(y ~ x)` finds it
+- [R²]{.hl} is the proportion of variation the line accounts for, compared with the intercept-only model `y ~ 1`
+- Check that the residuals are roughly normal, with the same spread along the line
+- Predict only within the range of the data, and look for groups that a single line hides
+:::
 
 ## Slides and code
 
