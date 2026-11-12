@@ -76,31 +76,29 @@ tidy(m)[, 1:3]
 
 . . .
 
-- __Slope__: each extra gram of body mass goes with `r round(b1, 4)` mm more flipper
-- __Intercept__: a penguin of 0 g would have flippers of `r round(b0, 1)` mm
+Each extra gram of body mass goes with `r round(b1, 4)` mm more flipper, and a penguin of 0 g would have flippers `r round(b0, 1)` mm long.
 
 . . .
 
-The model is fine, but the numbers are awkward: tiny slopes, and an intercept that describes an impossible penguin.
+The model is fine, but its numbers are awkward: a slope too small to picture, and an intercept that describes an impossible penguin. Today we fix both without touching the fit.
 
 ## Why transform?
 
-- __Interpretation__: make 0 mean something, and slopes use sensible units
-- __Comparison__: put variables measured in different units on a common scale
-- __Shape__: make skewed, multiplicative data behave more like the linear model expects
+| Goal | Example | Transformation |
+|:--|:--|:--|
+| Coefficients that are easier to read | slope per kg, intercept for an average penguin | units, centering |
+| Predictors on a common scale | body mass (g) against bill length (mm) | standardising |
+| A shape the linear model can handle | skewed reaction times, word frequencies | logarithm |
 
 . . .
 
-Transforming a variable changes only the scale on which we describe the data.
-
-## Linear vs non-linear
-
-- __Linear__: add, subtract, multiply or divide by a constant. The shape of the distribution stays the same.
-- __Non-linear__: e.g. the logarithm or the square root. The shape changes.
+The data stay the same. A transformation changes the scale on which we describe them.
 
 ## Linear vs non-linear {.smaller}
 
-```{r, echo = FALSE, fig.height = 4.6}
+A [linear]{.hl} transformation adds, subtracts, multiplies or divides by a constant. A non-linear one, such as the logarithm, changes the shape of the distribution.
+
+```{r, echo = FALSE, fig.height = 4.0}
 set.seed(3)
 rt <- tibble(rt_ms = rlnorm(2000, meanlog = log(600), sdlog = 0.35))
 
@@ -231,17 +229,17 @@ The slope is now the change in flipper length for one standard deviation more bo
 
 ## What a z-score says
 
-- `z = 0`: exactly average
-- `z = 1`: one SD above the mean
-- `z = -2`: two SDs below the mean
+```{r, echo = FALSE, fig.height = 3.4}
+mass_m <- mean(pengs$body_mass_g); mass_s <- sd(pengs$body_mass_g)
+ggplot(pengs, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 150, fill = kingfisher, colour = floor_col, alpha = 0.8) +
+  geom_vline(xintercept = mass_m + (-2:2) * mass_s, colour = hornbill, linetype = c("dotted", "dotted", "solid", "dotted", "dotted")) +
+  annotate("label", x = mass_m + (-2:2) * mass_s, y = Inf, vjust = 1.3, label = paste("z =", -2:2),
+           fill = floor_col, colour = hornbill, label.size = 0, size = 4.5) +
+  labs(x = "Body mass (g)", y = "Count")
+```
 
-. . .
-
-From lecture 3: in a normal distribution about 95% of values lie within 2 SD. A value with `z = 3` is unusual.
-
-. . .
-
-`scale(x)` computes z-scores too, but returns a `matrix`. Inside `mutate()`, use `as.numeric(scale(x))`.
+A z-score says how many standard deviations a value lies from the mean: `z = 0` is average, `z = -2` is two SDs below it. From lecture 3, about 95% of values in a normal distribution lie between `z = -2` and `z = 2`.
 
 ## Comparing predictors {.smaller}
 
@@ -254,7 +252,7 @@ c(coef(lm(flipper_length_mm ~ body_mass_g,    data = pengs))[2],
 
 . . .
 
-Grams and millimetres cannot be compared. Standardise both:
+Grams and millimetres cannot be compared. Standardise both. `scale()` computes z-scores, but returns a matrix, so wrap it in `as.numeric()`:
 
 ```{r}
 pengs <- pengs |> mutate(bill_length_z = as.numeric(scale(bill_length_mm)))
@@ -514,11 +512,11 @@ The most frequent word is 2000 times more frequent than the least frequent one. 
 
 ## What is a logarithm? {.smaller}
 
-The logarithm is the inverse function to exponentiation.
+A logarithm answers one question: how many times do I multiply the base by itself to get this number? `log10(1000)` is 3, because 10 × 10 × 10 = 1000.
 
 . . .
 
-That means the logarithm of a number x to the base b is the exponent to which b must be raised, to produce x.
+So the log turns multiplying into adding: each step of 1 on the log scale is one more multiplication by the base.
 
 . . .
 
