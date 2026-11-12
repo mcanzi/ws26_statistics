@@ -65,16 +65,11 @@ _Source: Thoen et al. (2014), Science_
 
 ## So far
 
-- Lectures 4 to 6: continuous predictors: frequency, length, body mass
-- `y ~ x1 + x2`: each slope is a change in `y` per unit of `x`
+Until now every predictor was a number: frequency, length, body mass. Each slope was a change in `y` per unit of `x`.
 
 . . .
 
-Many linguistic predictors are categories:
-
-- Voicing: voiced, voiceless
-- Speaking style: casual, clear, loud
-- Language, condition, speaker group, word class...
+Many linguistic predictors are categories instead: voicing (voiced, voiceless), speaking style (casual, clear, loud), language, condition, speaker group, word class.
 
 . . .
 
@@ -206,7 +201,7 @@ coef(lm(duration ~ voicing, data = vowels))
 
 . . .
 
-The intercept is now the `voiceless` mean, and the slope is +38 ms for voiced. The model and its fit are unchanged; only the comparison is different.
+The intercept is now the `voiceless` mean, and the slope is +`r round(diff(tapply(vowels$duration, vowels$voicing, mean)))` ms for voiced. The model and its fit are unchanged; only the comparison is different.
 
 ## Choosing the reference level
 
@@ -331,13 +326,30 @@ coef(m_style)
 
 . . .
 
-- __Intercept__: the mean of `casual`, the reference level
-- `styleclear`: clear minus casual
-- `styleloud`: loud minus casual
+The intercept is the mean of `casual`, the reference level. `styleclear` is clear minus casual, and `styleloud` is loud minus casual.
 
 . . .
 
 A predictor with `k` levels gets `k − 1` coefficients: each level against the reference.
+
+## Three levels, visually
+
+```{r, echo = FALSE, fig.height = 4.0}
+style_means <- styles |> summarise(mean = mean(duration), .by = style)
+casual_mean <- style_means$mean[style_means$style == "casual"]
+ggplot(styles, aes(x = style, y = duration, colour = style)) +
+  geom_jitter(width = 0.15, alpha = 0.35, size = 2) +
+  geom_hline(yintercept = casual_mean, colour = mist, linetype = "dashed") +
+  geom_segment(data = filter(style_means, style != "casual"),
+               aes(x = style, xend = style, y = casual_mean, yend = mean),
+               colour = mist, linewidth = 1.2, arrow = arrow(length = unit(0.25, "cm"))) +
+  geom_point(data = style_means, aes(y = mean), colour = mist, size = 5) +
+  annotate("text", x = 0.6, y = casual_mean - 6, label = "intercept", colour = mist, hjust = 0, size = 5) +
+  labs(x = "Speaking style", y = "Vowel duration (ms)") +
+  theme(legend.position = "none")
+```
+
+Each arrow is one coefficient: how far clear and loud speech lie from casual speech, the dashed line.
 
 ## Behind the scenes {.smaller}
 
@@ -406,6 +418,12 @@ augment(m_style) |>
 The same assumptions as before. With categories, check that the residuals have a similar spread in every group.
 
 # Mixing predictors
+
+::: {.fact}
+`Did you know:` mantis shrimp were the first animals shown to see [circularly polarised]{.hl} light. Some species also reflect it from body parts they display in courtship.
+
+_Source: Chiou et al. (2008), Current Biology_
+:::
 
 ## Categorical and continuous together
 
