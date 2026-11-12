@@ -64,9 +64,7 @@ _Source: National Geographic_
 
 ## So far
 
-Lectures 4 to 11: a continuous outcome, normally distributed residuals.
-
-- Reaction times, vowel durations, body mass
+Every model in lectures 4 to 11 had a continuous outcome, such as reaction times, vowel durations or body mass, with roughly normal residuals.
 
 . . .
 
@@ -209,8 +207,7 @@ tibble(p = c(0.1, 0.25, 0.5, 0.75, 0.9)) |>
 
 . . .
 
-- __Odds__: how much more likely it happens than not. p = 0.75 gives odds of 3: 3 to 1
-- __Log odds__ (__logits__): the log of the odds. They range from −∞ to +∞, and are 0 when p = 0.5
+The [odds]{.hl} say how much more likely something is to happen than not: p = 0.75 gives odds of 3, or 3 to 1. Their log, the log odds or logit, runs from −∞ to +∞ and is 0 when p = 0.5.
 
 ## The logistic function
 
@@ -237,8 +234,7 @@ plogis(1.0986)    # log odds -> probability
 
 . . .
 
-- `qlogis()`: the logit function
-- `plogis()`: its inverse, the logistic function
+`qlogis()` turns a probability into log odds, and `plogis()` turns log odds back into a probability.
 
 # Fitting with `glmer()`
 
@@ -274,9 +270,11 @@ print(summary(m), correlation = FALSE, signif.stars = FALSE)
 
 ## Reading the output
 
-- [Laplace Approximation]{.hl}: how the model was fitted. GLMMs use maximum likelihood: there is no REML
-- __Random effects__: SDs on the [log odds]{.hl} scale. There is no residual variance: for 0/1 data, it is fixed by the distribution
-- __Fixed effects__: estimates on the [log odds]{.hl} scale, with __z values__ and __p-values__
+| Part of the output | What it tells you |
+|:--|:--|
+| `Laplace Approximation` | how the model was fitted: maximum likelihood, there is no REML |
+| `Random effects` | SDs on the [log odds]{.hl} scale, and no residual variance: for 0/1 data the distribution fixes it |
+| `Fixed effects` | estimates on the log odds scale, with z values and p-values |
 
 . . .
 
