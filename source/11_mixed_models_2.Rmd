@@ -158,10 +158,12 @@ summary(m)
 
 ## Reading the output
 
-- __REML criterion__: the fit statistic for REML estimation (more on REML below)
-- __Random effects__: the variances and SDs of the varying effects, and their correlation
-- __Fixed effects__: estimates, SEs and t values, read exactly as in `lm()`
-- __Correlation of fixed effects__: how the estimates of the fixed effects covary. Rarely of interest
+| Part of the output | What it tells you |
+|:--|:--|
+| `REML criterion` | a fit statistic for REML estimation (more below) |
+| `Random effects` | how much speakers and words vary: variances, SDs and the correlation |
+| `Fixed effects` | estimates, SEs and t values, read exactly as in `lm()` |
+| `Correlation of Fixed Effects` | how the estimates covary: rarely of interest |
 
 . . .
 
@@ -286,9 +288,9 @@ The full model fits much better: χ²(`r anova(m_null, m_full)$Df[2]`) = `r roun
 
 ## What the test does
 
-- Each model has a __log-likelihood__: how probable the data are under the model's estimates
-- The more complex model always fits at least as well
-- Twice the difference in log-likelihood is compared with a [χ² distribution]{.hl}, with df = the difference in the number of parameters
+1. Each model has a log-likelihood, which says how probable the data are under that model's estimates
+2. The model with more parameters always fits at least as well, so the question is whether it fits better by more than chance would give
+3. Twice the difference in log-likelihood is compared with a [χ² distribution]{.hl}, whose degrees of freedom are the number of extra parameters
 
 . . .
 
@@ -366,7 +368,7 @@ c(with_slopes    = coef(summary(m))["voicingvoiced", "Std. Error"],
 
 . . .
 
-Here the difference is small: speakers' voicing effects vary little (SD ≈ `r round(attr(VarCorr(m)$speaker, "stddev")[2], 1)` ms). The more slopes vary across speakers, the bigger the gap: in lecture 10, the SE went from 1.5 to 4.2 ms.
+Here the difference is small: speakers' voicing effects vary little (SD ≈ `r round(attr(VarCorr(m)$speaker, "stddev")[2], 1)` ms). The more slopes vary across speakers, the bigger the gap: in lecture 10, adding the slopes made the SE about three times larger.
 
 ## Discussion
 
@@ -457,7 +459,7 @@ If a model is singular, consider simplifying the random effects (point 5 above),
 
 ## Shrinkage and individual differences
 
-```{r, echo = FALSE, fig.height = 3.6}
+```{r, echo = FALSE, fig.height = 3.3}
 own <- vowels |>
   summarise(own = mean(duration[voicing == "voiced"]) - mean(duration[voicing == "voiceless"]),
             .by = speaker)
@@ -523,7 +525,12 @@ lex_null <- update(lex_full, . ~ . - NativeLanguage)
 anova(lex_null, lex_full)
 ```
 
-With random intercepts only, the same test gives p ≈ .01. The by-word slope for NativeLanguage makes the test more cautious.
+```{r, include = FALSE}
+lex_ri_full <- lmer(RT ~ Frequency + NativeLanguage + (1 | Subject) + (1 | Word), data = lexdec, REML = FALSE)
+p_ri <- anova(update(lex_ri_full, . ~ . - NativeLanguage), lex_ri_full)$"Pr(>Chisq)"[2]
+```
+
+With random intercepts only, the same test gives p = `r signif(p_ri, 2)`. The by-word slope for NativeLanguage makes the test more cautious.
 
 ## Summary
 
