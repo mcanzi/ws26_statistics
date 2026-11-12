@@ -53,11 +53,19 @@ bill_mad  <- mad(bill, na.rm = TRUE)
   }
 </style>
 
-A model is like a map of a city: it is useful because it leaves most of the detail out.
+::: {.fact}
+`Did you know:` tardigrades are animals about [0.5 mm]{.hl} long, with eight stubby legs. The German pastor J.A.E. Goeze first described them in 1773 and called them _kleiner Wasserbär_: "little water bear".
+
+_Source: National Geographic_
+:::
+
+## Why describe?
+
+A data set with 344 penguins is too much to take in at once. A [descriptive statistic]{.hl} summarises it in one number, such as a typical value or how much the values vary.
 
 . . .
 
-Descriptive statistics are the simplest maps: one number that stands for a whole distribution.
+Like a map, a summary leaves most of the detail out. Today is about choosing a good summary, and noticing when it hides something important.
 
 ## Today
 
@@ -69,10 +77,14 @@ Descriptive statistics are the simplest maps: one number that stands for a whole
 
 ## Distributions
 
-A (frequency) distribution displays the frequency of occurrence of each possible outcome in a sample.
+A [distribution]{.hl} shows how often each value, or range of values, occurs.
 
-- [Empirical]{.hl} distribution: the values we actually observed
-- [Theoretical]{.hl} distribution: a mathematical shape, defined by a few [parameters]{.hl}
+- An empirical distribution describes the values we actually observed
+- A theoretical distribution is a mathematical shape, fully described by a few numbers called [parameters]{.hl}
+
+. . .
+
+We compare the two all the time: does our sample look like a shape we know?
 
 ## Plotting with `{ggplot2}` {.smaller}
 
@@ -84,9 +96,9 @@ ggplot(data, aes(x = column)) +   # the data, and which column goes where
   labs(x = "Axis label")          # labels
 ```
 
-- `ggplot()` + `aes()`: the data, and which columns map to `x`, `y`, `colour`, ...
-- `geom_*()`: the shape: `geom_histogram()`, `geom_point()`, `geom_boxplot()`, ...
-- `labs()`, `theme()`: labels and look
+- `ggplot()` and `aes()` say which data to use and which column goes on `x`, `y` or `colour`
+- A `geom_*()` draws the shapes: `geom_histogram()`, `geom_point()`, `geom_boxplot()`
+- `labs()` and `theme()` change the labels and the look
 
 . . .
 
@@ -96,7 +108,7 @@ Our slides use a theme set up in the hidden first chunk of the .Rmd: your plots 
 
 ```{r, fig.height = 4}
 ggplot(penguins, aes(x = flipper_length_mm)) +
-  geom_histogram(binwidth = 3, fill = "#b3443d", colour = "#f3eee5") +
+  geom_histogram(binwidth = 3, fill = "#5aa0e0", colour = "#0b110e") +
   labs(x = "Flipper length (mm)", y = "Count")
 ```
 
@@ -107,8 +119,8 @@ Each bar counts the penguins whose flipper length falls in a 3 mm bin.
 ```{r, fig.height = 4}
 ggplot(penguins, aes(x = flipper_length_mm)) +
   geom_histogram(aes(y = after_stat(density)), binwidth = 3,
-                 fill = "#b3443d", colour = "#f3eee5", alpha = 0.5) +
-  geom_density(colour = "#a8701c", linewidth = 1.2) +
+                 fill = "#5aa0e0", colour = "#0b110e", alpha = 0.5) +
+  geom_density(colour = "#f2d45c", linewidth = 1.2) +
   labs(x = "Flipper length (mm)", y = "Density")
 ```
 
@@ -116,7 +128,7 @@ The [density]{.hl} curve is a smoothed histogram. The area under it is 1.
 
 ## The normal distribution
 
-The normal (or __Gaussian__) distribution contains values symmetrically distributed around the mean, with the majority of data points lying close to the mean.
+In a [normal]{.hl} (or Gaussian) distribution, values are spread symmetrically around the mean, and most of them lie close to it: the familiar bell shape.
 
 . . .
 
@@ -136,8 +148,8 @@ head(round(normal, 2))
 tibble(value = normal) |>
   ggplot(aes(x = value)) +
   geom_histogram(aes(y = after_stat(density)), bins = 30,
-                 fill = "#3f7470", colour = "#f3eee5", alpha = 0.6) +
-  stat_function(fun = dnorm, colour = "#a8701c", linewidth = 1.2) +
+                 fill = "#e08ab8", colour = "#0b110e", alpha = 0.6) +
+  stat_function(fun = dnorm, colour = "#f2d45c", linewidth = 1.2) +
   labs(x = "Value", y = "Density")
 ```
 
@@ -167,7 +179,7 @@ In a normal distribution, about 68% of values lie within 1 SD of the mean, 95% w
 
 ## Other distributions {.smaller}
 
-There are many other theoretical distributions, we will see some during the course:
+Not every variable is normal. Three shapes you will meet in linguistic data:
 
 ```{r, echo = FALSE, fig.height = 4}
 set.seed(1)
@@ -189,21 +201,19 @@ ggplot() +
   theme(strip.text = element_text(size = 13))
 ```
 
-- [Binomial]{.hl}: counts of successes, e.g. accuracy
-- [Poisson]{.hl}: counts of events, e.g. pauses per minute (not taught here, but you may meet it)
-- [Gamma]{.hl} / [log-normal]{.hl}: positive and right-skewed, e.g. reaction times, durations
+Accuracy out of a fixed number of trials is [binomial]{.hl} (lecture 12). Counts of events, such as pauses per minute, are often Poisson. Reaction times and durations are positive with a long right tail, closer to a log-normal or gamma shape.
 
 # Central tendency
 
 ::: {.fact}
-`Did you know:` tardigrades are animals about [0.5 mm]{.hl} long, with eight stubby legs. The German pastor J.A.E. Goeze first described them in 1773 and called them _kleiner Wasserbär_: "little water bear".
+`Did you know:` a protein found only in tardigrades, Dsup, protects DNA from radiation. Human cells given the gene for it showed about [40% less DNA damage]{.hl} after X-rays.
 
-_Source: National Geographic_
+_Source: Hashimoto et al. (2016), Nature Communications_
 :::
 
 ## The tools of the trade
 
-Two types of descriptive measures are used to map our data:
+Descriptive measures come in two kinds:
 
 | Central tendency | Spread |
 |---|---|
@@ -283,7 +293,7 @@ ggplot(penguins, aes(x = bill_length_mm)) +
 
 ## `median()`
 
-The median is the observation at the center of the distribution, when the distribution is ordered from the lowest to the highest value.
+The [median]{.hl} is the middle value once all values are sorted from lowest to highest: half the values lie below it, half above.
 
 . . .
 
@@ -441,7 +451,7 @@ Both speakers have a mean of 150 ms. Speaker B is far less consistent.
 
 ## `sd()`
 
-A standard deviation is a measure of how dispersed the data is in relation to the mean: roughly, the typical distance of a value from the mean.
+The [standard deviation]{.hl} measures how spread out the values are around the mean: roughly, how far a typical value is from it.
 
 <div class="formula">s = √( Σ (xᵢ − <span style="text-decoration: overline;">x</span>)² / (n − 1) )</div>
 
@@ -475,19 +485,15 @@ ggplot(penguins, aes(x = bill_length_mm)) +
 
 ## `mad()`
 
-The median absolute deviation (MAD) is a robust measure of the variability of a univariate sample of quantitative data: the median distance from the median.
+The [median absolute deviation]{.hl} (MAD) is the robust partner of the SD: the median distance of the values from their median.
 
 . . .
 
-Consider the distribution: 1, 1, 2, __2__, 4, 6, 9
-
-. . .
-
-Consider the absolute deviations from the median: 1, 1, 0, 0, 2, 4, 7
-
-. . .
-
-Take the median of the (sorted) above distribution: 0, 0, 1, __1__, 2, 4, 7
+| Step | Values | |
+|:--|:--|:--|
+| 1. The data, sorted | 1, 1, 2, __2__, 4, 6, 9 | median = 2 |
+| 2. Distance of each value from 2 | 1, 1, 0, 0, 2, 4, 7 | |
+| 3. The same distances, sorted | 0, 0, 1, __1__, 2, 4, 7 | MAD = 1 |
 
 ## `mad()` in R {.smaller}
 
@@ -529,7 +535,7 @@ ggplot(penguins, aes(x = bill_length_mm)) +
 
 ## `range()`
 
-The `range()` returns the `min()` and `max()` values in a distribution. Their distance is what statisticians call the range.
+`range()` returns the smallest and the largest value. The distance between them is what statisticians call the range.
 
 . . .
 
@@ -544,11 +550,7 @@ The range depends on two values only, the most extreme ones. One outlier changes
 
 ## Quantiles / Quartiles
 
-Quantiles are cut points that divide a distribution, or the ordered values of a sample, into intervals of equal probability.
-
-. . .
-
-__Quartiles__ are __quantiles__ that divide the data into four quarters:
+[Quantiles]{.hl} cut the sorted values into groups of equal size. Quartiles cut them into four quarters:
 
 ```{r}
 quantile(penguins$bill_length_mm, na.rm = TRUE)
@@ -648,9 +650,11 @@ The message: the result is still grouped by species. Either add `.groups = "drop
 
 ## `group_by()` or `.by`?
 
-- Use `group_by()` when several steps in a row should work per group
-- Use `.by` when only one step needs the groups
-- Remember to `ungroup()` when you use `group_by()`, especially if you are doing other things before you save the result into a variable
+Use `group_by()` when several steps in a row should work per group, and `ungroup()` when you are done, before you save the result.
+
+. . .
+
+Use `.by` when only one step needs the groups. Nothing stays grouped afterwards, so there is nothing to forget.
 
 ## Many columns at once: `across()` {.smaller}
 
@@ -678,7 +682,7 @@ bill_summary <- penguins |>
 
 ggplot(drop_na(penguins, bill_length_mm), aes(x = species, y = bill_length_mm)) +
   geom_jitter(aes(colour = species), width = 0.2, alpha = 0.3) +
-  geom_pointrange(data = bill_summary, colour = "#2b2723", linewidth = 1, size = 0.8,
+  geom_pointrange(data = bill_summary, colour = "#e3e8e1", linewidth = 1, size = 0.8,
                   aes(y = mean, ymin = mean - sd, ymax = mean + sd)) +
   labs(x = NULL, y = "Bill length (mm)") + theme(legend.position = "none")
 ```
