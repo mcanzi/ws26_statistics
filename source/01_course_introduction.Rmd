@@ -49,27 +49,28 @@ _Source: Duke Lemur Center_
 
 ## Who I am
 
-I am Dr Massimiliano Canzi, Max for short.
+Dr Massimiliano Canzi, Max for short.
+
+<div style="display:grid; grid-template-columns: 6.5em 1fr; gap: 0.55em 1em; margin-top: 0.6em;">
+<div style="color: var(--pandan); font-weight: 700;">Now</div><div>Data scientist and manager of the LingLab, Universität Konstanz, since 2021</div>
+<div style="color: var(--pandan); font-weight: 700;">Studied</div><div>Linguistics in Milan (BA), Manchester (MA) and York (MSc); PhD in Manchester</div>
+<div style="color: var(--pandan); font-weight: 700;">Research</div><div>How listeners perceive speech and how speakers produce it, with experiments and quantitative methods</div>
+<div style="color: var(--pandan); font-weight: 700;">Also</div><div>Forensic speech science, and a lot of <code>R</code></div>
+</div>
+
+## Some of my research
+
+- _What PMN?_ How listeners process a phonological mismatch when the speech carries no meaning
+- Whether what we know about a speaker's body changes how we hear their voice
+- How loud speech differs acoustically from speech at a normal level
 
 . . .
 
-I studied linguistics in Milan (BA), Manchester (MA) and York (MSc), and returned to Manchester for my PhD.
-
-. . .
-
-I work on how listeners perceive speech and how speakers produce it, mostly with experiments and quantitative methods. Other interests: forensic speech science, and `R`.
-
-## My research
-
-Some of the questions I have worked on:
-
-- What PMN? Processing phonological mismatch in semantics-free speech perception
-- Do the somatic features of a speaker mediate how we perceive their voice?
-- A quantitative analysis of the acoustic differences between neutral and loud speech
+All three needed the tools of this course: experiments with many participants and items, and regression models to make sense of them.
 
 ## Who are you?
 
-Tell us briefly:
+Tell us, briefly:
 
 - Your name and your programme
 - The data you work with, or would like to work with
