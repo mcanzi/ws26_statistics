@@ -130,7 +130,7 @@ Grey: every response, 0 or 1. Orange: the proportion correct in 8 frequency bins
 
 ## Why not `lm()`?
 
-```{r, echo = FALSE, fig.height = 3.6}
+```{r, echo = FALSE, fig.height = 3.3}
 m_lm <- lm(correct ~ freq_c, data = acc)
 grid <- tibble(freq_c = seq(-8, 8, by = 0.05))
 m_glm <- glm(correct ~ freq_c, data = acc, family = binomial)
@@ -146,9 +146,7 @@ bind_rows(
   labs(x = "log frequency (centred)", y = "Predicted probability", colour = NULL)
 ```
 
-- A straight line predicts probabilities above 1 and below 0 (pink zones)
-- The residuals can only take two values: they cannot be normal
-- The variance depends on the mean: it is largest at p = 0.5
+A straight line predicts probabilities above 1 and below 0 (the pink zones). Its residuals can take only two values, so they cannot be normal, and their variance depends on the mean, peaking at p = 0.5.
 
 ## Discussion
 
