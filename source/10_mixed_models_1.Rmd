@@ -78,16 +78,11 @@ In linguistics, that is almost never true.
 
 ## Repeated measures
 
-**Repeated measures** data is collected when measurements are taken on the same units (participants, speakers, words, schools...) multiple times.
+Data have [repeated measures]{.hl} when the same units, such as participants, speakers, words or schools, are measured more than once. A participant responds to many words, each word is read by many participants, and a speaker produces many tokens of the same vowel.
 
 . . .
 
-- A participant responds to many words, and each word is read by many participants
-- A speaker produces many tokens of the same vowel
-
-. . .
-
-Measures from the same unit are likely to be more similar to each other than measures from different units. This violates the independence assumption of linear regression.
+Measurements from the same unit tend to be more alike than measurements from different units. That breaks the independence assumption of linear regression.
 
 ## The data {.smaller}
 
@@ -202,6 +197,12 @@ Think of a study you would like to run, or one you have read.
 
 # Design and averaging
 
+::: {.fact}
+`Did you know:` naked mole-rats can live for more than 30 years. In records of over 3,000 animals, their risk of dying [did not rise with age]{.hl}, unlike in any other mammal studied.
+
+_Source: Ruby, Smith & Buffenstein (2018), eLife_
+:::
+
 ## The traditional fix: averaging
 
 Collapse the data so that each unit contributes one number. A __by-participant__ (F1) analysis: one frequency slope per participant, then test the 20 slopes.
@@ -243,14 +244,13 @@ _Sources: Barker et al. (2021), Science; Science News_
 
 ## Fixed and random effects
 
-A __linear mixed effects model__ is an extension of linear regression for repeated measures and other non-independent data. It has two kinds of terms:
+A [linear mixed effects model]{.hl} extends linear regression to repeated measures. It mixes two kinds of terms:
 
-- __Fixed effects__: the effects of the predictors we are interested in, here `freq_c`. They are interpreted like the coefficients of `lm()`.
-- __Random effects__: by-participant and by-word adjustments to those coefficients, which capture how the grouping units vary.
-
-. . .
-
-"Mixed" because the model mixes the two.
+| | Fixed effects | Random effects |
+|:--|:--|:--|
+| What they are | the effects of the predictors we are interested in | adjustments to those effects for each participant or word |
+| Here | the frequency effect, `freq_c` | each participant's speed and frequency effect, each word's difficulty |
+| Read like | the coefficients of `lm()` | how much the grouping units vary |
 
 ## Three ways to pool {.smaller}
 
@@ -280,9 +280,7 @@ ggplot(lines, aes(x = freq_c, y = fit, group = participant)) +
   labs(x = "log frequency (centred)", y = "Predicted RT (ms)")
 ```
 
-- __Complete pooling__: ignore participants. Overconfident.
-- __No pooling__: treat each participant as unrelated to the others. Noisy.
-- __Partial pooling__: participants are different, but similar, drawn from one population.
+Complete pooling ignores participants and is overconfident. No pooling treats each participant as unrelated to the others, which makes every line noisy. [Partial pooling]{.hl} treats participants as different but similar, drawn from one population.
 
 ## Varying intercepts
 
@@ -312,7 +310,7 @@ Each participant also gets their own slope:
 
 <div class="formula">rt = (b₀ + u₀ⱼ) + (b₁ + u₁ⱼ) · freq + e</div>
 
-```{r, echo = FALSE, fig.height = 3.2}
+```{r, echo = FALSE, fig.height = 2.9}
 grid |>
   mutate(fit = predict(m_partial, newdata = grid)) |>
   ggplot(aes(x = freq_c, y = fit, group = participant)) +
@@ -338,7 +336,7 @@ The participants' individual adjustments are then predicted from these, and from
 
 ## Partial pooling = shrinkage
 
-```{r, echo = FALSE, fig.height = 4.2}
+```{r, echo = FALSE, fig.height = 3.9}
 shrink <- by_participant |>
   rename(no_pooling = slope) |>
   left_join(coef(m_partial)$participant |>
@@ -360,6 +358,12 @@ ggplot(shrink, aes(y = participant)) +
 Pink: each participant's own slope (no pooling). Blue: the mixed model's estimate. Extreme slopes are pulled, [shrunk]{.hl}, towards the average (dashed): the model borrows strength from the other participants.
 
 # Interpreting random effects
+
+::: {.fact}
+`Did you know:` naked mole-rat queens show no menopause. They stay [fertile past the age of 30]{.hl}.
+
+_Source: Ruby, Smith & Buffenstein (2018), eLife_
+:::
 
 ## Random effect SDs {.smaller}
 
@@ -389,7 +393,7 @@ A large random-effect SD means that participants differ a lot, even after accoun
 
 ## Random effect correlations
 
-```{r, echo = FALSE, fig.height = 3.8}
+```{r, echo = FALSE, fig.height = 3.5}
 coef(m_full)$participant |>
   ggplot(aes(x = `(Intercept)`, y = freq_c)) +
   geom_point(colour = kingfisher, size = 3) +
@@ -411,12 +415,14 @@ _Sources: Park et al. (2017), Science; Max Delbrück Center_
 
 The `{lme4}` package: `lmer()` works like `lm()`, plus random effects in brackets, `(effects | group)`.
 
-- `(1 | participant)`: varying intercepts by participant
-- `(1 + freq_c | participant)`: varying intercepts and slopes, and their correlation
-- `(1 + freq_c || participant)`: varying intercepts and slopes, no correlation
-- `(0 + freq_c | participant)`: varying slopes only
-- `(1 | participant) + (1 | word)`: [crossed]{.hl} random effects, every participant sees every word
-- `(1 | school / class)`: [nested]{.hl} random effects, each class belongs to one school
+| You write | Each group gets |
+|:--|:--|
+| `(1 \| participant)` | its own intercept |
+| `(1 + freq_c \| participant)` | its own intercept and slope, and their correlation |
+| `(1 + freq_c \|\| participant)` | its own intercept and slope, without a correlation |
+| `(0 + freq_c \| participant)` | only its own slope |
+| `(1 \| participant) + (1 \| word)` | [crossed]{.hl} effects: every participant sees every word |
+| `(1 \| school / class)` | [nested]{.hl} effects: each class belongs to one school |
 
 ## Our model
 
