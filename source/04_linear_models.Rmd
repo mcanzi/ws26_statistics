@@ -228,11 +228,11 @@ Squaring makes every residual positive, so misses above and below the line canno
 
 ```{r, echo = FALSE, fig.height = 3.6}
 search <- tibble(slope = seq(b1 * 0.3, b1 * 1.7, length.out = 101)) |>
-  mutate(ss = map_dbl(slope, \(k) sum((pengs$flipper_length_mm - (ym + k * (pengs$body_mass_g - xm)))^2)))
-ggplot(search, aes(x = slope, y = ss / 1000)) +
+  mutate(sq = map_dbl(slope, \(k) sum((pengs$flipper_length_mm - (ym + k * (pengs$body_mass_g - xm)))^2)))
+ggplot(search, aes(x = slope, y = sq / 1000)) +
   geom_line(colour = kingfisher, linewidth = 1.3) +
   geom_vline(xintercept = b1, colour = hornbill, linetype = "dashed") +
-  annotate("point", x = b1, y = min(search$ss) / 1000, colour = hornbill, size = 4) +
+  annotate("point", x = b1, y = min(search$sq) / 1000, colour = hornbill, size = 4) +
   labs(x = "Slope of a line through the middle of the data", y = "Sum of squared residuals (× 1,000)")
 ```
 
@@ -401,17 +401,17 @@ The left panel shows each penguin's distance from the mean, the residuals of `y 
 
 ## `R²` step by step
 
-<div class="formula">R² = 1 − SS<sub>line</sub> / SS<sub>mean</sub></div>
+<div class="formula">R² = 1 − <span class="sym">Σ</span>e²<sub>line</sub> / <span class="sym">Σ</span>e²<sub>mean</sub></div>
 
 ```{r}
-ss_mean <- sum(residuals(m0)^2)
-ss_line <- sum(residuals(m)^2)
-1 - ss_line / ss_mean
+sq_mean <- sum(residuals(m0)^2)
+sq_line <- sum(residuals(m)^2)
+1 - sq_line / sq_mean
 ```
 
 . . .
 
-`SS` is a sum of squared residuals, as in least squares. [R²]{.hl} is the proportion of the squared misses of the mean that the line removes, here `r round(r2 * 100)`%.
+`Σe²` is a sum of squared residuals, as in least squares. [R²]{.hl} is the proportion of the squared misses of the mean that the line removes, here `r round(r2 * 100)`%.
 
 ## Reading `R²`
 
