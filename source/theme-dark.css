@@ -1,5 +1,5 @@
 /* theme-dark.css
-   The forest theme of mcanzi.github.io for {revealjs}: a rainforest at night,
+   The forest theme of mcanzi.de for {revealjs}: a rainforest at night,
    green-black, with leaf green for headings, moon yellow for accents, and
    rafflesias drawn in ink, dimmed, over the background.
    The theme of Statistics. Advanced Statistics (theme-buttercup.css) and
@@ -83,7 +83,7 @@
 }
 
 /* ---- canvas: the website's background drawings, faint, in tiles -------
-   The tile is img/motifs/rafflesia.svg from mcanzi.github.io (rafflesias drawn in ink), dimmed like on
+   The tile is img/motifs/rafflesia.svg from mcanzi.de (rafflesias drawn in ink), dimmed like on
    the website and with its opacity built in. */
 
 .reveal-viewport,
@@ -199,7 +199,7 @@ body {
 
 /* the title of the title slide and of the section slides: a gradient from
    --title-top to --title-bottom (set with the palette above), as the name
-   and the page titles on mcanzi.github.io */
+   and the page titles on mcanzi.de */
 .reveal #title-slide h1.title,
 .reveal section.title-slide.level1 > h1 {
   background: linear-gradient(180deg, var(--title-top) 8%, var(--title-bottom) 92%);

@@ -18,11 +18,11 @@ Slides for *Statistics* (Dr Massimiliano Canzi, Department of Linguistics, Unive
 | 12 | Mixed logistic regression | 12, 15.8 |
 | 13 | Power and model building | 10, 11, 16 |
 
-The slides are online at [mcanzi.github.io/ws26_statistics](https://mcanzi.github.io/ws26_statistics/01_course_introduction.html).
+The slides are online at [mcanzi.de/ws26_statistics](https://mcanzi.de/ws26_statistics/01_course_introduction.html).
 
 ## Rendering the slides
 
-Knit `source/render_all.Rmd` to render every lecture into `docs`, which GitHub Pages serves. Knitting a single lecture also writes its HTML into `docs`. All lectures use the forest theme of mcanzi.github.io (`source/theme-dark.css`): green-black, leaf green and moon yellow, with rafflesias drawn in ink in the background. `source/slides_setup.R` sets the plot colours to match it. The fonts are in `source/fonts` and are embedded in each HTML file.
+Knit `source/render_all.Rmd` to render every lecture into `docs`, which GitHub Pages serves. Knitting a single lecture also writes its HTML into `docs`. All lectures use the forest theme of mcanzi.de (`source/theme-dark.css`): green-black, leaf green and moon yellow, with rafflesias drawn in ink in the background. `source/slides_setup.R` sets the plot colours to match it. The fonts are in `source/fonts` and are embedded in each HTML file.
 
 Requires `tidyverse`, `revealjs`, `palmerpenguins`, `broom`, `lme4`, `lmerTest`, `effsize` and `languageR`; optional: `qrcode` (QR codes), `ragg` and `systemfonts` (Atkinson Hyperlegible in the figures).
 

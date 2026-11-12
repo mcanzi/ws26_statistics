@@ -577,7 +577,7 @@ ggplot(preds_fl, aes(species, fit)) +
 <img src="`r qr_uri`" alt="QR code linking to these slides">
 <div>
 <p>These slides</p>
-<p class="qr-link">mcanzi.github.io/ws26_statistics/<wbr>`r lecture_file`</p>
+<p class="qr-link">mcanzi.de/ws26_statistics/<wbr>`r lecture_file`</p>
 <p>Code, data and all lectures</p>
 <p class="qr-link">github.com/mcanzi/ws26_statistics</p>
 </div>
