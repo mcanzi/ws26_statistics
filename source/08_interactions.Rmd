@@ -100,6 +100,13 @@ lm(y ~ x + group + x:group)
 - `x` and `group`: the __main effects__ (better: [simple effects]{.hl}, see below)
 - `x:group`: the __interaction term__, how much the effect of `x` changes with `group`
 
+## Discussion
+
+Interactions are common in linguistics: a frequency effect can be larger for L2 speakers, or a vowel can lengthen more before voiced consonants in one dialect than in another.
+
+- Think of a study in your own field where the effect of one variable could depend on another.
+- Sketch the plot you would expect with an interaction, and without one.
+
 # Categorical × continuous
 
 ::: {.fact}

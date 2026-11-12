@@ -152,6 +152,13 @@ bind_rows(
 - The residuals can only take two values: they cannot be normal
 - The variance depends on the mean: it is largest at p = 0.5
 
+## Discussion
+
+Many outcomes in linguistics are binary: correct or incorrect, one variant or another, a word recognised or not.
+
+- Which binary outcomes come up in your field?
+- Have you seen them analysed as percentages averaged per participant? What could go wrong with that?
+
 # The generalised linear model
 
 ::: {.fact}

@@ -54,7 +54,11 @@ r2      <- glance(m)$r.squared
   }
 </style>
 
-Last week we looked at one variable at a time. Today we look at how one variable changes with another.
+::: {.fact}
+`Did you know:` an Alpine ibex hoof has a hard, thin rim around a [soft, spongy sole]{.hl}, and the ibex can move its two toes independently, placing each one on a different edge of the rock.
+
+_Source: ALPECOLE, University of Zurich_
+:::
 
 ## Today
 
@@ -64,21 +68,20 @@ Last week we looked at one variable at a time. Today we look at how one variable
 - Reading and checking a model
 - A warning: when one line misleads
 
-## Univariate > Bivariate
+## Last week: one variable
 
-- Univariate > Bivariate (or multivariate.. watch this space)
-- Mean > [Conditional]{.hl} mean
+```{r, echo = FALSE, fig.height = 3.9}
+ggplot(pengs, aes(x = seq_along(flipper_length_mm), y = flipper_length_mm)) +
+  geom_hline(yintercept = mean(pengs$flipper_length_mm), colour = hornbill, linewidth = 1.2) +
+  geom_point(colour = pandan, alpha = 0.5, size = 2) +
+  labs(x = "Penguin", y = "Flipper length (mm)")
+```
 
-. . .
+The mean (`r round(mean(pengs$flipper_length_mm))` mm) is the simplest model of a variable: it predicts the same flipper length for every penguin. Most penguins are some distance away from it.
 
-> Model changes in `y` by changes in `x`
+## Today: two variables
 
-- __Univariate__: mean flipper length (mm)
-- __Bivariate__: mean flipper length (mm) for penguins of a given body mass (g)
-
-## Conditional means
-
-```{r, echo = FALSE, fig.height = 4.4}
+```{r, echo = FALSE, fig.height = 3.4}
 ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
   geom_point(colour = pandan, alpha = 0.35, size = 2) +
   stat_summary_bin(fun = mean, bins = 10, geom = "point",
@@ -88,32 +91,30 @@ ggplot(pengs, aes(x = body_mass_g, y = flipper_length_mm)) +
   labs(x = "Body mass (g)", y = "Flipper length (mm)")
 ```
 
-Orange: the mean flipper length within each body-mass bin. The means line up along a straight line.
+If we know a penguin's body mass, we can do better: the [conditional mean]{.hl} is the mean flipper length of penguins with a given body mass (orange). The conditional means lie close to a straight line.
 
-## Simple linear regression
+## Outcome and predictor
 
-Winter (2019): simple linear regression models one continuous outcome as a function of one predictor.
+[Simple linear regression]{.hl} models one continuous outcome with one predictor (Winter, 2019).
 
-. . .
 
-- Dependent, response, __outcome__ variable: the `y`
-- Independent variable or __predictor__: the `x`
+:::: {.columns}
 
-## Simple linear regression
+::: {.column width="52%"}
+- The __outcome__ (dependent or response variable, `y`) is what you measure
+- The __predictor__ (independent variable, `x`) is what you manipulate, or measure alongside, to see whether the outcome changes with it
+:::
 
-> Single continuous outcome variable:
+::: {.column width="48%"}
+| Outcome | Predictor |
+|:--|:--|
+| Reaction time | Word frequency |
+| Vowel duration | Speaking rate |
+| Pitch (f0) | Speaker age |
+| Reading speed | Font size |
+:::
 
-. . .
-
-What you are measuring, your __dependent variable__ or __outcome variable__ (e.g. in linguistic studies: vowel formant frequencies, pitch height, reaction times, reading speed, etc.)
-
-. . .
-
-> Predictor variable:
-
-. . .
-
-The variable you manipulate in an experiment, or measure alongside the outcome, to see whether the outcome changes with it (e.g. word frequency, speaking rate, age, condition).
+::::
 
 # Intercepts & slopes
 
@@ -305,6 +306,13 @@ glance(m)$r.squared
 - 0: the predictor tells us nothing about the outcome
 - 1: every point lies exactly on the line
 - In linguistics, much smaller values are normal: people are noisy
+
+## Discussion
+
+Body mass accounts for `r round(r2 * 100)`% of the variation in flipper length. Suppose a study finds that word frequency accounts for 5% of the variation in reaction times.
+
+- Is that model useless?
+- What might account for the other 95%?
 
 ## Predictions
 

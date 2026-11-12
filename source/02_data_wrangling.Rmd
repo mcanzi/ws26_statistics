@@ -175,6 +175,13 @@ A data set is [tidy]{.hl} when
 
 ::::
 
+## Discussion
+
+You record 20 speakers reading the same 30 words, and measure F1, F2 and the duration of each vowel.
+
+- What is one row in your tidy data set? Which columns do you need?
+- Where would information about the speakers, such as age or dialect, go?
+
 ## Tibbles
 
 A `tibble` is a data frame with nicer defaults.
@@ -534,6 +541,13 @@ nrow(filter(penguins, sex != "female"))
 . . .
 
 `165 + 168 = 333`, not 344! The 11 penguins with unknown `sex` are dropped by both.
+
+## Discussion
+
+In a listening experiment, some participants did not respond on a few trials, so those cells are `NA`.
+
+- Should these trials be removed, kept as `NA`, or counted as wrong answers?
+- Does your answer depend on why the response is missing?
 
 ## `filter_out()` (new in `{dplyr}` 1.2.0) {.smaller}
 

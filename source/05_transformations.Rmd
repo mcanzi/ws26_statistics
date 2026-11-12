@@ -327,6 +327,13 @@ ggplot(formants_z, aes(x = F2, y = F1, colour = speaker, shape = vowel)) +
 
 After normalisation, the vowels overlap across speakers.
 
+## Discussion
+
+Lobanov normalisation removes the differences between speakers, so that vowels can be compared across them.
+
+- When could those differences be exactly what you want to study?
+- What would you lose by normalising in that case?
+
 ## Linear transformations: summary {.smaller}
 
 ```{r, echo = FALSE}
@@ -472,6 +479,13 @@ Bigger feet do not teach words. Both grow with a third variable: age.
 . . .
 
 A correlation, or a regression slope, tells us that two variables go together. Whether one causes the other is a question for the design of the study.
+
+## Discussion
+
+Suppose children who are read to at home every day know more words than children who are not.
+
+- Does reading aloud cause vocabulary growth? What else could explain the correlation?
+- What kind of study would let you decide?
 
 # Logarithms
 

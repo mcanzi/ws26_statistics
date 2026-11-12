@@ -368,6 +368,13 @@ tibble(data   = c("40 trials", "40 trials + one 5000 ms"),
 
 The mean moves by more than 100 ms. The median barely moves: it is [robust]{.hl}.
 
+## Discussion
+
+Here we know that the participant fell asleep. In real data, a 5,000 ms response usually comes with no explanation.
+
+- Would you remove it? How would you decide which responses are too slow?
+- Why does it matter whether you decide before or after looking at the results?
+
 ## Mode {.smaller}
 
 The mode is the most frequent value. It is used in __categorical__ distributions.

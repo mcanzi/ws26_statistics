@@ -217,6 +217,13 @@ The intercept is now the `voiceless` mean, and the slope is +38 ms for voiced. T
 
 In R, the reference level of a factor is simply its first level.
 
+## Discussion
+
+Your study compares L1 English speakers with three groups of L2 speakers of English, whose first languages are German, Italian and Mandarin.
+
+- Which group would you choose as the reference level, and why?
+- Would your choice change if your question were about differences among the three L2 groups?
+
 # Sum coding
 
 ::: {.fact}

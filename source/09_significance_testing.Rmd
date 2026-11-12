@@ -501,6 +501,13 @@ A medium effect that is not significant, and a tiny effect that is. The p-value 
 
 Always report the [effect size]{.hl} and its [confidence interval]{.hl} alongside p.
 
+## Discussion
+
+Study A tests a pronunciation training with 3,000 learners: ratings improve by 0.1 points on a 7-point scale, p < .001. Study B tests a different training with 12 learners: ratings improve by 1.2 points, p = .09.
+
+- Which result is more convincing? Which training would you try in your own class?
+- What would you want to know about each study before deciding?
+
 ## t-tests are linear models
 
 ```{r}

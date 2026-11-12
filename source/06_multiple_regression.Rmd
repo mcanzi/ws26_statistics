@@ -443,6 +443,13 @@ r2_len2 <- glance(lm(length ~ log_freq, data = words))$r.squared
 - Keep the predictor that best answers your research question, or combine them
 - Never add predictors just because the data happen to contain them
 
+## Discussion
+
+Frequent words tend to be short, so word frequency and word length overlap. You want to know whether frequency affects reading times.
+
+- Would you put length in the model too? Why, or why not?
+- What does "the effect of frequency, holding length constant" mean for a real word?
+
 # Your turn
 
 ## Exercises

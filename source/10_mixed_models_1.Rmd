@@ -193,6 +193,13 @@ The residuals of one participant are mostly positive or mostly negative. Knowing
 
 Clark (1973) called ignoring item variation the __language-as-fixed-effect fallacy__: if our conclusions should hold for words in general, not just the 40 we tested, the words are a sample too.
 
+## Discussion
+
+Think of a study you would like to run, or one you have read.
+
+- Which units does it measure more than once: speakers, words, texts, classes, recording sessions?
+- Should the conclusions hold beyond the particular units in the study?
+
 # Design and averaging
 
 ## The traditional fix: averaging

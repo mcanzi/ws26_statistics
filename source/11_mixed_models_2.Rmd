@@ -368,6 +368,13 @@ c(with_slopes    = coef(summary(m))["voicingvoiced", "Std. Error"],
 
 Here the difference is small: speakers' voicing effects vary little (SD ≈ `r round(attr(VarCorr(m)$speaker, "stddev")[2], 1)` ms). The more slopes vary across speakers, the bigger the gap: in lecture 10, the SE went from 1.5 to 4.2 ms.
 
+## Discussion
+
+A paper reports a significant effect of a condition that every speaker took part in. The model has random intercepts for speakers, but no random slopes.
+
+- As a reviewer, what would you ask the authors, and why?
+- Would your trust in the result change if they added the slopes and the effect stayed significant?
+
 # Remaining issues
 
 ::: {.fact}

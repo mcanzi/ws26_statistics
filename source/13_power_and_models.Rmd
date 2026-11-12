@@ -329,6 +329,13 @@ false_alarm
 
 With 10 peeks, the false alarm rate is about `r round(100 * false_alarm)`%, not 5%. Fix the sample size in advance, and report how you chose it.
 
+## Discussion
+
+After 20 participants, your result is p = .07. Your supervisor suggests testing 10 more and checking again.
+
+- What is the problem with this plan?
+- What could you do instead, and how would you report what happened honestly?
+
 # Uncertainty in regression
 
 ::: {.fact}
