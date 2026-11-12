@@ -97,8 +97,7 @@ lm(y ~ x + group + x:group)
 
 . . .
 
-- `x` and `group`: the __main effects__ (better: [simple effects]{.hl}, see below)
-- `x:group`: the __interaction term__, how much the effect of `x` changes with `group`
+`x` and `group` are often called the main effects, although with an interaction they are really [simple effects]{.hl} (more below). `x:group` is the interaction term: how much the effect of `x` changes from one group to the other.
 
 ## Discussion
 
@@ -168,9 +167,12 @@ coef(m_int)
 
 . . .
 
-- `log_freq`: the frequency slope for the reference group, L1
-- `groupL2`: the difference between L2 and L1 `when log_freq = 0`
-- `log_freq:groupL2`: how much steeper the slope is for L2
+| Coefficient | What it is |
+|:--|:--|
+| `(Intercept)` | the L1 reaction time at `log_freq = 0` |
+| `log_freq` | the frequency slope for the reference group, L1 |
+| `groupL2` | the L2 minus L1 difference, at `log_freq = 0` |
+| `log_freq:groupL2` | how much steeper the frequency slope is for L2 |
 
 . . .
 
@@ -199,8 +201,7 @@ coef(lm(rt ~ log_freq_c * group, data = lex))
 
 . . .
 
-- `groupL2`: now the L1–L2 difference for a word of average frequency
-- The slope and the interaction do not change
+`groupL2` is now the L1–L2 difference for a word of average frequency, which is what most readers expect it to mean. The slope and the interaction do not change.
 
 ## Did the interaction help?
 
@@ -307,8 +308,7 @@ coef(lm(duration ~ voicing * style, data = vs_sum))
 
 ## Which coding?
 
-- __Treatment__ coding: each effect is relative to the reference level of the other predictor
-- __Sum__ coding: each effect is the average across the levels of the other predictor
+With treatment coding, each effect describes the reference level of the other predictor: the voicing effect in casual speech. With sum coding, each effect is averaged over the levels of the other predictor: the voicing effect across both styles.
 
 . . .
 
@@ -394,6 +394,12 @@ Without an interaction, the contour lines were straight and parallel (lecture 6)
 
 # Higher-order interactions
 
+::: {.fact}
+`Did you know:` in Niassa National Reserve, Mozambique, [75%]{.hl} of the bees' nests that Yao honey hunters found were found with the help of a honeyguide.
+
+_Source: Spottiswoode, Begg & Begg (2016), Science_
+:::
+
 ## Three-way interactions
 
 ```{r, eval = FALSE}
@@ -404,9 +410,9 @@ lm(y ~ a * b * c)
 
 expands to 7 coefficients beyond the intercept:
 
-- three main (simple) effects: `a`, `b`, `c`
-- three two-way interactions: `a:b`, `a:c`, `b:c`
-- one three-way interaction: `a:b:c`, "the interaction between a and b depends on c"
+- three simple effects: `a`, `b` and `c`
+- three two-way interactions: `a:b`, `a:c` and `b:c`
+- and the three-way interaction `a:b:c`: the interaction between `a` and `b` changes with `c`
 
 . . .
 
