@@ -86,10 +86,15 @@ _Source: Duke Lemur Center_
 
 ## How the course works
 
-- Lecture, Fridays at 11:45: new concepts, and the code that goes with them
-- Tutorial, Wednesdays at 13:30: you practise, with help at hand
-- Office hours, Fridays 10:00 to 11:30, by appointment
-- Ilias: announcements, homework and submissions
+| | When | What happens |
+|:--|:--|:--|
+| Lecture | Fridays, 11:45 | New concepts, and the code that goes with them |
+| Tutorial | Wednesdays, 13:30 | You practise, with help at hand |
+| Office hours | Fridays, 10:00–11:30, by appointment | Questions about the course or your own data |
+
+. . .
+
+Announcements, homework and submissions are on Ilias.
 
 ## Assessment
 
@@ -230,6 +235,12 @@ packageVersion("dplyr")   # should be 1.2.0 or newer
 You [install]{.hl} a package once. You [load]{.hl} it with `library()` in every session.
 
 # First steps in R
+
+::: {.fact}
+`Did you know:` the aye-aye's thin middle finger sits on a [ball-and-socket joint]{.hl}, like a human shoulder, so it can swivel in almost any direction while it probes for larvae.
+
+_Source: Duke Lemur Center_
+:::
 
 ## Hello, world {.smaller}
 
@@ -444,12 +455,18 @@ We start using it next week. It builds on everything you saw today: vectors, dat
 
 # Statistics
 
-## Objective or subjective?
+::: {.fact}
+`Did you know:` aye-ayes have a sixth finger. Next to each thumb is a small [pseudothumb]{.hl}, with its own fingerprint, that helps them grip branches.
 
-Discuss:
+_Source: Hartstone-Rose et al. (2019), American Journal of Physical Anthropology_
+:::
 
-- Two researchers analyse the same data. Do they reach the same conclusion?
-- Which decisions in an analysis are yours to make?
+## Discussion
+
+Two researchers receive the same recordings and the same research question, and analyse them independently.
+
+- Will they reach the same conclusion?
+- Which decisions in an analysis are the researcher's to make?
 
 ## Objective or subjective?
 
@@ -472,11 +489,13 @@ By the end of the course you will be able to:
 - build, interpret and check regression models, from simple linear models to mixed effects and logistic regression
 - report an analysis so that others can follow it and reproduce it
 
-## And now
+## Your turn
+
+Open `RStudio`, start a new script, and run the code from today's slides line by line.
 
 . . .
 
-Let's open `RStudio` and try all of this ourselves.
+Then change things: other numbers, other words, a missing value. Seeing what breaks is the quickest way to learn what each piece does.
 
 ## Slides and code
 
