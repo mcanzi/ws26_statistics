@@ -1148,22 +1148,50 @@ sentence.</p>
 </section>
 <section id="the-typical-workflow" class="slide level2 smaller">
 <h2 class="smaller">The typical workflow</h2>
-<div style="text-align:center; font-size:1.1em;">
-<p><span class="hl">import</span> → <span class="hl">tidy</span> → <span class="hl">transform</span> → <span class="hl">visualise</span> → <span class="hl">model</span> → <span class="hl">communicate</span></p>
+<p>Almost every analysis goes through the same steps, and each has its
+own tools:</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Import</th>
+<th style="text-align: left;">Tidy</th>
+<th style="text-align: left;">Transform</th>
+<th style="text-align: left;">Visualise</th>
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">Communicate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>{readr}</code></td>
+<td style="text-align: left;"><code>{tidyr}</code></td>
+<td style="text-align: left;"><code>{dplyr}</code></td>
+<td style="text-align: left;"><code>{ggplot2}</code></td>
+<td style="text-align: left;"><code>lm()</code> and friends</td>
+<td style="text-align: left;">Quarto, R Markdown</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">today</td>
+<td style="text-align: left;">today</td>
+<td style="text-align: left;"><span class="hl">today</span></td>
+<td style="text-align: left;">next class</td>
+<td style="text-align: left;">lectures 4–13</td>
+<td style="text-align: left;">your assignment</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>The steps are not a straight line: plotting often sends you back to
+transform, and a model often sends you back to plot.</p>
 </div>
-<ul>
-<li class="fragment"><span class="hl">import</span>:
-<code>{readr}</code></li>
-<li class="fragment"><span class="hl">tidy</span>:
-<code>{tidyr}</code></li>
-<li class="fragment"><span class="hl">transform</span>:
-<code>{dplyr}</code> (today)</li>
-<li class="fragment"><span class="hl">visualise</span>:
-<code>{ggplot2}</code> (next class)</li>
-<li class="fragment"><span class="hl">model</span>: the rest of this
-course</li>
-<li class="fragment"><span class="hl">communicate</span>: Quarto</li>
-</ul>
 </section>
 <section id="tidy-data" class="slide level2 smaller">
 <h2 class="smaller">Tidy data</h2>
@@ -1238,10 +1266,41 @@ row</li>
 </div>
 </div>
 </section>
+<section id="discussion" class="slide level2">
+<h2>Discussion</h2>
+<p>You record 20 speakers reading the same 30 words, and measure F1, F2
+and the duration of each vowel.</p>
+<ul>
+<li class="fragment">What is one row in your tidy data set? Which
+columns do you need?</li>
+<li class="fragment">Where would information about the speakers, such as
+age or dialect, go?</li>
+</ul>
+</section>
+<section id="from-wide-to-long" class="slide level2 smaller">
+<h2 class="smaller">From wide to long</h2>
+<p><code>pivot_longer()</code> from <code>{tidyr}</code> turns the wide
+table into a tidy one:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>wide <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">participant =</span> <span class="fu">c</span>(<span class="st">&quot;P01&quot;</span>, <span class="st">&quot;P02&quot;</span>), <span class="at">rt_high =</span> <span class="fu">c</span>(<span class="dv">580</span>, <span class="dv">611</span>), <span class="at">rt_low =</span> <span class="fu">c</span>(<span class="dv">642</span>, <span class="dv">690</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>wide <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(rt_high, rt_low), <span class="at">names_to =</span> <span class="st">&quot;frequency&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;rt&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix =</span> <span class="st">&quot;rt_&quot;</span>)</span></code></pre></div>
+<pre class="r-output"><code># A tibble: 4 × 3
+  participant frequency    rt
+  &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;
+1 P01         high        580
+2 P01         low         642
+3 P02         high        611
+# ℹ 1 more row</code></pre>
+<div class="fragment">
+<p><code>pivot_wider()</code> goes the other way, which is sometimes
+handy for tables in a paper.</p>
+</div>
+</section>
 <section id="tibbles" class="slide level2">
 <h2>Tibbles</h2>
 <p>A <code>tibble</code> is a data frame with nicer defaults.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>penguins</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>penguins</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 344 × 8
   species island    bill_length_mm bill_depth_mm flipper_length_mm
   &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;
@@ -1261,7 +1320,7 @@ fit</li>
 <section id="glimpse" class="slide level2">
 <h2><code>glimpse()</code></h2>
 <p>A transposed overview: one line per column.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(penguins)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(penguins)</span></code></pre></div>
 <pre class="r-output"><code>Rows: 344
 Columns: 8
 $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Ad…
@@ -1289,8 +1348,8 @@ palmerpenguins documentation</em></p>
 <h2>The <code>penguins</code> data</h2>
 <p>344 penguins, 3 species, 3 islands in the Palmer Archipelago
 (Antarctica).</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;palmerpenguins&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;palmerpenguins&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span></code></pre></div>
 </section>
 <section id="penguins-in-base-r" class="slide level2 smaller">
 <h2 class="smaller"><code>penguins</code> in base R</h2>
@@ -1334,32 +1393,54 @@ you get <code>object &#39;bill_length_mm&#39; not found</code>, you forgot!</p>
 </section>
 <section id="reading-and-writing-files" class="slide level2 smaller">
 <h2 class="smaller">Reading and writing files</h2>
-<div class="fragment fade-up">
-<p>We use <code>{readr}</code> primarily to</p>
-</div>
-<ul>
-<li class="fragment"><code>read_csv()</code>: read comma separated
-files</li>
-<li class="fragment"><code>read_tsv()</code>: read tab separated
-files</li>
-<li class="fragment"><code>read_csv2()</code>: semicolon separated, with
-decimal commas (German Excel exports)</li>
-<li class="fragment"><code>read_delim()</code>: any other separator</li>
-<li class="fragment"><code>write_csv()</code>: save a data frame as
-.csv</li>
-</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">For files that look like</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>read_csv()</code></td>
+<td style="text-align: left;"><code>word,rt</code> with commas between
+values</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>read_tsv()</code></td>
+<td style="text-align: left;">values separated by tabs</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>read_csv2()</code></td>
+<td style="text-align: left;"><code>word;rt</code> with semicolons and
+decimal commas, as in German Excel exports</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>read_delim()</code></td>
+<td style="text-align: left;">any other separator</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>write_csv()</code></td>
+<td style="text-align: left;">saves a data frame as a .csv file</td>
+</tr>
+</tbody>
+</table>
 <div class="fragment">
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/my_file.csv&quot;</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ... do things with data ...</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(data, <span class="st">&quot;data/my_file_clean.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/my_file.csv&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ... do things with data ...</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(data, <span class="st">&quot;data/my_file_clean.csv&quot;</span>)</span></code></pre></div>
 </div>
 </section>
 <section id="what-read_csv-tells-you" class="slide level2 smaller">
 <h2 class="smaller">What <code>read_csv()</code> tells you</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rt <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(example_file)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rt <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(example_file)</span></code></pre></div>
 <pre class="r-output r-message"><code>Rows: 6 Columns: 5
 ── Column specification ──────────────────────────────────────────────
 Delimiter: &quot;,&quot;
@@ -1376,8 +1457,8 @@ dbl (2): rt, accuracy
 </ul>
 </div>
 <div class="fragment">
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rt <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/rt.csv&quot;</span>,</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">participant =</span> <span class="fu">col_factor</span>()))</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>rt <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/rt.csv&quot;</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">participant =</span> <span class="fu">col_factor</span>()))</span></code></pre></div>
 </div>
 </section>
 <section id="read_csv-vs-read.csv" class="slide level2">
@@ -1484,7 +1565,7 @@ names without quotes</li>
 </section>
 <section id="the-verb-never-changes-your-data" class="slide level2 smaller">
 <h2 class="smaller">The verb never changes your data</h2>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 124 × 8
   species island bill_length_mm bill_depth_mm flipper_length_mm
   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;
@@ -1493,13 +1574,13 @@ names without quotes</li>
 3 Gentoo  Biscoe           48.7          14.1               210
 # ℹ 121 more rows
 # ℹ 3 more variables: body_mass_g &lt;int&gt;, sex &lt;fct&gt;, year &lt;int&gt;</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(penguins)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(penguins)</span></code></pre></div>
 <pre class="r-output"><code>[1] 344</code></pre>
 <div class="fragment">
 <p>Nothing happened to <code>penguins</code>! To keep the result, assign
 it:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>gentoo <span class="ot">&lt;-</span> <span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(gentoo)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gentoo <span class="ot">&lt;-</span> <span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(gentoo)</span></code></pre></div>
 <pre class="r-output"><code>[1] 124</code></pre>
 </div>
 </section></section>
@@ -1510,10 +1591,8 @@ it:</p>
 </section>
 <section id="select" class="slide level2">
 <h2><code>select()</code></h2>
-<div class="fragment fade-up">
-<p>Choose columns to keep / drop</p>
-</div>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, species, bill_length_mm)</span></code></pre></div>
+<p>Keep the columns you name:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, species, bill_length_mm)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 344 × 2
   species bill_length_mm
   &lt;fct&gt;            &lt;dbl&gt;
@@ -1523,20 +1602,20 @@ it:</p>
 # ℹ 341 more rows</code></pre>
 <div class="fragment">
 <p>Drop a column with <code>-</code></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="sc">-</span>year)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="sc">-</span>year)</span></code></pre></div>
 </div>
 </section>
 <section id="select-helpers" class="slide level2 smaller">
 <h2 class="smaller"><code>select()</code> helpers</h2>
 <p>Select by name pattern or type instead of typing every name:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, species<span class="sc">:</span>bill_depth_mm)   <span class="co"># a range of columns</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">starts_with</span>(<span class="st">&quot;bill&quot;</span>))     <span class="co"># names starting with &quot;bill&quot;</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">ends_with</span>(<span class="st">&quot;_mm&quot;</span>))        <span class="co"># names ending with &quot;_mm&quot;</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">contains</span>(<span class="st">&quot;length&quot;</span>))      <span class="co"># names containing &quot;length&quot;</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">where</span>(is.numeric))       <span class="co"># all numeric columns</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, sex, <span class="fu">everything</span>())       <span class="co"># move sex to the front</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, species<span class="sc">:</span>bill_depth_mm)   <span class="co"># a range of columns</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">starts_with</span>(<span class="st">&quot;bill&quot;</span>))     <span class="co"># names starting with &quot;bill&quot;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">ends_with</span>(<span class="st">&quot;_mm&quot;</span>))        <span class="co"># names ending with &quot;_mm&quot;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">contains</span>(<span class="st">&quot;length&quot;</span>))      <span class="co"># names containing &quot;length&quot;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">where</span>(is.numeric))       <span class="co"># all numeric columns</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, sex, <span class="fu">everything</span>())       <span class="co"># move sex to the front</span></span></code></pre></div>
 <div class="fragment">
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">ends_with</span>(<span class="st">&quot;_mm&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="fu">ends_with</span>(<span class="st">&quot;_mm&quot;</span>))</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 344 × 3
   bill_length_mm bill_depth_mm flipper_length_mm
            &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;
@@ -1549,9 +1628,9 @@ it:</p>
 <section id="select-by-position" class="slide level2">
 <h2><code>select()</code> by position</h2>
 <p>Also possible, but fragile:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>))</span></code></pre></div>
 <div class="fragment">
 <p>If the column order changes (new data export, a colleague’s file),
 your code silently selects the wrong columns. Prefer names.</p>
@@ -1560,7 +1639,7 @@ your code silently selects the wrong columns. Prefer names.</p>
 <section id="rename" class="slide level2 smaller">
 <h2 class="smaller"><code>rename()</code></h2>
 <p><code>new_name = old_name</code></p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rename</span>(penguins, <span class="at">Type =</span> species)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rename</span>(penguins, <span class="at">Type =</span> species)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 344 × 8
   Type   island    bill_length_mm bill_depth_mm flipper_length_mm
   &lt;fct&gt;  &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;
@@ -1572,7 +1651,7 @@ your code silently selects the wrong columns. Prefer names.</p>
 <div class="fragment">
 <p><code>select()</code> can rename too, but drops everything you do not
 name:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="at">Type =</span> species, bill_length_mm)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins, <span class="at">Type =</span> species, bill_length_mm)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 344 × 2
   Type   bill_length_mm
   &lt;fct&gt;           &lt;dbl&gt;
@@ -1584,13 +1663,11 @@ name:</p>
 </section>
 <section id="mutate" class="slide level2 smaller">
 <h2 class="smaller"><code>mutate()</code></h2>
-<div class="fragment fade-up">
-<p>Create new columns, or overwrite existing ones</p>
-</div>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(penguins,</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">body_mass_kg =</span> body_mass_g <span class="sc">/</span> <span class="dv">1000</span>,</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">bill_ratio   =</span> bill_length_mm <span class="sc">/</span> bill_depth_mm)</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins_2, species, body_mass_kg, bill_ratio)</span></code></pre></div>
+<p>Create new columns, or overwrite existing ones:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(penguins,</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">body_mass_kg =</span> body_mass_g <span class="sc">/</span> <span class="dv">1000</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">bill_ratio   =</span> bill_length_mm <span class="sc">/</span> bill_depth_mm)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(penguins_2, species, body_mass_kg, bill_ratio)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 344 × 3
   species body_mass_kg bill_ratio
   &lt;fct&gt;          &lt;dbl&gt;      &lt;dbl&gt;
@@ -1606,17 +1683,17 @@ created in the same <code>mutate()</code>.</p>
 <section id="mutate-with-conditions" class="slide level2 smaller">
 <h2 class="smaller"><code>mutate()</code> with conditions</h2>
 <p><code>if_else()</code> for two outcomes</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(penguins, <span class="at">size =</span> <span class="fu">if_else</span>(body_mass_g <span class="sc">&gt;</span> <span class="dv">4500</span>, <span class="st">&quot;large&quot;</span>, <span class="st">&quot;small&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(penguins, <span class="at">size =</span> <span class="fu">if_else</span>(body_mass_g <span class="sc">&gt;</span> <span class="dv">4500</span>, <span class="st">&quot;large&quot;</span>, <span class="st">&quot;small&quot;</span>))</span></code></pre></div>
 <div class="fragment">
 <p><code>case_when()</code> for more than two</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(penguins,</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="fu">case_when</span>(</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    body_mass_g <span class="sc">&lt;</span> <span class="dv">3500</span> <span class="sc">~</span> <span class="st">&quot;small&quot;</span>,</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    body_mass_g <span class="sc">&lt;</span> <span class="dv">4500</span> <span class="sc">~</span> <span class="st">&quot;medium&quot;</span>,</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    body_mass_g <span class="sc">&gt;=</span> <span class="dv">4500</span> <span class="sc">~</span> <span class="st">&quot;large&quot;</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(penguins_2, size)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(penguins,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="fu">case_when</span>(</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    body_mass_g <span class="sc">&lt;</span> <span class="dv">3500</span> <span class="sc">~</span> <span class="st">&quot;small&quot;</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    body_mass_g <span class="sc">&lt;</span> <span class="dv">4500</span> <span class="sc">~</span> <span class="st">&quot;medium&quot;</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    body_mass_g <span class="sc">&gt;=</span> <span class="dv">4500</span> <span class="sc">~</span> <span class="st">&quot;large&quot;</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(penguins_2, size)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 4 × 2
   size       n
   &lt;chr&gt;  &lt;int&gt;
@@ -1636,16 +1713,16 @@ created in the same <code>mutate()</code>.</p>
 <p><code>mutate_if()</code> and <code>mutate_all()</code> are <span class="hl">superseded</span>: they still work, but are no longer
 developed. Use <code>across()</code>:</p>
 <div class="fragment">
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># old</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate_if</span>(penguins, is.factor, as.character)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># new</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(penguins, <span class="fu">across</span>(<span class="fu">where</span>(is.factor), as.character))</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># old</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate_if</span>(penguins, is.factor, as.character)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># new</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(penguins, <span class="fu">across</span>(<span class="fu">where</span>(is.factor), as.character))</span></code></pre></div>
 </div>
 <div class="fragment">
 <p><code>across(columns, function)</code>: <em>apply this function to
 these columns</em></p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(penguins, <span class="fu">across</span>(<span class="fu">ends_with</span>(<span class="st">&quot;_mm&quot;</span>), \(x) x <span class="sc">/</span> <span class="dv">10</span>))  <span class="co"># mm to cm</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(penguins, <span class="fu">across</span>(<span class="fu">ends_with</span>(<span class="st">&quot;_mm&quot;</span>), \(x) x <span class="sc">/</span> <span class="dv">10</span>))  <span class="co"># mm to cm</span></span></code></pre></div>
 <p><code>\(x) x / 10</code> is a short way to write a small function:
 <em>take x, divide it by 10</em>.</p>
 </div>
@@ -1657,10 +1734,8 @@ these columns</em></p>
 </section>
 <section id="filter" class="slide level2">
 <h2><code>filter()</code></h2>
-<div class="fragment fade-up">
-<p>Keep the rows where a condition is <code>TRUE</code></p>
-</div>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>)</span></code></pre></div>
+<p>Keep the rows where a condition is <code>TRUE</code>:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 124 × 8
   species island bill_length_mm bill_depth_mm flipper_length_mm
   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;
@@ -1721,16 +1796,16 @@ these columns</em></p>
 <section id="combining-conditions" class="slide level2 smaller">
 <h2 class="smaller">Combining conditions</h2>
 <p><code>,</code> or <code>&amp;</code>: both must be true (AND)</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>, body_mass_g <span class="sc">&gt;</span> <span class="dv">5000</span>)</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">&amp;</span> body_mass_g <span class="sc">&gt;</span> <span class="dv">5000</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span>, body_mass_g <span class="sc">&gt;</span> <span class="dv">5000</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">&amp;</span> body_mass_g <span class="sc">&gt;</span> <span class="dv">5000</span>)</span></code></pre></div>
 <div class="fragment">
 <p><code>|</code>: at least one must be true (OR)</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>)</span></code></pre></div>
 </div>
 <div class="fragment">
 <p><code>%in%</code> is shorter when matching several values of one
 column</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(<span class="fu">filter</span>(penguins, species <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Gentoo&quot;</span>, <span class="st">&quot;Chinstrap&quot;</span>))<span class="sc">$</span>species)</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(<span class="fu">filter</span>(penguins, species <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Gentoo&quot;</span>, <span class="st">&quot;Chinstrap&quot;</span>))<span class="sc">$</span>species)</span></code></pre></div>
 <pre class="r-output"><code>[1] Gentoo    Chinstrap
 Levels: Adelie Chinstrap Gentoo</code></pre>
 </div>
@@ -1739,24 +1814,35 @@ Levels: Adelie Chinstrap Gentoo</code></pre>
 <h2 class="smaller"><code>filter()</code> and missing values</h2>
 <p><code>filter()</code> drops rows where the condition is
 <code>NA</code>.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(penguins)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(penguins)</span></code></pre></div>
 <pre class="r-output"><code>[1] 344</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(penguins<span class="sc">$</span>sex))</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(penguins<span class="sc">$</span>sex))</span></code></pre></div>
 <pre class="r-output"><code>[1] 11</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">filter</span>(penguins, sex <span class="sc">==</span> <span class="st">&quot;female&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">filter</span>(penguins, sex <span class="sc">==</span> <span class="st">&quot;female&quot;</span>))</span></code></pre></div>
 <pre class="r-output"><code>[1] 165</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">filter</span>(penguins, sex <span class="sc">!=</span> <span class="st">&quot;female&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">filter</span>(penguins, sex <span class="sc">!=</span> <span class="st">&quot;female&quot;</span>))</span></code></pre></div>
 <pre class="r-output"><code>[1] 168</code></pre>
 <div class="fragment">
 <p><code>165 + 168 = 333</code>, not 344! The 11 penguins with unknown
 <code>sex</code> are dropped by both.</p>
 </div>
 </section>
+<section id="discussion-1" class="slide level2">
+<h2>Discussion</h2>
+<p>In a listening experiment, some participants did not respond on a few
+trials, so those cells are <code>NA</code>.</p>
+<ul>
+<li class="fragment">Should these trials be removed, kept as
+<code>NA</code>, or counted as wrong answers?</li>
+<li class="fragment">Does your answer depend on why the response is
+missing?</li>
+</ul>
+</section>
 <section id="filter_out-new-in-dplyr-1.2.0" class="slide level2 smaller">
 <h2 class="smaller"><code>filter_out()</code> (new in
 <code>{dplyr}</code> 1.2.0)</h2>
 <p>Say which rows to drop. Rows with <code>NA</code> are kept.</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">filter_out</span>(penguins, sex <span class="sc">==</span> <span class="st">&quot;female&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">filter_out</span>(penguins, sex <span class="sc">==</span> <span class="st">&quot;female&quot;</span>))</span></code></pre></div>
 <pre class="r-output"><code>[1] 179</code></pre>
 <div class="fragment">
 <p>Rule of thumb:</p>
@@ -1775,7 +1861,7 @@ drop</li>
 <section id="arrange" class="slide level2">
 <h2><code>arrange()</code></h2>
 <p>Sort rows, smallest first</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(penguins, body_mass_g)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(penguins, body_mass_g)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 344 × 8
   species   island bill_length_mm bill_depth_mm flipper_length_mm
   &lt;fct&gt;     &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;
@@ -1787,8 +1873,8 @@ drop</li>
 <div class="fragment">
 <p>Largest first with <code>desc()</code>; sort by several columns in
 turn</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(penguins, <span class="fu">desc</span>(body_mass_g))</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(penguins, species, <span class="fu">desc</span>(body_mass_g))</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(penguins, <span class="fu">desc</span>(body_mass_g))</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(penguins, species, <span class="fu">desc</span>(body_mass_g))</span></code></pre></div>
 </div>
 </section></section>
 <section>
@@ -1803,10 +1889,10 @@ each, which add up to about 11 hours of sleep.</p>
 <section id="summarise" class="slide level2 smaller">
 <h2 class="smaller"><code>summarise()</code></h2>
 <p>Collapse many rows into one</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(penguins,</span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">mean_mass =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">sd_mass   =</span> <span class="fu">sd</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">n         =</span> <span class="fu">n</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(penguins,</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">mean_mass =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">sd_mass   =</span> <span class="fu">sd</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">n         =</span> <span class="fu">n</span>())</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 1 × 3
   mean_mass sd_mass     n
       &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;
@@ -1820,10 +1906,10 @@ each, which add up to about 11 hours of sleep.</p>
 <h2 class="smaller"><code>group_by()</code> +
 <code>summarise()</code></h2>
 <p>One row per group</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>penguins_grouped <span class="ot">&lt;-</span> <span class="fu">group_by</span>(penguins, species)</span>
-<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(penguins_grouped,</span>
-<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">mean_mass =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">n         =</span> <span class="fu">n</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>penguins_grouped <span class="ot">&lt;-</span> <span class="fu">group_by</span>(penguins, species)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(penguins_grouped,</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">mean_mass =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">n         =</span> <span class="fu">n</span>())</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 3 × 3
   species   mean_mass     n
   &lt;fct&gt;         &lt;dbl&gt; &lt;int&gt;
@@ -1838,10 +1924,10 @@ next verb to work group by group.</p>
 <section id="by-grouping-for-one-step" class="slide level2 smaller">
 <h2 class="smaller"><code>.by</code>: grouping for one step</h2>
 <p>Same result, without a separate <code>group_by()</code>:</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(penguins,</span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">mean_mass =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">n         =</span> <span class="fu">n</span>(),</span>
-<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">.by       =</span> <span class="fu">c</span>(species, sex))</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(penguins,</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">mean_mass =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">n         =</span> <span class="fu">n</span>(),</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">.by       =</span> <span class="fu">c</span>(species, sex))</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 8 × 4
   species sex    mean_mass     n
   &lt;fct&gt;   &lt;fct&gt;      &lt;dbl&gt; &lt;int&gt;
@@ -1859,7 +1945,7 @@ next verb to work group by group.</p>
 <section id="count" class="slide level2">
 <h2><code>count()</code></h2>
 <p>A shortcut for counting rows per group</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(penguins, species, island)</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(penguins, species, island)</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 5 × 3
   species island        n
   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;
@@ -1886,16 +1972,16 @@ record.</p>
 <section id="the-problem" class="slide level2 smaller">
 <h2 class="smaller">The problem</h2>
 <p>Three steps, three intermediate objects:</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> <span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>)</span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>penguins_3 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(penguins_2, <span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>)</span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>penguins_4 <span class="ot">&lt;-</span> <span class="fu">select</span>(penguins_3, species, bill_length_cm)</span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> <span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>)</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>penguins_3 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(penguins_2, <span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>)</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>penguins_4 <span class="ot">&lt;-</span> <span class="fu">select</span>(penguins_3, species, bill_length_cm)</span></code></pre></div>
 <div class="fragment">
 <p>Or nested, read from the inside out:</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>penguins_4 <span class="ot">&lt;-</span> <span class="fu">select</span>(</span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>),</span>
-<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>),</span>
-<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>  species, bill_length_cm)</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>penguins_4 <span class="ot">&lt;-</span> <span class="fu">select</span>(</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(penguins, species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>),</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>),</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>  species, bill_length_cm)</span></code></pre></div>
 </div>
 </section>
 <section id="the-pipe-1" class="slide level2 smaller">
@@ -1910,11 +1996,11 @@ first argument of the function on the right</li>
 There is no need to repeat the object at every step</li>
 </ul>
 <div class="fragment">
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
-<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, bill_length_cm)</span>
-<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>penguins_2</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, bill_length_cm)</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>penguins_2</span></code></pre></div>
 <pre class="r-output"><code># A tibble: 192 × 2
   species bill_length_cm
   &lt;fct&gt;            &lt;dbl&gt;
@@ -1926,23 +2012,48 @@ There is no need to repeat the object at every step</li>
 </section>
 <section id="reading-a-pipe-aloud" class="slide level2">
 <h2>Reading a pipe aloud</h2>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>penguins_2 <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
-<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, bill_length_cm)</span></code></pre></div>
-<p>Take <code>penguins</code>, then <code>filter</code> only the
-<code>species</code> Gentoo or Chinstrap, then <code>mutate</code> to
-add a column <code>bill_length_cm</code> which divides
-<code>bill_length_mm</code> by 10, then <code>select</code> only
-<code>species</code> and <code>bill_length_cm</code>. Save the result as
-<code>penguins_2</code>.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Code</th>
+<th style="text-align: left;">Read it as</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>penguins_2 &lt;- penguins \|&gt;</code></td>
+<td style="text-align: left;">Take <code>penguins</code>, then</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>filter(species == &quot;Gentoo&quot; \| species == &quot;Chinstrap&quot;) \|&gt;</code></td>
+<td style="text-align: left;">keep only Gentoo and Chinstrap penguins,
+then</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>mutate(bill_length_cm = bill_length_mm / 10) \|&gt;</code></td>
+<td style="text-align: left;">add bill length in cm, then</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>select(species, bill_length_cm)</code></td>
+<td style="text-align: left;">keep only these two columns.</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>Store the result as <code>penguins_2</code>. If you cannot read a
+pipe aloud like this, it is probably doing too much at once.</p>
+</div>
 </section>
 <section id="pro-tip-save-to-the-right" class="slide level2">
 <h2><code>PRO TIP!</code> Save to the right</h2>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
-<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, bill_length_cm) <span class="ot">-&gt;</span> penguins_2</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">&quot;Gentoo&quot;</span> <span class="sc">|</span> species <span class="sc">==</span> <span class="st">&quot;Chinstrap&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bill_length_cm =</span> bill_length_mm <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, bill_length_cm) <span class="ot">-&gt;</span> penguins_2</span></code></pre></div>
 <p>Same output as the previous slide. The code now reads top to bottom
 in the order things happen.</p>
 </section>
@@ -1968,11 +2079,11 @@ loaded with the tidyverse (since 2014)</li>
 <section id="from-wrangling-to-plotting" class="slide level2">
 <h2>From wrangling to plotting</h2>
 <p>The output of a pipe can go straight into <code>{ggplot2}</code></p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span></span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter_out</span>(<span class="fu">is.na</span>(sex)) <span class="sc">|&gt;</span></span>
-<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">colour =</span> species)) <span class="sc">+</span></span>
-<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Flipper length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Body mass (g)&quot;</span>, <span class="at">colour =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter_out</span>(<span class="fu">is.na</span>(sex)) <span class="sc">|&gt;</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">colour =</span> species)) <span class="sc">+</span></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Flipper length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Body mass (g)&quot;</span>, <span class="at">colour =</span> <span class="cn">NULL</span>)</span></code></pre></div>
 <div class="fragment">
 <p>Note: <code>{ggplot2}</code> layers are added with <code>+</code>,
 not <code>|&gt;</code>. More next class.</p>

@@ -1062,10 +1062,8 @@ statistic</li>
 </section>
 <section id="so-far" class="slide level2">
 <h2>So far</h2>
-<p>Lectures 3 to 8: describing the data we have.</p>
-<ul>
-<li class="fragment">Means, SDs, slopes, differences between groups</li>
-</ul>
+<p>Lectures 3 to 8 described the data we have: means, SDs, slopes,
+differences between groups.</p>
 <div class="fragment">
 <p>But we never care about these 120 vowels. We care about vowels before
 voiced consonants in general.</p>
@@ -1076,18 +1074,40 @@ voiced consonants in general.</p>
 </section>
 <section id="samples-and-populations" class="slide level2">
 <h2>Samples and populations</h2>
-<ul>
-<li class="fragment"><strong>Population</strong>: everything we want to
-draw conclusions about: all speakers of a language, all tokens of a
-vowel</li>
-<li class="fragment"><strong>Sample</strong>: the part of it we actually
-measured</li>
-<li class="fragment"><strong>Parameter</strong>: a number describing the
-population, e.g. its mean <code>μ</code>. Usually unknown.</li>
-<li class="fragment"><strong>Statistic</strong>: the same number
-computed from the sample, e.g. <span style="text-decoration: overline;">x</span>. Our estimate of the
-parameter.</li>
-</ul>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Population</th>
+<th style="text-align: left;">Sample</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">What it is</td>
+<td style="text-align: left;">everything we want to draw conclusions
+about: all speakers of a language, all tokens of a vowel</td>
+<td style="text-align: left;">the part of it we actually measured</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Its mean</td>
+<td style="text-align: left;">a <span class="hl">parameter</span>,
+written <code>μ</code>, usually unknown</td>
+<td style="text-align: left;">a <span class="hl">statistic</span>,
+written <span style="text-decoration: overline;">x</span>, which we can
+compute</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>We use the statistic as our estimate of the parameter. Today is about
+how good that estimate is.</p>
+</div>
 </section>
 <section id="a-population-we-know" class="slide level2">
 <h2>A population we know</h2>
@@ -1140,8 +1160,8 @@ their muscles.</p>
 <p>A difference of about 38 ms. Big or small?</p>
 </div>
 <div class="fragment">
-<p>It depends on how much durations vary anyway. 38 ms is huge if tokens
-vary by 5 ms, and tiny if they vary by 200 ms.</p>
+<p>That depends on how much durations vary anyway. The same difference
+is huge if tokens vary by 5 ms, and tiny if they vary by 200 ms.</p>
 </div>
 </section>
 <section id="cohens-d" class="slide level2">
@@ -1253,13 +1273,10 @@ the long run, 95% of intervals contain it.</p>
 </section>
 <section id="what-a-confidence-interval-means" class="slide level2">
 <h2>What a confidence interval means</h2>
-<ul>
-<li class="fragment">The procedure captures the true value in 95% of
-samples, and the interval is a range of values compatible with the
-data</li>
-<li class="fragment">Narrow interval: a precise estimate. Wide interval:
-an imprecise one</li>
-</ul>
+<p>The procedure captures the true value in 95% of samples. Each
+interval is a range of values that are compatible with the data: narrow
+intervals come from precise estimates, wide ones from imprecise
+estimates.</p>
 <div class="fragment">
 <p>It does not mean “there is a 95% probability that the true value lies
 in this particular interval”. The true value is fixed, while the
@@ -1279,10 +1296,10 @@ milk from two patches of fur on their mother’s belly.</p>
 <section id="null-and-alternative-hypotheses" class="slide level2">
 <h2>Null and alternative hypotheses</h2>
 <ul>
-<li class="fragment"><strong>Null hypothesis</strong>, H₀: there is no
-difference: μ_voiced = μ_voiceless</li>
-<li class="fragment"><strong>Alternative hypothesis</strong>, H₁: there
-is a difference: μ_voiced ≠ μ_voiceless</li>
+<li class="fragment">The <span class="hl">null hypothesis</span> H₀ says
+there is no difference: μ_voiced = μ_voiceless</li>
+<li class="fragment">The alternative hypothesis H₁ says there is one:
+μ_voiced ≠ μ_voiceless</li>
 </ul>
 <div class="fragment">
 <p>Significance testing asks: how compatible are our data with H₀?</p>
@@ -1492,6 +1509,19 @@ The p-value mixes effect size and sample size.</p>
 <p>Always report the <span class="hl">effect size</span> and its <span class="hl">confidence interval</span> alongside p.</p>
 </div>
 </section>
+<section id="discussion" class="slide level2">
+<h2>Discussion</h2>
+<p>Study A tests a pronunciation training with 3,000 learners: ratings
+improve by 0.1 points on a 7-point scale, p &lt; .001. Study B tests a
+different training with 12 learners: ratings improve by 1.2 points, p =
+.09.</p>
+<ul>
+<li class="fragment">Which result is more convincing? Which training
+would you try in your own class?</li>
+<li class="fragment">What would you want to know about each study before
+deciding?</li>
+</ul>
+</section>
 <section id="t-tests-are-linear-models" class="slide level2">
 <h2>t-tests are linear models</h2>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(<span class="fu">lm</span>(duration <span class="sc">~</span> voicing, <span class="at">data =</span> vowels))</span></code></pre></div>
@@ -1589,8 +1619,9 @@ attr(,&quot;conf.level&quot;)
 <div class="fragment">
 <p>Flipper length differs clearly; body mass does not reach
 significance. But a non-significant result is not evidence of no
-difference: the CI for body mass still includes differences of over 100
-g.</p>
+difference: the CI for body mass runs from -150 to 86 g. The data are
+compatible with no difference, but just as compatible with differences
+of that size.</p>
 </div>
 </section>
 <section id="summary" class="slide level2">
@@ -1598,12 +1629,11 @@ g.</p>
 <div class="takeaway">
 <ul>
 <li class="fragment">We estimate population <span class="hl">parameters</span> from sample <span class="hl">statistics</span></li>
-<li class="fragment"><span class="hl">Cohen’s d</span>: a difference in
-SD units</li>
-<li class="fragment"><code>SE = SD / √n</code>: how much an estimate
-varies across samples</li>
-<li class="fragment"><span class="hl">95% CI</span>: a range of values
-compatible with the data</li>
+<li class="fragment"><span class="hl">Cohen’s d</span> expresses a
+difference in SD units</li>
+<li class="fragment">The SE (<code>SD / √n</code>) says how much an
+estimate varies across samples, and a <span class="hl">95% CI</span>
+gives the values compatible with the data</li>
 <li class="fragment"><code>t</code> = difference / SE; <code>p</code> =
 how surprising t would be if H₀ were true</li>
 <li class="fragment">Significant ≠ large ≠ important: report <span class="hl">effect sizes</span> and <span class="hl">CIs</span></li>

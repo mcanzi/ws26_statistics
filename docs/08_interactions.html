@@ -1079,15 +1079,23 @@ on the value of another. The lines are no longer parallel.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">*</span> group)            <span class="co"># is the same as</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">+</span> group <span class="sc">+</span> x<span class="sc">:</span>group)</span></code></pre></div>
 <div class="fragment">
-<ul>
-<li class="fragment"><code>x</code> and <code>group</code>: the
-<strong>main effects</strong> (better: <span class="hl">simple
-effects</span>, see below)</li>
-<li class="fragment"><code>x:group</code>: the <strong>interaction
-term</strong>, how much the effect of <code>x</code> changes with
-<code>group</code></li>
-</ul>
+<p><code>x</code> and <code>group</code> are often called the main
+effects, although with an interaction they are really <span class="hl">simple effects</span> (more below). <code>x:group</code> is
+the interaction term: how much the effect of <code>x</code> changes from
+one group to the other.</p>
 </div>
+</section>
+<section id="discussion" class="slide level2">
+<h2>Discussion</h2>
+<p>Interactions are common in linguistics: a frequency effect can be
+larger for L2 speakers, or a vowel can lengthen more before voiced
+consonants in one dialect than in another.</p>
+<ul>
+<li class="fragment">Think of a study in your own field where the effect
+of one variable could depend on another.</li>
+<li class="fragment">Sketch the plot you would expect with an
+interaction, and without one.</li>
+</ul>
 </section></section>
 <section>
 <section id="categorical-continuous" class="title-slide slide level1">
@@ -1136,14 +1144,36 @@ per log unit, against −25 ms for L1 speakers.</p>
 <pre class="r-output"><code>     (Intercept)         log_freq          groupL2 log_freq:groupL2 
        711.46630        -27.05222        201.53411        -31.43419 </code></pre>
 <div class="fragment">
-<ul>
-<li class="fragment"><code>log_freq</code>: the frequency slope for the
-reference group, L1</li>
-<li class="fragment"><code>groupL2</code>: the difference between L2 and
-L1 <code>when log_freq = 0</code></li>
-<li class="fragment"><code>log_freq:groupL2</code>: how much steeper the
-slope is for L2</li>
-</ul>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Coefficient</th>
+<th style="text-align: left;">What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>(Intercept)</code></td>
+<td style="text-align: left;">the L1 reaction time at
+<code>log_freq = 0</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>log_freq</code></td>
+<td style="text-align: left;">the frequency slope for the reference
+group, L1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>groupL2</code></td>
+<td style="text-align: left;">the L2 minus L1 difference, at
+<code>log_freq = 0</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>log_freq:groupL2</code></td>
+<td style="text-align: left;">how much steeper the frequency slope is
+for L2</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="fragment">
 <p>L2 slope = -27.1 + (-31.4) = -58.5 ms per log unit.</p>
@@ -1173,11 +1203,9 @@ its reference level).</p>
 log_freq_c:groupL2 
          -31.43419 </code></pre>
 <div class="fragment">
-<ul>
-<li class="fragment"><code>groupL2</code>: now the L1–L2 difference for
-a word of average frequency</li>
-<li class="fragment">The slope and the interaction do not change</li>
-</ul>
+<p><code>groupL2</code> is now the L1–L2 difference for a word of
+average frequency, which is what most readers expect it to mean. The
+slope and the interaction do not change.</p>
 </div>
 </section>
 <section id="did-the-interaction-help" class="slide level2">
@@ -1314,12 +1342,10 @@ coefficients mean something different</li>
 </section>
 <section id="which-coding" class="slide level2">
 <h2>Which coding?</h2>
-<ul>
-<li class="fragment"><strong>Treatment</strong> coding: each effect is
-relative to the reference level of the other predictor</li>
-<li class="fragment"><strong>Sum</strong> coding: each effect is the
-average across the levels of the other predictor</li>
-</ul>
+<p>With treatment coding, each effect describes the reference level of
+the other predictor: the voicing effect in casual speech. With sum
+coding, each effect is averaged over the levels of the other predictor:
+the voicing effect across both styles.</p>
 <div class="fragment">
 <p>With interactions, always check which coding you used before
 interpreting a “main effect”.</p>
@@ -1382,7 +1408,12 @@ lines now fan out.</p>
 <section>
 <section id="higher-order-interactions" class="title-slide slide level1">
 <h1>Higher-order interactions</h1>
-
+<div class="fact">
+<p><code>Did you know:</code> in Niassa National Reserve, Mozambique,
+<span class="hl">75%</span> of the bees’ nests that Yao honey hunters
+found were found with the help of a honeyguide.</p>
+<p><em>Source: Spottiswoode, Begg &amp; Begg (2016), Science</em></p>
+</div>
 </section>
 <section id="three-way-interactions" class="slide level2">
 <h2>Three-way interactions</h2>
@@ -1390,12 +1421,13 @@ lines now fan out.</p>
 <div class="fragment">
 <p>expands to 7 coefficients beyond the intercept:</p>
 <ul>
-<li class="fragment">three main (simple) effects: <code>a</code>,
-<code>b</code>, <code>c</code></li>
+<li class="fragment">three simple effects: <code>a</code>,
+<code>b</code> and <code>c</code></li>
 <li class="fragment">three two-way interactions: <code>a:b</code>,
-<code>a:c</code>, <code>b:c</code></li>
-<li class="fragment">one three-way interaction: <code>a:b:c</code>, “the
-interaction between a and b depends on c”</li>
+<code>a:c</code> and <code>b:c</code></li>
+<li class="fragment">and the three-way interaction <code>a:b:c</code>:
+the interaction between <code>a</code> and <code>b</code> changes with
+<code>c</code></li>
 </ul>
 </div>
 <div class="fragment">
