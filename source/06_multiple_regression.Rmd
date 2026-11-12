@@ -65,8 +65,7 @@ _Sources: Born Free Foundation; National Geographic_
 
 ## So far
 
-- Lectures 4 and 5: one outcome with one predictor (`y ~ x`), and centering and standardising predictors
-- And a warning: with the penguins, ignoring species reversed a slope
+In lectures 4 and 5, every model had one predictor (`y ~ x`). We also saw a warning: with the penguins, leaving out species reversed a slope.
 
 . . .
 
@@ -153,9 +152,8 @@ _Sources: National Geographic; Born Free Foundation_
 
 <div class="formula">y = b₀ + b₁ · x₁ + b₂ · x₂ + e</div>
 
-- `b₀`: the predicted `y` when `x₁ = 0` and `x₂ = 0`
-- `b₁`: the change in `y` when `x₁` increases by 1, [holding x₂ constant]{.hl}
-- `b₂`: the change in `y` when `x₂` increases by 1, [holding x₁ constant]{.hl}
+- The intercept `b₀` is the predicted `y` when both predictors are 0
+- Each slope is the change in `y` when its predictor goes up by 1 [while the other stays the same]{.hl}
 
 . . .
 
@@ -280,7 +278,7 @@ coef(m)[-1]
 
 . . .
 
-−29 per log unit of frequency or +15 per letter? The units differ, so the numbers cannot be compared directly.
+`r round(coef(m)["log_freq"])` ms per log unit of frequency, or `r round(coef(m)["length"])` ms per letter? The units differ, so the numbers cannot be compared directly.
 
 . . .
 
@@ -415,8 +413,26 @@ tidy(lm(rt ~ log_freq + length + syllables, data = words))[, 1:3]
 
 . . .
 
-- The standard error of length grows: its estimate becomes less precise
-- Syllables gets a coefficient, even though in our simulation it has no effect, while the overall fit barely changes
+Adding syllables makes the estimate for length less precise: its standard error grows. Syllables also gets a coefficient of its own, although in our simulation it has no effect, while the overall fit barely changes.
+
+## Collinearity, visually
+
+```{r, echo = FALSE, fig.height = 3.6}
+bind_rows(`Without syllables` = tidy(lm(rt ~ log_freq + length, data = words)),
+          `With syllables` = tidy(lm(rt ~ log_freq + length + syllables, data = words)), .id = "model") |>
+  filter(term %in% c("length", "syllables")) |>
+  mutate(model = fct_inorder(model)) |>
+  ggplot(aes(x = estimate, y = term, colour = model)) +
+  geom_vline(xintercept = 0, colour = muted, linetype = "dashed") +
+  geom_vline(xintercept = 14, colour = hornbill, linetype = "dotted") +
+  geom_pointrange(aes(xmin = estimate - 2 * std.error, xmax = estimate + 2 * std.error),
+                  position = position_dodge(width = 0.5), linewidth = 1.1, size = 0.6) +
+  scale_colour_manual(values = c(kingfisher, orchid)) +
+  labs(x = "Estimate ± 2 SE (ms)", y = NULL, colour = NULL) +
+  theme(legend.position = "right")
+```
+
+The dotted line is the true effect of length (14 ms per letter). With syllables in the model, both intervals are much wider: the model cannot tell the two overlapping predictors apart.
 
 ## Measuring collinearity: VIF {.smaller}
 
