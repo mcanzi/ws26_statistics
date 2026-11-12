@@ -181,8 +181,7 @@ The residuals of one participant are mostly positive or mostly negative. Knowing
 
 ## Two sources of non-independence
 
-- __Participants__: some are faster, some show bigger effects
-- __Items__ (here, words): some words are harder than others, for everyone
+Participants differ: some are faster than others, and some show bigger effects. Items differ too: some words are harder than others, for everyone.
 
 . . .
 
@@ -374,10 +373,12 @@ VarCorr(m_full)
 
 . . .
 
-- __participant (Intercept)__: participants' average RTs vary with an SD of about `r round(attr(VarCorr(m_full)$participant, "stddev")[1])` ms
-- __participant freq_c__: their frequency slopes vary with an SD of about `r round(attr(VarCorr(m_full)$participant, "stddev")[2])` ms per log unit
-- __word (Intercept)__: words vary in difficulty with an SD of about `r round(attr(VarCorr(m_full)$word, "stddev")[1])` ms
-- __Residual__: what is left, trial by trial
+| Row | Varies with an SD of about |
+|:--|:--|
+| `participant (Intercept)` | `r round(attr(VarCorr(m_full)$participant, "stddev")[1])` ms: participants' average RTs |
+| `participant freq_c` | `r round(attr(VarCorr(m_full)$participant, "stddev")[2])` ms per log unit: their frequency slopes |
+| `word (Intercept)` | `r round(attr(VarCorr(m_full)$word, "stddev")[1])` ms: how hard the words are |
+| `Residual` | `r round(sigma(m_full))` ms: what is left, trial by trial |
 
 ## What an SD of 18 means
 
@@ -431,9 +432,7 @@ library(lme4)
 lmer(rt ~ freq_c + (1 + freq_c | participant) + (1 | word), data = lexdec)
 ```
 
-- `rt ~ freq_c`: the fixed effects, exactly as in `lm()`
-- `(1 + freq_c | participant)`: each participant has their own intercept and frequency slope
-- `(1 | word)`: each word has its own intercept
+The fixed effects, `rt ~ freq_c`, are written exactly as in `lm()`. Then each participant gets their own intercept and frequency slope, and each word its own intercept.
 
 . . .
 

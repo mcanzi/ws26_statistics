@@ -206,9 +206,11 @@ The intercept is now the predicted flipper length of a 4 kg penguin.
 
 In linguistic data:
 
-- `age - 18`: the intercept describes an 18-year-old speaker
-- `year - 2000`: the intercept describes the year 2000
-- `trial - 1`: the intercept describes the first trial
+| Centred predictor | The intercept describes |
+|:--|:--|
+| `age - 18` | an 18-year-old speaker |
+| `year - 2000` | the year 2000 |
+| `trial - 1` | the first trial |
 
 ## Standardising
 
@@ -648,10 +650,12 @@ The log is not a cure-all. Report which variables you transformed and why, and i
 
 "Normalising" is used for several different operations:
 
-- [z-scoring]{.hl}: subtract the mean, divide by the SD
-- [min-max scaling]{.hl}: squeeze values into the range 0 to 1
-- transforming a variable so its distribution looks more normal, e.g. with a log
-- [speaker normalisation]{.hl} in phonetics, e.g. Lobanov
+| What people mean | What it does |
+|:--|:--|
+| [z-scoring]{.hl} | subtracts the mean and divides by the SD |
+| min-max scaling | squeezes values into the range 0 to 1 |
+| a normalising transformation | makes a distribution look more normal, e.g. a log |
+| speaker normalisation | removes vocal tract differences in phonetics, e.g. Lobanov |
 
 . . .
 

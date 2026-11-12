@@ -136,8 +136,7 @@ _Source: Smithsonian Magazine_
 
 ## Which random effects?
 
-- `speaker`: every speaker produces voiced and voiceless words, so voicing varies within speakers: `(1 + voicing | speaker)`
-- `word`: each word is either voiced or voiceless, so voicing does not vary within words: `(1 | word)`
+Every speaker produces both voiced and voiceless words, so voicing varies within speakers and can get a slope: `(1 + voicing | speaker)`. Each word is either voiced or voiceless, so words get only an intercept: `(1 | word)`.
 
 . . .
 
@@ -389,8 +388,7 @@ _Source: RNZ_
 
 There is no single R². Nakagawa and Schielzeth (2013) distinguish:
 
-- __Marginal R²__: variance explained by the fixed effects alone
-- __Conditional R²__: variance explained by fixed and random effects
+[Marginal R²]{.hl} is the variance explained by the fixed effects alone. Conditional R² also counts what the random effects explain.
 
 . . .
 

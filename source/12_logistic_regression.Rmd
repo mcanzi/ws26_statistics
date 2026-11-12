@@ -169,8 +169,7 @@ Winter (2019, section 12.2): think about the process that generates each data po
 
 . . .
 
-- Normal: each value is a mean plus normally distributed noise, with some SD
-- __Bernoulli__: each response is a [weighted coin]{.hl}. It comes up 1 with probability `p`, and 0 otherwise
+In a normal model, each value is a mean plus some normally distributed noise. In a [Bernoulli]{.hl} model, each response is a weighted coin that comes up 1 with probability `p` and 0 otherwise.
 
 . . .
 

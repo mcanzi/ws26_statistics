@@ -396,9 +396,7 @@ coef(lm(duration ~ style, data = styles))
 
 . . .
 
-- Intercept: the [grand mean]{.hl} of the three styles
-- `style1`: casual's deviation from it; `style2`: clear's deviation
-- Loud's deviation is not shown: it is minus the sum of the other two
+The intercept is now the [grand mean]{.hl} of the three styles. `style1` is casual's deviation from it and `style2` is clear's. Loud's deviation is not shown, because it is minus the sum of the other two.
 
 ## Model fit and assumptions {.smaller}
 
@@ -445,7 +443,7 @@ coef(m_bills)
 
 . . .
 
-The bill depth slope turns positive: Simpson's paradox, solved.
+With species in the model, the bill depth slope turns positive, as it is within each species.
 
 ## Three parallel lines
 
@@ -467,9 +465,11 @@ tidy(m_bills)[, 1:2]
 
 . . .
 
-- `bill_depth_mm`: `+` `r round(coef(m_bills)["bill_depth_mm"], 2)` mm of length per mm of depth, within a species
-- `speciesChinstrap`: Chinstrap bills are `r round(coef(m_bills)["speciesChinstrap"], 1)` mm longer than Adelie bills of the same depth
-- `speciesGentoo`: Gentoo, `r round(coef(m_bills)["speciesGentoo"], 1)` mm longer than Adelie
+| Coefficient | Meaning |
+|:--|:--|
+| `bill_depth_mm` | `r round(coef(m_bills)["bill_depth_mm"], 2)` mm of length per mm of depth, within a species |
+| `speciesChinstrap` | Chinstrap bills are `r round(coef(m_bills)["speciesChinstrap"], 1)` mm longer than Adelie bills of the same depth |
+| `speciesGentoo` | Gentoo bills, `r round(coef(m_bills)["speciesGentoo"], 1)` mm longer |
 
 ## Other coding schemes
 
@@ -525,8 +525,7 @@ Males are about `r round(coef(lm(body_mass_g ~ sex + flipper_length_mm, data = p
 
 ::: {.takeaway}
 - R stores categories as [factors]{.hl}; the first level is the reference
-- [Treatment coding]{.hl}: intercept = reference mean, coefficients = differences from it
-- [Sum coding]{.hl}: intercept = grand mean, coefficients = deviations from it
+- [Treatment coding]{.hl} compares each level with the reference; sum coding compares each with the grand mean
 - `k` levels → `k − 1` coefficients; change the reference to see other comparisons
 - Categorical and continuous predictors can be combined: one slope, several intercepts
 :::

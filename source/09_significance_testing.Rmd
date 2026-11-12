@@ -576,9 +576,8 @@ Flipper length differs clearly; body mass does not reach significance. But a non
 
 ::: {.takeaway}
 - We estimate population [parameters]{.hl} from sample [statistics]{.hl}
-- [Cohen's d]{.hl}: a difference in SD units
-- `SE = SD / √n`: how much an estimate varies across samples
-- [95% CI]{.hl}: a range of values compatible with the data
+- [Cohen's d]{.hl} expresses a difference in SD units
+- The SE (`SD / √n`) says how much an estimate varies across samples, and a [95% CI]{.hl} gives the values compatible with the data
 - `t` = difference / SE; `p` = how surprising t would be if H₀ were true
 - Significant ≠ large ≠ important: report [effect sizes]{.hl} and [CIs]{.hl}
 :::
