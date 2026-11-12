@@ -128,16 +128,16 @@ Both give the same answer; the tidyverse version reads more like a sentence.
 
 ## The typical workflow {.smaller}
 
-::: {style="text-align:center; font-size:1.1em;"}
-[import]{.hl} → [tidy]{.hl} → [transform]{.hl} → [visualise]{.hl} → [model]{.hl} → [communicate]{.hl}
-:::
+Almost every analysis goes through the same steps, and each has its own tools:
 
-- [import]{.hl}: `{readr}`
-- [tidy]{.hl}: `{tidyr}`
-- [transform]{.hl}: `{dplyr}` (today)
-- [visualise]{.hl}: `{ggplot2}` (next class)
-- [model]{.hl}: the rest of this course
-- [communicate]{.hl}: Quarto
+| Import | Tidy | Transform | Visualise | Model | Communicate |
+|:--|:--|:--|:--|:--|:--|
+| `{readr}` | `{tidyr}` | `{dplyr}` | `{ggplot2}` | `lm()` and friends | Quarto, R Markdown |
+| today | today | [today]{.hl} | next class | lectures 4–13 | your assignment |
+
+. . .
+
+The steps are not a straight line: plotting often sends you back to transform, and a model often sends you back to plot.
 
 ## Tidy data {.smaller}
 
@@ -181,6 +181,21 @@ You record 20 speakers reading the same 30 words, and measure F1, F2 and the dur
 
 - What is one row in your tidy data set? Which columns do you need?
 - Where would information about the speakers, such as age or dialect, go?
+
+## From wide to long {.smaller}
+
+`pivot_longer()` from `{tidyr}` turns the wide table into a tidy one:
+
+```{r}
+wide <- tibble(participant = c("P01", "P02"), rt_high = c(580, 611), rt_low = c(642, 690))
+wide |>
+  pivot_longer(c(rt_high, rt_low), names_to = "frequency", values_to = "rt",
+               names_prefix = "rt_")
+```
+
+. . .
+
+`pivot_wider()` goes the other way, which is sometimes handy for tables in a paper.
 
 ## Tibbles
 
@@ -237,15 +252,13 @@ In this course we always load `{palmerpenguins}` first. If you get `object 'bill
 
 ## Reading and writing files {.smaller}
 
-::: {.fragment .fade-up}
-We use `{readr}` primarily to
-:::
-
-- `read_csv()`: read comma separated files
-- `read_tsv()`: read tab separated files
-- `read_csv2()`: semicolon separated, with decimal commas (German Excel exports)
-- `read_delim()`: any other separator
-- `write_csv()`: save a data frame as .csv
+| Function | For files that look like |
+|:--|:--|
+| `read_csv()` | `word,rt` with commas between values |
+| `read_tsv()` | values separated by tabs |
+| `read_csv2()` | `word;rt` with semicolons and decimal commas, as in German Excel exports |
+| `read_delim()` | any other separator |
+| `write_csv()` | saves a data frame as a .csv file |
 
 . . .
 
@@ -342,9 +355,7 @@ nrow(gentoo)
 
 ## `select()`
 
-::: {.fragment .fade-up}
-Choose columns to keep / drop
-:::
+Keep the columns you name:
 
 ```{r}
 select(penguins, species, bill_length_mm)
@@ -409,9 +420,7 @@ select(penguins, Type = species, bill_length_mm)
 
 ## `mutate()` {.smaller}
 
-::: {.fragment .fade-up}
-Create new columns, or overwrite existing ones
-:::
+Create new columns, or overwrite existing ones:
 
 ```{r}
 penguins_2 <- mutate(penguins,
@@ -479,9 +488,7 @@ mutate(penguins, across(ends_with("_mm"), \(x) x / 10))  # mm to cm
 
 ## `filter()`
 
-::: {.fragment .fade-up}
-Keep the rows where a condition is `TRUE`
-:::
+Keep the rows where a condition is `TRUE`:
 
 ```{r}
 filter(penguins, species == "Gentoo")
@@ -701,14 +708,16 @@ penguins_2
 
 ## Reading a pipe aloud
 
-```{r, eval=FALSE}
-penguins_2 <- penguins |>
-  filter(species == "Gentoo" | species == "Chinstrap") |>
-  mutate(bill_length_cm = bill_length_mm / 10) |>
-  select(species, bill_length_cm)
-```
+| Code | Read it as |
+|:--|:--|
+| `penguins_2 <- penguins \|>` | Take `penguins`, then |
+| `filter(species == "Gentoo" \| species == "Chinstrap") \|>` | keep only Gentoo and Chinstrap penguins, then |
+| `mutate(bill_length_cm = bill_length_mm / 10) \|>` | add bill length in cm, then |
+| `select(species, bill_length_cm)` | keep only these two columns. |
 
-Take `penguins`, then `filter` only the `species` Gentoo or Chinstrap, then `mutate` to add a column `bill_length_cm` which divides `bill_length_mm` by 10, then `select` only `species` and `bill_length_cm`. Save the result as `penguins_2`.
+. . .
+
+Store the result as `penguins_2`. If you cannot read a pipe aloud like this, it is probably doing too much at once.
 
 ## `PRO TIP!` Save to the right
 
