@@ -26,6 +26,19 @@ Knit `source/render_all.Rmd` to render every lecture into `docs`, which GitHub P
 
 Requires `tidyverse`, `revealjs`, `palmerpenguins`, `broom`, `lme4`, `lmerTest`, `effsize` and `languageR`; optional: `qrcode` (QR codes), `ragg` and `systemfonts` (Atkinson Hyperlegible in the figures).
 
+## Tutorials
+
+Each tutorial is one file with its solutions, `source/tutorials/tutorial_03.Rmd` and so on, in which every solution sits in a `::: solution` block. Knit `source/render_tutorials.Rmd` to make two versions of each, both in `docs/tutorials`:
+
+- `tutorial_03.Rmd`: the exercise sheet for students, without the solutions and with an empty chunk where each piece of solution code was. It knits to a plain page with the `darkly` theme.
+- `tutorial_03.html`: slides in the lecture theme, one exercise at a time, each followed by its solution.
+
+`render_tutorials.Rmd` explains the rules (solution blocks, slide breaks, `{.smaller}`). The slides are online at mcanzi.de/ws26_statistics/tutorials/, and the teaching page of mcanzi.de links each one with its exercise sheet.
+
+| | Tutorial | Slides | Exercise sheet |
+|---|---|---|---|
+| 3 | Descriptive statistics | [tutorial_03.html](https://mcanzi.de/ws26_statistics/tutorials/tutorial_03.html) | [tutorial_03.Rmd](https://mcanzi.de/ws26_statistics/tutorials/tutorial_03.Rmd) |
+
 ## License
 
 Course materials © Massimiliano Canzi, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (see `LICENSE.md`). Code is licensed under the MIT License (see `LICENSE-CODE.md`). The fonts used in the slide theme (Atkinson Hyperlegible, Bricolage Grotesque, JetBrains Mono) are licensed under the SIL Open Font License 1.1 (see `source/fonts/OFL-*.txt`).

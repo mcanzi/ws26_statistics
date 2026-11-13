@@ -57,11 +57,12 @@ lecture_count <- length(list.files(pattern = "^[0-9]{2}_.*\\.Rmd$"))
 lecture_label <- sprintf('"lecture %s / %s"', substr(lecture_file, 1, 2), lecture_count)
 slides_url <- paste0("https://mcanzi.de/ws26_statistics/", lecture_file)
 
-qr_uri <- ""
-if (requireNamespace("qrcode", quietly = TRUE)) {
+qr_for <- function(url) {
+  if (!requireNamespace("qrcode", quietly = TRUE)) return("")
   qr_file <- tempfile(fileext = ".svg")
-  qrcode::generate_svg(qrcode::qr_code(slides_url), filename = qr_file,
+  qrcode::generate_svg(qrcode::qr_code(url), filename = qr_file,
                        foreground = qr_dark, background = qr_light, show = FALSE)
-  qr_uri <- xfun::base64_uri(qr_file)
+  xfun::base64_uri(qr_file)
 }
+qr_uri <- qr_for(slides_url)
 qr_css <- if (nzchar(qr_uri)) sprintf('url("%s")', qr_uri) else "none"
