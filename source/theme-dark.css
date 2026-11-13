@@ -324,6 +324,48 @@ body {
 .reveal .takeaway > :first-child { margin-top: 0; }
 .reveal .takeaway > :last-child { margin-bottom: 0; }
 
+/* ---- weekly assignment box (::: {.assignment} in the tutorials) ------ */
+/* like the take-home box, in moon yellow, on the section slide of the weekly assignment */
+
+.reveal .assignment {
+  position: relative;
+  margin: 0.6em auto 0;
+  max-width: 34em;
+  padding: 1.75em 1.15em 0.7em;
+  font-size: 0.8em;
+  text-align: left;
+  background: color-mix(in srgb, var(--understory) 88%, transparent);
+  border: 1px solid var(--vine);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.reveal .assignment::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 10px 10px 0 0;
+  background: var(--hornbill);
+}
+
+.reveal .assignment::after {
+  content: "> weekly assignment";
+  position: absolute;
+  top: 0.9em;
+  left: 1.95em;
+  font-family: "JetBrains Mono", Menlo, Consolas, monospace;
+  font-size: 0.58em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--hornbill);
+}
+
+.reveal .assignment > :first-child { margin-top: 0; }
+.reveal .assignment > :last-child { margin-bottom: 0; }
+
 /* ---- text --------------------------------------------------------- */
 
 /* emphasis, written [like this]{.hl} in the Rmd: a highlighter stroke,

@@ -1,6 +1,6 @@
 ---
-title: "Tutorial 3"
-subtitle: "Descriptive statistics"
+title: "Descriptive statistics"
+subtitle: "Tutorial 3"
 author: "Dr Massimiliano Canzi"
 output:
   html_document:
@@ -38,7 +38,7 @@ Some values are missing (`NA`). Keep that in mind: it matters for almost everyth
 
 `rnorm()` draws random numbers from a normal distribution. Draw 1000 values with a mean of 600 and a standard deviation of 80 (think of them as reaction times in ms), and save them into a tibble called `rt`.
 
-Run `set.seed(1)` first: it makes sure we all get the **same** random numbers.
+Run `set.seed(1)` first, so that everyone gets the same random numbers.
 
 ```{r}
 set.seed(1)
@@ -59,16 +59,17 @@ Plot the distribution of `value` with `geom_density()`.
 ::: solution
 
 ```{r}
-ggplot(rt, aes(x = value)) +
+rt %>%
+  ggplot(aes(x = value)) +
   geom_density(fill = "plum2", alpha = 0.5) +
-  labs(x = "Reaction time (ms)", y = "Density")
+  xlab("Reaction time (ms)") + ylab("Density")
 ```
 
 :::
 
 ### 1.3 Change the spread
 
-Draw another 1000 values with the **same** mean but `sd = 20`, and plot both distributions together. What changes, and what stays the same? Start with `set.seed(2)`.
+Draw another 1000 values with the same mean but `sd = 20`, and plot both distributions together. What changes, and what stays the same? Start with `set.seed(2)`.
 
 ```{r}
 set.seed(2)
@@ -88,12 +89,13 @@ rt2 <- bind_rows(
 ::: solution
 
 ```{r}
-ggplot(rt2, aes(x = value, fill = sd)) +
+rt2 %>%
+  ggplot(aes(x = value, fill = sd)) +
   geom_density(alpha = 0.5) +
-  labs(x = "Reaction time (ms)", y = "Density")
+  xlab("Reaction time (ms)") + ylab("Density")
 ```
 
-Both distributions are centred on 600 ms; the one with the smaller SD is much narrower.
+Both distributions are centred on 600 ms, and the one with the smaller SD is much narrower.
 
 :::
 
@@ -111,22 +113,26 @@ Compute the mean of `flipper_length_mm`. First try it directly: what happens?
 mean(penguins$flipper_length_mm)
 ```
 
-`NA` means "unknown". The mean of numbers that include an unknown value is unknown.
+`NA` means "unknown", and the mean of numbers that include an unknown value is unknown too.
 
 :::
 
-There are two ways around it: remove the rows with missing values with `na.omit()` before taking the mean, or tell `mean()` to ignore them with `na.rm = TRUE`. Try both.
+There are two ways around it. You can remove the rows with missing values with `na.omit()`, pull out the column and take its mean, or you can tell `mean()` to ignore the missing values with `na.rm = TRUE`. Try both.
 
 ::: solution
 
 ```{r}
-mean(na.omit(penguins)$flipper_length_mm)
+penguins %>%
+  na.omit() %>%
+  pull(flipper_length_mm) %>%
+  mean()
+
 mean(penguins$flipper_length_mm, na.rm = TRUE)
 ```
 
 :::
 
-The two numbers are **not** the same. Why? *Hint*: compare the number of rows.
+The two numbers differ. Why? *Hint*: compare the number of rows.
 
 ::: {.solution .smaller}
 
@@ -136,7 +142,7 @@ nrow(na.omit(penguins))
 sum(is.na(penguins$flipper_length_mm))
 ```
 
-`na.omit()` removes every row with an `NA` in **any** column, including penguins whose flipper length we do know but whose `sex` is missing. `na.rm = TRUE` only ignores the `NA`s in the column we are summarising.
+`na.omit()` removes every row with an `NA` in any column, including penguins whose flipper length we know but whose `sex` is missing. `na.rm = TRUE` only ignores the `NA`s in the column we are summarising.
 
 :::
 
@@ -156,7 +162,7 @@ The median (`r median(penguins$flipper_length_mm, na.rm = TRUE)` mm) is smaller 
 
 ### 2.3 The mode
 
-The mode is the most frequent value, and it is used with categorical data. Here is the function from the lecture:
+The **mode** is the most frequent value, and we use it with categorical data. Here is the function from the lecture:
 
 ```{r}
 find_mode <- function(x) {
@@ -182,8 +188,8 @@ Check your answers with `count()`.
 ::: solution
 
 ```{r}
-count(penguins, island)
-count(penguins, species)
+penguins %>% count(island)
+penguins %>% count(species)
 ```
 
 :::
@@ -194,7 +200,7 @@ count(penguins, species)
 
 ### 3.1 Standard deviation, MAD and range
 
-For `body_mass_g`, compute the standard deviation, the median absolute deviation, and the range.
+For `body_mass_g`, compute the standard deviation, the median absolute deviation and the range.
 
 ::: solution
 
@@ -218,7 +224,7 @@ diff(range(penguins$body_mass_g, na.rm = TRUE))
 
 ### 3.2 Quantiles
 
-`quantile()` gives the quartiles by default: the minimum, the 25%, 50% and 75% points, and the maximum. Compute them for `body_mass_g`. Which of these numbers is the median?
+By default, `quantile()` gives the **quartiles**: the minimum, the 25%, 50% and 75% points, and the maximum. Compute them for `body_mass_g`. Which of these numbers is the median?
 
 ::: solution
 
@@ -238,7 +244,7 @@ Here are 10 reaction times from one participant:
 rts <- c(512, 548, 575, 590, 601, 615, 630, 644, 668, 702)
 ```
 
-Compute the mean, the median, the SD and the MAD. Then add one very slow trial (the participant got distracted: 3000 ms) and compute them again. Which measures change a lot, and which barely move?
+Compute the mean, the median, the SD and the MAD. Then add one very slow trial of 3000 ms (the participant got distracted) and compute them again. Which measures change a lot, and which barely move?
 
 ::: {.solution .smaller}
 
@@ -249,7 +255,7 @@ rts_slow <- c(rts, 3000)
 c(mean = mean(rts_slow), median = median(rts_slow), sd = sd(rts_slow), mad = mad(rts_slow))
 ```
 
-The mean and the SD are pulled up by a single trial. The median and the MAD are **robust**: they barely change.
+One slow trial pulls the mean and the SD up a lot, while the median and the MAD barely change: they are **robust**.
 
 :::
 
@@ -264,8 +270,8 @@ Compute the mean `body_mass_g` for each species, with `group_by()` and `summaris
 ::: solution
 
 ```{r}
-penguins |>
-  group_by(species) |>
+penguins %>%
+  group_by(species) %>%
   summarise(mean_mass = mean(body_mass_g, na.rm = TRUE),
             sd_mass = sd(body_mass_g, na.rm = TRUE),
             n = n())
@@ -280,14 +286,14 @@ Do the same with the `.by` argument instead of `group_by()`.
 ::: {.solution .smaller}
 
 ```{r}
-penguins |>
+penguins %>%
   summarise(mean_mass = mean(body_mass_g, na.rm = TRUE),
             sd_mass = sd(body_mass_g, na.rm = TRUE),
             n = n(),
             .by = species)
 ```
 
-The numbers are the same. Only the **order** of the rows may differ: `.by` keeps the groups in the order in which they first appear in the data.
+The numbers are the same, and the rows may come in a different order: `.by` keeps the groups in the order in which they first appear in the data.
 
 :::
 
@@ -298,8 +304,8 @@ Which island has the heaviest penguins on average? Sort the result from heaviest
 ::: solution
 
 ```{r}
-penguins |>
-  summarise(mean_mass = mean(body_mass_g, na.rm = TRUE), .by = island) |>
+penguins %>%
+  summarise(mean_mass = mean(body_mass_g, na.rm = TRUE), .by = island) %>%
   arrange(desc(mean_mass))
 ```
 
@@ -313,6 +319,6 @@ Is this a fair comparison between islands? *Hint*: run `count(penguins, island, 
 count(penguins, island, species)
 ```
 
-Only Biscoe has Gentoo penguins, the heaviest species. The difference between islands is mostly a difference between **species**.
+Only Biscoe has Gentoo penguins, the heaviest species, so most of the difference between the islands comes from the species that live there.
 
 :::

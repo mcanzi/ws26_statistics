@@ -28,16 +28,17 @@ Requires `tidyverse`, `revealjs`, `palmerpenguins`, `broom`, `lme4`, `lmerTest`,
 
 ## Tutorials
 
-Each tutorial is one file with its solutions, `source/tutorials/tutorial_03.Rmd` and so on, in which every solution sits in a `::: solution` block. Knit `source/render_tutorials.Rmd` to make two versions of each, both in `docs/tutorials`:
+Each tutorial is one file with its solutions in `source/tutorials`, named like its lecture (`03_descriptive_statistics.Rmd`). Every solution sits in a `::: solution` block, and the weekly assignment in a box. Knit `source/render_tutorials.Rmd` to make two versions of each tutorial in `docs/tutorials`:
 
-- `tutorial_03.Rmd`: the exercise sheet for students, without the solutions and with an empty chunk where each piece of solution code was. It knits to a plain page with the `darkly` theme.
-- `tutorial_03.html`: slides in the lecture theme, one exercise at a time, each followed by its solution.
+- `03_descriptive_statistics.Rmd`, the exercise sheet for students: the same file without the solutions, with an empty chunk where each piece of solution code was. It knits to a plain page with the `darkly` theme.
+- `03_descriptive_statistics.html`, the slides: the lecture theme, one exercise at a time, each followed by its solution.
 
-`render_tutorials.Rmd` explains the rules (solution blocks, slide breaks, `{.smaller}`). The slides are online at mcanzi.de/ws26_statistics/tutorials/, and the teaching page of mcanzi.de links each one with its exercise sheet.
+`render_tutorials.Rmd` explains how solution blocks and slide breaks work. The teaching page of mcanzi.de links each tutorial's slides and exercise sheet.
 
 | | Tutorial | Slides | Exercise sheet |
 |---|---|---|---|
-| 3 | Descriptive statistics | [tutorial_03.html](https://mcanzi.de/ws26_statistics/tutorials/tutorial_03.html) | [tutorial_03.Rmd](https://mcanzi.de/ws26_statistics/tutorials/tutorial_03.Rmd) |
+| 2 | Data wrangling | [02_data_wrangling.html](https://mcanzi.de/ws26_statistics/tutorials/02_data_wrangling.html) | [02_data_wrangling.Rmd](https://mcanzi.de/ws26_statistics/tutorials/02_data_wrangling.Rmd) |
+| 3 | Descriptive statistics | [03_descriptive_statistics.html](https://mcanzi.de/ws26_statistics/tutorials/03_descriptive_statistics.html) | [03_descriptive_statistics.Rmd](https://mcanzi.de/ws26_statistics/tutorials/03_descriptive_statistics.Rmd) |
 
 ## License
 
