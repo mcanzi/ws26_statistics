@@ -1138,14 +1138,14 @@ Levels: setosa versicolor virginica</code></pre>
 </section>
 <section id="the-pipe" class="slide level2">
 <h2>1.3 The pipe</h2>
-<p>The <strong>pipe</strong>, <code>%&gt;%</code>, reads as “and then”.
+<p>The <strong>pipe</strong>, <code>|&gt;</code>, reads as “and then”.
 Write the same step with the pipe: take <code>iris</code>, and then keep
 every flower that is not <code>setosa</code>. Save the result as
 <code>data_no_setosa_pipe</code>.</p>
 </section>
 <section id="solution-3" class="slide level2">
 <h2>1.3 Solution</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>data_no_setosa_pipe <span class="ot">&lt;-</span> iris <span class="sc">%&gt;%</span></span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>data_no_setosa_pipe <span class="ot">&lt;-</span> iris <span class="sc">|&gt;</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Species <span class="sc">!=</span> <span class="st">&quot;setosa&quot;</span>)</span></code></pre></div>
 </section>
 <section id="the-pipe-1" class="slide level2">
@@ -1154,8 +1154,8 @@ every flower that is not <code>setosa</code>. Save the result as
 also cleans the column names with <code>clean_names()</code>, which
 comes back in 2.2. After cleaning, <code>Species</code> is called
 <code>species</code>:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data_no_setosa_clean <span class="ot">&lt;-</span> iris <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">%&gt;%</span></span>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data_no_setosa_clean <span class="ot">&lt;-</span> iris <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">|&gt;</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">!=</span> <span class="st">&quot;setosa&quot;</span>)</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(data_no_setosa_clean)</span></code></pre></div>
@@ -1232,10 +1232,9 @@ width, with the values in mm.</p>
 </section>
 <section id="all-in-one-go" class="slide level2">
 <h2>3.2 All in one go</h2>
-<p>Repeat all the steps above in a single chain with
-<code>%&gt;%</code>: start from the <code>iris</code> data set, carry
-out every step from 1.1 to 3.1, and save the result as
-<code>data</code>.</p>
+<p>Repeat all the steps above in a single chain with <code>|&gt;</code>:
+start from the <code>iris</code> data set, carry out every step from 1.1
+to 3.1, and save the result as <code>data</code>.</p>
 <p><em>Hint</em>: think about the order of the steps. After
 <code>clean_names()</code>, the column names change.</p>
 </section>
