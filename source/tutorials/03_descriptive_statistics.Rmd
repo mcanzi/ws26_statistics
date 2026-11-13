@@ -59,7 +59,7 @@ Plot the distribution of `value` with `geom_density()`.
 ::: solution
 
 ```{r}
-rt %>%
+rt |>
   ggplot(aes(x = value)) +
   geom_density(fill = "plum2", alpha = 0.5) +
   xlab("Reaction time (ms)") + ylab("Density")
@@ -89,7 +89,7 @@ rt2 <- bind_rows(
 ::: solution
 
 ```{r}
-rt2 %>%
+rt2 |>
   ggplot(aes(x = value, fill = sd)) +
   geom_density(alpha = 0.5) +
   xlab("Reaction time (ms)") + ylab("Density")
@@ -122,9 +122,9 @@ There are two ways around it. You can remove the rows with missing values with `
 ::: solution
 
 ```{r}
-penguins %>%
-  na.omit() %>%
-  pull(flipper_length_mm) %>%
+penguins |>
+  na.omit() |>
+  pull(flipper_length_mm) |>
   mean()
 
 mean(penguins$flipper_length_mm, na.rm = TRUE)
@@ -188,8 +188,8 @@ Check your answers with `count()`.
 ::: solution
 
 ```{r}
-penguins %>% count(island)
-penguins %>% count(species)
+penguins |> count(island)
+penguins |> count(species)
 ```
 
 :::
@@ -270,8 +270,8 @@ Compute the mean `body_mass_g` for each species, with `group_by()` and `summaris
 ::: solution
 
 ```{r}
-penguins %>%
-  group_by(species) %>%
+penguins |>
+  group_by(species) |>
   summarise(mean_mass = mean(body_mass_g, na.rm = TRUE),
             sd_mass = sd(body_mass_g, na.rm = TRUE),
             n = n())
@@ -286,7 +286,7 @@ Do the same with the `.by` argument instead of `group_by()`.
 ::: {.solution .smaller}
 
 ```{r}
-penguins %>%
+penguins |>
   summarise(mean_mass = mean(body_mass_g, na.rm = TRUE),
             sd_mass = sd(body_mass_g, na.rm = TRUE),
             n = n(),
@@ -304,8 +304,8 @@ Which island has the heaviest penguins on average? Sort the result from heaviest
 ::: solution
 
 ```{r}
-penguins %>%
-  summarise(mean_mass = mean(body_mass_g, na.rm = TRUE), .by = island) %>%
+penguins |>
+  summarise(mean_mass = mean(body_mass_g, na.rm = TRUE), .by = island) |>
   arrange(desc(mean_mass))
 ```
 

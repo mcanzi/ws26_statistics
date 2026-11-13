@@ -10,6 +10,8 @@ Knit this file, or run its chunks, to make both versions of every tutorial in `t
 
 In a tutorial, everything inside a `::: solution` block counts as solution, text included. Everything else appears in both versions, including hints and code that students get, such as `set.seed()` or a helper function. A second `::: solution` block in the same exercise starts a new solution slide, and task text after a solution starts a new task slide. A solution slide gets smaller text with `::: {.solution .smaller}`. The weekly assignment sits in a box, `::: {.assignment .alert .alert-info}`: the `alert` classes draw it on the exercise sheet (darkly theme), `assignment` on the slides.
 
+Everything after the assignment box (or after a heading with "Weekly assignment" in it) is the weekly assignment, and a tutorial never contains its solutions, so the slides can be published at any time. If a `::: solution` block comes after that point, rendering stops with an error that names the tutorial.
+
 On the slides, `## 1. Distributions` becomes a section slide and `### 1.1 A normal distribution` a slide; a `##` part without exercises (`## Setup`) is an ordinary slide. Horizontal rules (`---`) only appear on the exercise sheet.
 
 The slides are rendered from a temporary file next to the lectures, because they need `slides_setup.R`, `theme-dark.css` and `fonts/`. Its name starts with `tutorial_`, so `render_all.Rmd` never takes it for a lecture, and it is deleted afterwards. Rendering stops at the first tutorial that fails, and the error names it.
@@ -228,10 +230,20 @@ slide_lines <- function(d, footer) {
 
 ## Making both versions
 
+`check_assignment()` stops if the weekly assignment contains a solution.
+
 ```{r make}
+check_assignment <- function(d, path) {
+  box <- which(!d$chunk & (grepl("^:::+ *\\{.*\\.assignment", d$line) | grepl("^#+ .*weekly assignment", d$line, ignore.case = TRUE)))
+  if (length(box) && any(d$sol[box[1]:nrow(d)] > 0)) {
+    stop(basename(path), ": the weekly assignment contains a solution. Tutorials never include solutions to the weekly assignment.", call. = FALSE)
+  }
+}
+
 make_tutorial <- function(path, out_dir) {
   tutor <- read_tutor(path)
   d <- classify(tutor$body)
+  check_assignment(d, path)
   rmd <- basename(path)
   html <- sub("\\.Rmd$", ".html", rmd)
   number <- sub("^Tutorial +", "", yaml_field(tutor$yaml, "subtitle"))

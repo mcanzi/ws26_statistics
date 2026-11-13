@@ -28,7 +28,7 @@ Requires `tidyverse`, `revealjs`, `palmerpenguins`, `broom`, `lme4`, `lmerTest`,
 
 ## Tutorials
 
-Each tutorial is one file with its solutions in `source/tutorials`, named like its lecture (`03_descriptive_statistics.Rmd`). Every solution sits in a `::: solution` block, and the weekly assignment in a box. Knit `source/render_tutorials.Rmd` to make two versions of each tutorial in `docs/tutorials`:
+Each tutorial is one file with its solutions in `source/tutorials`, named like its lecture (`03_descriptive_statistics.Rmd`). Every solution sits in a `::: solution` block, and the weekly assignment in a box. The weekly assignment never has solutions in these files (rendering stops if it finds one), so tutorials can be published at any time. Knit `source/render_tutorials.Rmd` to make two versions of each tutorial in `docs/tutorials`:
 
 - `03_descriptive_statistics.Rmd`, the exercise sheet for students: the same file without the solutions, with an empty chunk where each piece of solution code was. It knits to a plain page with the `darkly` theme.
 - `03_descriptive_statistics.html`, the slides: the lecture theme, one exercise at a time, each followed by its solution.
