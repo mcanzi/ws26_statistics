@@ -84,15 +84,18 @@ rt2 <- bind_rows(
 )
 ```
 
-:::
-
-::: solution
-
-```{r}
+```{r density-sd, eval = FALSE}
 rt2 |>
   ggplot(aes(x = value, fill = sd)) +
   geom_density(alpha = 0.5) +
   xlab("Reaction time (ms)") + ylab("Density")
+```
+
+:::
+
+::: solution
+
+```{r, ref.label = "density-sd", echo = FALSE}
 ```
 
 Both distributions are centred on 600 ms, and the one with the smaller SD is much narrower.
